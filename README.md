@@ -66,6 +66,32 @@ See [`verification/research_pipeline.md`](verification/research_pipeline.md) for
 
 ---
 
+## Rituals
+
+Two repeatable workflows run this template. Each is a single instruction block you paste to Claude — copy it verbatim and edit only the placeholders.
+
+### Spawning a new dossier
+
+Birth a new dossier from the template. Paste into the Code tab, editing the number and title:
+
+```
+Create a new public GitHub repo named dossier-NNN from my template repo m4gr4th34/open-dossier-template, and clone it into this folder. Use the gh CLI (gh repo create m4gr4th34/dossier-NNN --template m4gr4th34/open-dossier-template --public --clone); if gh isn't installed or authenticated, walk me through installing and logging in first. Then do the rename pass: in README.md, index.html, paper.html, dossier.html, CITATION.cff, and .zenodo.json, replace every "open-dossier-template" and "DOSSIER NNN"/"dossier-NNN" placeholder with dossier-NNN and the working title "[YOUR TITLE]", and set my name and affiliation (Irfan Ali-Khan, Independent Researcher, Saratoga, California) where the author placeholders are. Then enable GitHub Pages on the new repo from branch main, root folder, using gh api. Show me what changed, commit as "Initialize Dossier NNN from template", and push.
+```
+
+Two clicks remain that no tool can do for you, both one-time per dossier: the Zenodo toggle (zenodo.org → GitHub → flip the new repo on — do it at birth so the first release auto-DOIs) and, in Claude.ai, creating the matching Project with the repo synced into Files and the dispatcher instructions pasted. (Automating the Zenodo step via their API token is already on the tooling roadmap — a real v2 ticket.)
+
+### Syncing template improvements into an existing dossier
+
+Port the latest template improvements into an existing dossier. This is the subtle one, because a filled-in dossier and the template share machinery but not content, and a naive copy would bulldoze your paper. The instruction encodes that distinction:
+
+```
+In the dossier-NNN clone: fetch the latest m4gr4th34/open-dossier-template into a temporary folder and compare it against this repo. Apply template-side improvements to MACHINERY ONLY: everything in .github/workflows/, the format spec at verification/research_pipeline.md, the doctrine sections of CLAUDE.md (preserving this repo's "Standing context" section untouched), and any CSS/JavaScript machinery changes in index.html, paper.html, and dossier.html — but never touch this repo's content: section text, terms, citation chips and CITES entries, checks in verify_numbers.py, claim_ledger.csv rows, manuscript files, or anything in timestamps/. Show me the full diff of what you propose before committing. Then commit as "Port template machinery updates [date]" and push. If any machinery change conflicts with local content edits, stop and ask me instead of guessing.
+```
+
+The diff-before-commit and stop-on-conflict clauses are the safety rails — you stay the editor-in-chief of every port.
+
+---
+
 ## Originates from
 
 Dossier 001 — [m4gr4th34/dossier-001](https://github.com/m4gr4th34/dossier-001)
