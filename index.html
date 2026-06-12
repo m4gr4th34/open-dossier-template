@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOSSIER NNN — YOUR TITLE (Open Dossier)</title>
+<meta name="description" content="YOUR ONE-LINE DESCRIPTION. Every claim executable in your browser.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,800;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap');
+  :root{
+    --ink:#101d26;--ink2:#42525c;--paper:#f6f8f9;--card:#ffffff;
+    --teal:#0e7c7b;--coral:#e4572e;--violet:#6b4e9b;
+    --pass:#1e8e5a;--fail:#c9362c;--line:#d8e0e4;
+    --serif:'Spectral',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+  a{color:var(--teal)}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header{padding:54px 0 26px;border-bottom:3px solid var(--ink)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+  .eyebrow b{color:var(--coral)}
+  h1{font-family:var(--serif);font-weight:800;font-size:clamp(27px,4.6vw,44px);line-height:1.12;margin:.4em 0 .25em;letter-spacing:-.01em}
+  .byline{font-family:var(--serif);font-style:italic;color:var(--ink2)}
+  .abstract{font-family:var(--serif);font-size:17.5px;max-width:70ch;margin-top:18px}
+  .abstract b{color:var(--teal)}
+  .cta{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 4px}
+  .btn{font-family:var(--mono);font-size:13.5px;font-weight:600;text-decoration:none;padding:11px 16px;border:1.5px solid var(--ink);color:var(--ink);background:var(--card)}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  section{padding:40px 0 8px}
+  h2{font-family:var(--serif);font-weight:600;font-size:26px;margin:0 0 4px}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+  .kicker.teal{color:var(--teal)}.kicker.coral{color:var(--coral)}.kicker.violet{color:var(--violet)}
+  p.lede{color:var(--ink2);max-width:66ch;margin-top:6px}
+
+  /* verification console */
+  .console{background:var(--card);border:1.5px solid var(--ink);margin-top:18px}
+  .console-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .console-head .label{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+  button#run{font-family:var(--mono);font-size:14px;font-weight:600;background:var(--teal);color:#fff;border:none;padding:10px 18px;cursor:pointer}
+  button#run:hover{background:#0a615f}
+  button#run[disabled]{background:var(--ink2);cursor:default}
+  #log{font-family:var(--mono);font-size:13px;padding:10px 16px 14px;min-height:80px}
+  .row{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line);align-items:baseline}
+  .row:last-child{border-bottom:none}
+  .badge{flex:0 0 auto;font-weight:600;padding:1px 7px;font-size:11.5px}
+  .badge.p{color:var(--pass);border:1px solid var(--pass)}
+  .badge.f{color:var(--fail);border:1px solid var(--fail)}
+  .row .what{flex:1 1 auto;min-width:0}
+  .row .nums{flex:0 0 auto;color:var(--ink2)}
+  .tally{margin-top:10px;padding-top:10px;border-top:2px solid var(--ink);font-weight:600}
+
+  /* concept cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:16px}
+  details.card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--violet)}
+  details.card summary{cursor:pointer;padding:13px 15px;font-weight:600;font-family:var(--serif);font-size:17px;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:'+';float:right;color:var(--violet);font-family:var(--mono)}
+  details.card[open] summary::after{content:'–'}
+  details.card .body{padding:0 15px 14px;color:var(--ink2);font-size:14.5px}
+
+  footer{margin-top:46px;padding:22px 0 56px;border-top:3px solid var(--ink);font-size:13.5px;color:var(--ink2)}
+  .mono{font-family:var(--mono)}
+  @media(max-width:560px){.row{flex-wrap:wrap}.row .nums{width:100%;padding-left:46px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">An Open Dossier · <b>NNN</b> · v1.0 · MONTH YEAR</div>
+  <h1>YOUR TITLE HERE</h1>
+  <div class="byline">YOUR NAME — YOUR AFFILIATION</div>
+  <p class="abstract">YOUR ABSTRACT. Replace this with your paper's abstract. End it with: <b>Don't trust this paper — run it.</b></p>
+  <div class="cta">
+    <a class="btn primary" href="#verify">Run the checks</a>
+    <a class="btn" href="paper/manuscript.pdf">Read the PDF</a>
+    <a class="btn" href="dossier.html">Audit trail</a>
+    <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source &amp; issues</a>
+  </div>
+</header>
+
+<!-- OPTIONAL: Add an interactive explorer section here if your paper
+     has quantitative claims with adjustable parameters. See dossier-001
+     for a worked example with range sliders and a live readout. -->
+
+<section id="verify">
+  <div class="kicker teal">CLAIMS · EXECUTABLE</div>
+  <h2>Run the paper</h2>
+  <p class="lede">Every quantitative claim recomputed from its stated assumptions. Same arithmetic as <span class="mono">verification/verify_numbers.py</span>, which CI reruns on every commit.</p>
+  <div class="console">
+    <div class="console-head">
+      <span class="label">verification console · N checks</span>
+      <button id="run">Run all checks</button>
+    </div>
+    <div id="log" aria-live="polite">
+      <div class="row">
+        <span class="badge" style="color:var(--ink2);border:1px solid var(--line)">IDLE</span>
+        <span class="what" style="color:var(--ink2)">Awaiting run. Don't trust this paper — run it.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPT CARDS: add one per key idea the reader needs to understand
+     your result. Each expands inline — no page navigation required. -->
+<section>
+  <div class="kicker violet">LEARN AS YOU READ</div>
+  <h2>Key concepts</h2>
+  <div class="cards">
+    <details class="card">
+      <summary>Concept 1 — NAME IT</summary>
+      <div class="body">Explain this concept in 3–5 sentences, written for a smart non-specialist. What is it, why does it matter to your result, and what's the one surprising thing about it?</div>
+    </details>
+    <details class="card">
+      <summary>Concept 2 — NAME IT</summary>
+      <div class="body">Replace this with your second key concept.</div>
+    </details>
+    <details class="card">
+      <summary>Concept 3 — NAME IT</summary>
+      <div class="body">Replace this with your third key concept.</div>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <b>How to review this paper:</b> run the checks above, read the <a href="dossier.html">audit trail</a> (red-team findings published, not hidden), then <a href="https://github.com/YOURUSER/YOURREPO/issues">file an issue against any claim</a>. Every revision is versioned; nothing is memory-holed. Releases archived at CERN with a DOI; hashes anchored in the Bitcoin blockchain automatically on every release.
+  <br><br>
+  <span class="mono">Open Dossier format · CC BY 4.0 (paper) / MIT (code) · AI-assistance: DESCRIBE YOUR USE HERE and state your actual review basis.</span>
+</footer>
+
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// VERIFICATION CONSOLE
+// Port your verify_numbers.py checks here as JavaScript.
+// Pattern: checks.push(["label", computed_value, [lo, hi]])
+// See dossier-001/index.html for a full worked example.
+// ---------------------------------------------------------------
+function buildChecks(){
+  const c = [];
+  // TODO: replace this placeholder with your actual checks
+  c.push(["PLACEHOLDER — replace with your first real check", 42, [41, 43]]);
+  return c;
+}
+
+const fmt = v => v >= 1e4 ? v.toExponential(2) : v.toFixed(4);
+const runBtn = document.getElementById('run');
+const logEl  = document.getElementById('log');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+runBtn.addEventListener('click', () => {
+  runBtn.disabled = true; logEl.innerHTML = '';
+  const checks = buildChecks(); let pass = 0;
+  checks.forEach((ck, i) => {
+    const [label, val, [lo, hi]] = ck, ok = val >= lo && val <= hi;
+    if(ok) pass++;
+    const row = document.createElement('div'); row.className = 'row'; row.style.opacity = '0';
+    row.innerHTML = '<span class="badge ' + (ok?'p':'f') + '">' + (ok?'PASS':'FAIL') + '</span>' +
+      '<span class="what">' + String(i+1).padStart(2,'0') + ' · ' + label + '</span>' +
+      '<span class="nums">' + fmt(val) + ' ∈ [' + fmt(lo) + ', ' + fmt(hi) + ']</span>';
+    logEl.appendChild(row);
+    const show = () => { row.style.transition = 'opacity .25s'; row.style.opacity = '1'; };
+    reduced ? show() : setTimeout(show, 90 * i);
+    if(i === checks.length - 1){
+      const t = document.createElement('div'); t.className = 'tally';
+      t.textContent = 'TOTAL: ' + checks.length + ' checks · ' + pass + ' pass · ' +
+        (checks.length - pass) + ' fail' +
+        (pass === checks.length ? ' — the paper\u2019s numbers reproduce.' : ' — fix the paper, not the tolerance.');
+      const fin = () => { logEl.appendChild(t); runBtn.disabled = false; runBtn.textContent = 'Run again'; };
+      reduced ? fin() : setTimeout(fin, 90 * i + 350);
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+id,claim,type,verifier,status
+C01,PLACEHOLDER — replace with your first claim,NUM,verify_numbers.py #1,OPEN
+C02,PLACEHOLDER — replace with your second claim,CITE,citation_audit.md,OPEN
+C03,PLACEHOLDER — replace with a novelty claim,NOVEL,prior-art search DATE,TO-OUR-KNOWLEDGE
