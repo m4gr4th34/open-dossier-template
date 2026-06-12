@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Self-Explaining Edition — DOSSIER NNN (Open Dossier)</title>
+<meta name="description" content="YOUR ONE-LINE DESCRIPTION. The full paper, written to explain itself.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;600&display=swap');
+  :root{
+    --ink:#101d26;--ink2:#42525c;--paper:#f6f8f9;--card:#ffffff;
+    --teal:#0e7c7b;--teal-soft:#e3f0f0;--coral:#e4572e;--violet:#6b4e9b;--violet-soft:#efe9f6;
+    --pass:#1e8e5a;--open:#b07d1f;--line:#d8e0e4;
+    --serif:'Spectral',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.65}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px}
+  a{color:var(--teal)}
+  header{padding:54px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+  .eyebrow b{color:var(--coral)}
+  h1{font-family:var(--serif);font-weight:800;font-size:clamp(28px,5vw,42px);line-height:1.12;margin:.4em 0 .2em;letter-spacing:-.01em}
+  .byline{font-family:var(--serif);font-style:italic;color:var(--ink2);margin-bottom:18px}
+  .howto{background:var(--card);border:1.5px solid var(--ink);padding:14px 16px;font-size:15px;margin:18px 0 8px}
+  .howto .mono{font-family:var(--mono);font-size:13px}
+  h2{font-family:var(--serif);font-weight:600;font-size:27px;margin:48px 0 6px;line-height:1.2}
+  h2 .num{color:var(--coral);font-family:var(--mono);font-size:15px;font-weight:600;vertical-align:middle;margin-right:10px}
+  p{margin:14px 0;max-width:68ch}
+
+  /* tappable terms */
+  .term{background:linear-gradient(transparent 70%, var(--teal-soft) 70%);border:none;border-bottom:1.5px dashed var(--teal);
+        padding:0 1px;font:inherit;color:inherit;cursor:pointer;text-align:left}
+  .term:focus-visible{outline:2.5px solid var(--coral);outline-offset:2px}
+  /* citation chips */
+  .cite{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--violet);background:var(--violet-soft);
+        border:1px solid var(--violet);border-radius:10px;padding:1px 8px;cursor:pointer;vertical-align:2px}
+  .cite:focus-visible{outline:2.5px solid var(--coral);outline-offset:2px}
+  /* the expansion card both produce */
+  .popcard{display:block;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);
+           padding:12px 14px;margin:10px 0;font-size:15px;color:var(--ink2);max-width:68ch;animation:open .18s ease-out}
+  .popcard.citecard{border-left-color:var(--violet)}
+  .popcard b{color:var(--ink)}
+  .popcard .src{font-family:var(--mono);font-size:11.5px;color:var(--ink2);display:block;margin-top:6px}
+  @keyframes open{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.popcard{animation:none}}
+
+  /* go-deeper layers */
+  details.deeper{background:var(--card);border:1px solid var(--line);margin:16px 0}
+  details.deeper summary{cursor:pointer;padding:12px 15px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--violet);list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:'▸ ';color:var(--violet)}
+  details.deeper[open] summary::before{content:'▾ '}
+  details.deeper .body{padding:0 15px 14px;font-size:15px;color:var(--ink2)}
+  details.deeper .eq{font-family:var(--mono);font-size:14px;background:var(--paper);padding:10px 12px;margin:8px 0;overflow-x:auto}
+
+  .openclaim{background:#fdf6e9;border:1px solid var(--open);border-left:5px solid var(--open);padding:14px 16px;margin:18px 0;font-size:15.5px}
+  .openclaim .tag{font-family:var(--mono);font-size:11px;color:var(--open);border:1px solid var(--open);padding:2px 7px;margin-right:8px}
+  .punch{font-family:var(--serif);font-style:italic;font-size:20px;border-left:4px solid var(--coral);padding:6px 0 6px 16px;margin:26px 0;max-width:60ch}
+  footer{margin-top:56px;padding:22px 0 60px;border-top:3px solid var(--ink);font-size:14px;color:var(--ink2)}
+  .mono{font-family:var(--mono)}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;padding:10px 15px;border:1.5px solid var(--ink);color:var(--ink);background:var(--card)}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">An Open Dossier · <b>NNN</b> · self-explaining edition · v1.0</div>
+  <h1>YOUR PLAIN-LANGUAGE TITLE</h1>
+  <div class="byline">YOUR NAME — YOUR AFFILIATION</div>
+  <div class="howto">
+    <b>How to read this:</b> the whole paper is on this one page, written to explain itself.
+    Tap any <button class="term" data-d="Like this! Underlined-dashed words expand in place with a plain-language explanation. Tap again to close. You never leave the page.">underlined term</button>
+    for a plain-language explanation. Tap any <button class="cite" data-c="demo">ref</button> to see what that source actually showed, in two sentences. <span class="mono">No rabbit holes. No prerequisites.</span>
+  </div>
+  <div class="btnrow">
+    <a class="btn primary" href="index.html#verify">Run the paper's numbers</a>
+    <a class="btn" href="paper/manuscript.pdf">Formal PDF</a>
+    <a class="btn" href="dossier.html">Audit trail</a>
+  </div>
+</header>
+
+<!-- ============================================================
+     AUTHOR INSTRUCTIONS (delete this comment when done):
+     1. Write your paper as numbered narrative sections below.
+        Plain language first; math goes in details.deeper blocks.
+     2. Wrap technical terms in:
+        <button class="term" data-d="3-5 sentence plain explanation">term</button>
+     3. Cite with chips:
+        <button class="cite" data-c="KEY">Venue 'YY</button>
+        ...and add KEY to the CITES database in the script below,
+        with who/what/src — what the source showed, in 2 sentences.
+     4. Any OPEN-UNVERIFIED claim gets an .openclaim box, in the text,
+        where the claim is made. Honest labels, always.
+     ============================================================ -->
+
+<h2><span class="num">01</span>YOUR FIRST SECTION TITLE</h2>
+
+<p>Your opening narrative. Here is a
+<button class="term" data-d="Replace this with a 3-5 sentence plain-language explanation of the term, written for a smart non-specialist. What is it, why does it matter here, what is the one surprising thing about it?">tappable term</button>
+and here is a claim with a source
+<button class="cite" data-c="ref1">Journal 'YY</button>.
+Write the whole argument this way — every concept explained where it first appears.</p>
+
+<details class="deeper"><summary>Go deeper: NAME THE TECHNICAL LAYER</summary>
+<div class="body">Equations and formal detail live here, collapsed by default.
+<div class="eq">your_equation = goes / here</div>
+Cite within deeper blocks the same way <button class="cite" data-c="ref2">Journal 'YY</button>.</div>
+</details>
+
+<h2><span class="num">02</span>YOUR SECOND SECTION TITLE</h2>
+
+<p>Continue the narrative. If a claim is published unverified by design, label it honestly where it appears:</p>
+
+<div class="openclaim">
+<span class="tag">OPEN-UNVERIFIED</span><b>Honest label:</b> DESCRIBE THE UNVERIFIED CLAIM. State that it is claim <span class="mono">CNN</span> in the public ledger and an open challenge: <b>the first person to confirm or refute it gets named credit in the next version.</b>
+</div>
+
+<p class="punch">End with the line your readers should carry away.</p>
+
+<footer>
+  <b>About this edition:</b> this page is the complete paper in self-explaining form. The <a href="paper/manuscript.pdf">formal PDF</a> exists for tradition and archives; the <a href="index.html">interactive edition</a> carries the verification console; the <a href="dossier.html">audit trail</a> carries the receipts.
+  <br><br><span class="mono">An Open Dossier · CC BY 4.0 · AI-assistance: DESCRIBE YOUR USE and state your actual review basis · every verification label is true</span>
+</footer>
+
+</div>
+
+<script>
+// citation database — add an entry per chip:
+// KEY: {who:"Author(s) (Year)", what:"What they showed, 2 sentences, plain language.", src:"Journal Vol, Page"}
+const CITES = {
+  demo: {who:"This is a citation chip", what:"Tap any chip like this one and you get the source plus a two-sentence plain-language summary of what it actually showed — instead of a bare [7] sending you down a rabbit hole.", src:"You never leave the page."},
+  ref1: {who:"REPLACE — Author et al. (Year)", what:"REPLACE — what this source demonstrated, in plain language, and why it matters to this paper.", src:"Journal Vol, Page (Year)"},
+  ref2: {who:"REPLACE — Author et al. (Year)", what:"REPLACE.", src:"Journal Vol, Page (Year)"}
+};
+// one shared toggle behavior for terms and citations
+function closeCard(btn){ const c = btn._card; if(c){ c.remove(); btn._card = null; btn.setAttribute('aria-expanded','false'); } }
+function toggle(btn, html, extraClass){
+  if(btn._card){ closeCard(btn); return; }
+  const card = document.createElement('span');
+  card.className = 'popcard' + (extraClass ? ' ' + extraClass : '');
+  card.innerHTML = html;
+  // insert after the end of the current paragraph-level parent for clean layout
+  const block = btn.closest('p, .howto, .body, .openclaim') || btn.parentNode;
+  block.insertAdjacentElement('afterend', card);
+  btn._card = card; btn.setAttribute('aria-expanded','true');
+}
+document.querySelectorAll('.term').forEach(btn=>{
+  btn.setAttribute('aria-expanded','false');
+  btn.addEventListener('click', ()=> toggle(btn, btn.dataset.d));
+});
+document.querySelectorAll('.cite').forEach(btn=>{
+  btn.setAttribute('aria-expanded','false');
+  btn.addEventListener('click', ()=>{
+    const c = CITES[btn.dataset.c];
+    if(!c) return;
+    toggle(btn, '<b>'+c.who+':</b> '+c.what+'<span class="src">'+c.src+'</span>', 'citecard');
+  });
+});
+</script>
+</body>
+</html>

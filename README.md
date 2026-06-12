@@ -31,6 +31,7 @@ A research publication shipped as a versioned repository:
 
 ```
 index.html          ← replace title, abstract, concept cards, JS checks
+paper.html          ← self-explaining edition: replace placeholder sections, terms, and citation chips
 dossier.html        ← replace red-team findings and citation table
 verification/
   verify_numbers.py ← replace placeholder check with real ones
