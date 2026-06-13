@@ -26,8 +26,12 @@ to.
    up in about two minutes at the publish step (Step 4), using "log in with
    GitHub." It's what gives your paper a permanent DOI. Mentioned here only so
    it's no surprise later.
-4. That's it. Claude Code installs and updates itself; you don't need to
-   install Git, LaTeX, or anything else.
+4. Claude Code installs and updates itself, and handles LaTeX and the rest for
+   you. One possible exception: depending on your Mac's setup, a step may ask
+   you to install git (Apple's developer tool). If that happens, open Terminal
+   and run `xcode-select --install`, click through the dialog, then fully quit
+   and reopen Terminal and Claude Code. Most people won't need this — but it's
+   here so it's no surprise.
 
 ---
 
