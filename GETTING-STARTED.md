@@ -116,21 +116,6 @@ Tell Claude Code exactly what you see — "I clicked X and got Y" — and let it
 diagnose. It can read error messages and fix them. You are never expected to
 debug anything yourself.
 
-## Once you've published your first one (optional power-up)
-
-Publishing more dossiers? You can keep each research topic tidy in its own
-**Claude Project** (the Projects tab in the desktop app — different from
-Code). A Project remembers the context and instructions for one line of
-research across many sessions. Workflow that scales well:
-- One Claude **Project** per research topic (holds your strategy and notes).
-- One GitHub **repo** + one Claude Code **folder** per dossier (holds the
-  actual publication).
-- Decide and plan in the Project chat; execute and publish in Code.
-
-But don't bother with this for your first dossier — just get one published.
-Organization is a reward you give yourself after the first win, not a hoop
-to jump through before it.
-
 ---
 
 ## The research loop: pause, resume, repeat
