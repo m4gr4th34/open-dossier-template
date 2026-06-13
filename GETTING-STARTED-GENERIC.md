@@ -1,4 +1,4 @@
-# GETTING-STARTED.md — Your first dossier, start to finish
+# Getting Started (platform-agnostic) — Your first dossier, start to finish
 
 > This is the platform-agnostic walkthrough. If you're using the Claude desktop app (the easiest path), use [GETTING-STARTED.md](GETTING-STARTED.md) instead.
 

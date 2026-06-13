@@ -19,7 +19,11 @@ to.
 1. **Claude desktop app** with a Pro or Max plan — you have this.
 2. **A GitHub account** — free at github.com. Pick a username; write it down.
    You'll use it in a moment.
-3. That's it. Claude Code installs and updates itself; you don't need to
+3. **A Zenodo account** — also free, but you don't need it yet. You'll set it
+   up in about two minutes at the publish step (Step 4), using "log in with
+   GitHub." It's what gives your paper a permanent DOI. Mentioned here only so
+   it's no surprise later.
+4. That's it. Claude Code installs and updates itself; you don't need to
    install Git, LaTeX, or anything else.
 
 ---
