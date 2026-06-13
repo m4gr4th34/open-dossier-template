@@ -130,3 +130,55 @@ research across many sessions. Workflow that scales well:
 But don't bother with this for your first dossier — just get one published.
 Organization is a reward you give yourself after the first win, not a hoop
 to jump through before it.
+
+---
+
+## The research loop: pause, resume, repeat
+
+A dossier isn't a one-shot. Real research circles back — you draft, you
+reality-check, you step away to verify something, you come back and revise.
+Here's how that flows.
+
+### Pausing and coming back to the same dossier
+
+You can stop any time — your work is saved in two places automatically: the
+files on your Mac (in the folder you chose) and, once you've pushed at least
+once, on GitHub. To resume later, open Claude Code, point it at the **same
+folder**, and just say what you want next, e.g.:
+
+> "Pull the latest, show me where we left off on this dossier, and let's keep
+> going. I checked with a primary source and need to revise [X]."
+
+Nothing is lost between sessions. If you already published a release, small
+fixes are ordinary edits; a substantial revision becomes a new versioned
+release (v1.1, v1.2 …), and every version stays preserved with its own
+timestamp.
+
+### Reality-checking before you publish (encouraged!)
+
+If a claim depends on something you want to confirm — a primary source, an
+expert, a collaborator, your own memory of the details — **pause and confirm
+it before publishing.** Tell Claude Code to label that claim as open in the
+meantime:
+
+> "I'm not certain about [claim] yet — I want to verify it with [a source]
+> before we publish. Mark it OPEN-UNVERIFIED and hedge the wording until I
+> confirm."
+
+This is the whole spirit of the format: it's fine to publish with open
+questions clearly labeled, and it's fine to hold a claim back until you've
+checked it. The one rule is that every label is true.
+
+### Starting a brand-new dossier (different topic)
+
+Each dossier is its own repository and its own folder — they don't interfere.
+To begin a new topic, just **run Step 2 again** with a new repo name and the
+new idea. Use a fresh folder per topic to keep things tidy, e.g.
+`~/dossiers/dossier-newtopic`. That's the entire "start another one" process:
+new name, new folder, same one-paste setup.
+
+> Tip once you're publishing several: keep each topic in its own **Claude
+> Project** (the Projects tab — different from Code) to hold that line of
+> research's context and notes across sessions. Optional, and best saved for
+> after your first publication — don't let organization slow down your first
+> win.
