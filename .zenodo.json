@@ -6,5 +6,6 @@
   "publication_type": "preprint",
   "access_right": "open",
   "license": "cc-by-4.0",
-  "keywords": ["open dossier", "verified open research", "YOUR FIELD"]
+  "keywords": ["open dossier", "verified open research", "YOUR FIELD"],
+  "communities": [{"identifier": "open-dossier"}]
 }
