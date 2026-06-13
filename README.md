@@ -7,7 +7,24 @@ Click "Use this template" to create your Dossier NNN in one step.
 ### ▶ [Read the living paper](https://USER.github.io/REPO/) · [Self-explaining edition](https://USER.github.io/REPO/paper.html) · [Run the checks](https://USER.github.io/REPO/#verify) · [Audit trail](https://USER.github.io/REPO/dossier.html)
 Rationale: lead with the live result for the skeptic, then GETTING-STARTED for the would-be author, then the explanatory sections. Do not leave these as live links until the Pages site actually resolves, or they 404. -->
 
-New here? Start with [GETTING-STARTED.md](GETTING-STARTED.md) — one contested idea taken from first question to live publication, in plain English. No Git, LaTeX, or web experience needed.
+## Get started in an afternoon
+
+You got into science for the ideas — not for wrestling LaTeX, trimming to word limits, formatting bibliographies at 1 a.m., or waiting eight months on Reviewer 2. This deletes all of that.
+
+You bring the idea and the judgment. An AI agent does the rest — drafting, typesetting, citations, figures, verification code, web pages — and out comes a live, citable, timestamped publication that **checks its own math and explains itself to strangers.** No Git, LaTeX, or web skills required.
+
+**The whole process, start to finish:**
+1. **Spawn** — point your AI agent at this template; it clones and renames everything.
+2. **Map the idea** — the agent does a prior-art search and sorts claims into established / adjacent / open. You correct it with what you know.
+3. **Draft** — the agent writes the paper, sets the math, formats every citation. No LaTeX tantrums.
+4. **Self-check** — a verification script recomputes every number; an AI red-team attacks the paper; findings get published, not hidden.
+5. **Readable editions** — a verification-console edition and a self-explaining edition any curious outsider can follow.
+6. **Publish** — one release mints your DOI at CERN and anchors the hash in the Bitcoin blockchain. Priority is yours, timestamped.
+7. **Live review** — readers file issues against specific claims; corrections become dated amendments. The paper stays alive.
+
+**→ Full step-by-step walkthrough, with a worked example: [GETTING-STARTED.md](GETTING-STARTED.md)**
+
+The first scientists to publish this way will look, in hindsight, like the first people who emailed instead of mailed.
 
 [![claims: verified](https://github.com/m4gr4th34/open-dossier-template/actions/workflows/verify.yml/badge.svg)](https://github.com/m4gr4th34/open-dossier-template/actions/workflows/verify.yml)
 
