@@ -18,6 +18,8 @@ A research publication shipped as a versioned repository:
 - **Honest verification labels** — the rule isn't "everything is verified." The rule is "every label is true."
 - **GitHub Issues as the review venue** — unknown people chip away at open claims in public. The version history preserves who contributed what, when.
 
+This format eats its own cooking: its first deployment lost its automation files to a web-upload quirk, was caught by its own tooling, fixed, and publicly logged — see the [closed postmortem](https://github.com/m4gr4th34/open-dossier-template/issues/1) — within a day of launch. Every label must be true, including the tooling's labels about itself.
+
 [Dossier 001](https://m4gr4th34.github.io/dossier-001/) is the reference specimen.
 
 ---
