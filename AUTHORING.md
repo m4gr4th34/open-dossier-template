@@ -139,7 +139,7 @@ After each release, confirm the real version DOI is in `provenance.json`
 (or was written there by the workflow) and in the manuscript footer.
 DEPLOY.md's release step carries this reminder.
 
-**Publish CTA — keep it canonical.** The publish-like-this CTA band and top button intentionally point at the canonical open-dossier-template, not at this dossier's own repo — every dossier funnels new authors back to the shared template. Leave these URLs as the canonical template.
+**Publish CTA — keep it canonical.** The publish-like-this CTA band (before the footer on index.html, paper.html, and dossier.html) intentionally points at the canonical open-dossier-template's GETTING-STARTED.md — the instructions-first front door — not at this dossier's own repo and not at the template's repo root. Every dossier funnels new authors straight into the step-by-step guide. Leave these URLs as the canonical GETTING-STARTED.md.
 
 ## Design identity (do not reinvent)
 
