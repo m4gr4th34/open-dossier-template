@@ -222,11 +222,21 @@ doctrine here, point the Project at that file. Click into the Project's
 Read PROJECT-INSTRUCTIONS.md in the synced repo and follow it as your constitution for every conversation in this project.
 ```
 
-Then open `PROJECT-INSTRUCTIONS.md` in the repo and fill in its two bracketed
-spots — the topic line and the Standing-context list — for your dossier
-(Claude Code can do this for you). Because the constitution lives in the repo,
-it's versioned and upgrades with the normal template-machinery sync, so your
-Project never goes stale.
+Then have Claude Code fill in the constitution's two blanks. Paste this into
+Claude Code, edited for your dossier:
+
+```
+In PROJECT-INSTRUCTIONS.md in this repo, fill in the two bracketed spots and commit + push:
+- The topic line: this dossier is "[NNN or short-name]: [one-line description of your topic]"
+- The Standing context section — replace its bracketed placeholders with:
+  - Open claims: [list any claims you already know will be open/unverified, or "none yet — to be determined during drafting"]
+  - Open red-team findings: [usually "none yet" at the start]
+  - Anything a fresh session must know: [the topic's sensitivities, the key prior work, and the boldest claims and exactly how they should be labeled]
+Leave all the doctrine, geography, and division-of-labor sections exactly as they are.
+```
+
+Because the constitution lives in the repo, it's versioned and upgrades with
+the normal template-machinery sync, so your Project never goes stale.
 
 ### Step D — Connect the repo to the Project (read-only sync)
 
