@@ -1,0 +1,10 @@
+{
+  "title": "DOSSIER NNN — YOUR TITLE HERE",
+  "creators": [{"name": "YOUR NAME", "affiliation": "YOUR AFFILIATION"}],
+  "description": "YOUR ABSTRACT HERE. An Open Dossier publication: executable claims under CI, published adversarial review, auto-DOI and auto-timestamped releases.",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "access_right": "open",
+  "license": "cc-by-4.0",
+  "keywords": ["open dossier", "verified open research", "YOUR FIELD"]
+}
