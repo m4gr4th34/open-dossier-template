@@ -1,0 +1,38 @@
+name: auto-timestamp
+on:
+  release:
+    types: [published]
+jobs:
+  timestamp:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install OpenTimestamps client
+        run: pip install opentimestamps-client
+      - name: Download release archive
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          curl -L -H "Authorization: token $GH_TOKEN" \
+            "https://github.com/${{ github.repository }}/archive/refs/tags/${TAG}.tar.gz" \
+            -o "${TAG}.tar.gz"
+          echo "ARCHIVE=${TAG}.tar.gz" >> $GITHUB_ENV
+      - name: Stamp with OpenTimestamps
+        run: ots stamp "${{ env.ARCHIVE }}"
+      - name: Commit proof to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p timestamps
+          mv "${{ env.ARCHIVE }}.ots" timestamps/
+          git add timestamps/
+          git commit -m "Auto-timestamp: ${{ github.event.release.tag_name }} anchored via OpenTimestamps"
+          git push
