@@ -39,7 +39,7 @@ to.
 
 ## Step 2 — Paste this one message
 
-Copy the block below, **change only the two bracketed parts**, and paste it
+Copy the block below, **change only the four bracketed parts**, and paste it
 into Claude Code. That's the whole setup.
 
 > Go to https://github.com/m4gr4th34/open-dossier-template and read its
