@@ -57,7 +57,7 @@ into Claude Code. That's the whole setup.
 > Name the new GitHub repository: **dossier-[SHORT-NAME-FOR-YOUR-IDEA]**
 > I am: **[YOUR NAME], [your affiliation, or "independent researcher, city"]**
 >
-> My research idea is: **[describe your idea in a sentence or two]**
+> My research idea is: **[describe your idea — a full paragraph is better than a sentence. Include the core claim, why you think it's true or interesting, any specific results/numbers/sources you already have in mind, and what makes it novel. The more you give here, the less the agent has to guess — this is the one input only you can provide.]**
 >
 > If I'm not yet signed in to GitHub on this machine, walk me through it
 > first. Before you start writing the paper, do the prior-art
