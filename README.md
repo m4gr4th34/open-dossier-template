@@ -22,7 +22,7 @@ You bring the idea and the judgment. An AI agent does the rest — drafting, typ
 6. **Publish** — one release mints your DOI at CERN and anchors the hash in the Bitcoin blockchain. Priority is yours, timestamped.
 7. **Live review** — readers file issues against specific claims; corrections become dated amendments. The paper stays alive.
 
-**→ Full step-by-step walkthrough, with a worked example: [GETTING-STARTED.md](GETTING-STARTED.md)**
+**→ Start here: [GETTING-STARTED.md](GETTING-STARTED.md)** — publish with the Claude desktop app, step by step. Using a different AI agent, or want the full conceptual walkthrough with a worked example? See [GETTING-STARTED-GENERIC.md](GETTING-STARTED-GENERIC.md).
 
 The first scientists to publish this way will look, in hindsight, like the first people who emailed instead of mailed.
 
@@ -55,7 +55,8 @@ This format eats its own cooking: its first deployment lost its automation files
 4. Work through the `TODO` markers in order:
 
 ```
-GETTING-STARTED.md  ← plain-English walkthrough — start here if you're new
+GETTING-STARTED.md  ← start here — publish with the Claude desktop app
+GETTING-STARTED-GENERIC.md ← platform-agnostic version
 AUTHORING.md        ← production playbook — hand to your AI agent (read, don't edit)
 index.html          ← replace title, abstract, concept cards, JS checks
 paper.html          ← self-explaining edition: replace placeholder sections, terms, and citation chips

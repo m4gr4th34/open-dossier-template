@@ -1,205 +1,121 @@
-# GETTING-STARTED.md — Your first dossier, start to finish
+# Quickstart — publish your first dossier with Claude Code (macOS)
 
-Be honest: you got into science for the ideas. The discovery, the
-argument, the moment the data clicks. You did *not* get into it for
-wrestling LaTeX into making a two-column figure float to the right page,
-or trimming a beautiful paragraph to hit a word limit, or formatting a
-bibliography by hand at 1 a.m., or waiting eight months to learn that
-Reviewer 2 skimmed it.
+> Using a different AI agent? See the [platform-agnostic walkthrough](GETTING-STARTED-GENERIC.md).
 
-This page shows you a different way. You bring the idea and the judgment;
-an AI agent does the rest — the writing, the typesetting, the citations,
-the figures, the verification code, the web pages — and what comes out is
-a live, citable, timestamped publication that **checks its own math and
-explains itself to strangers.** Start to finish in an afternoon, not a
-year.
+This is the no-detours path: from nothing to a live, citable, timestamped
+publication, using the Claude desktop app on a Mac. Every step is literal.
+If you've never touched Git or a command line, that's fine — you won't have
+to.
 
-No Git, no LaTeX, no web skills required. If you can explain your idea in
-plain English and tell when an answer smells wrong, you're qualified.
-
-> **The deal.** The AI does the literature search, the drafting, the math
-> typesetting, the citation formatting, the figures, the verification
-> script, and all three web editions. You do four things: bring the idea,
-> sanity-check the results, decide what's established versus still an open
-> question, and press the buttons that publish. That's it. That's the job.
+> **You'll talk to "Claude Code," not the chat.** In the Claude desktop app,
+> look for the **Code** tab (not the regular chat, not Projects). Code is the
+> one that can create files, run things, and publish to GitHub for you.
+> Everything below is pasted into **Code**.
 
 ---
 
-## What you'll need (15 minutes, once)
+## Before you start (one-time, ~10 min)
 
-1. **A GitHub account** — free, at github.com. Your paper lives here.
-2. **An AI coding agent** — e.g. Claude Code (Pro/Max plan). It reads the
-   instruction files in the template automatically and already knows the
-   rules.
-3. **A Zenodo account** — free, "log in with GitHub." Mints your permanent
-   DOI. (One-time, in Step 6.)
-
-No local software to install. The agent and GitHub's servers do the heavy
-lifting.
+1. **Claude desktop app** with a Pro or Max plan — you have this.
+2. **A GitHub account** — free at github.com. Pick a username; write it down.
+   You'll use it in a moment.
+3. That's it. Claude Code installs and updates itself; you don't need to
+   install Git, LaTeX, or anything else.
 
 ---
 
-## A complete worked example
+## Step 1 — Open Claude Code and pick a folder
 
-To show every step on something real, we'll publish a deliberately
-spicy question — the kind that makes a department chair reach for the
-antacid:
+1. Open the Claude desktop app.
+2. Click the **Code** tab.
+3. It will ask you to choose a folder to work in. Make a fresh one — e.g.
+   in your home directory, a folder called `dossiers`. Select it. This is
+   just where your work lives on your Mac; you won't have to touch it
+   directly.
 
-> **"What can be inferred about UAP propulsion from the public kinematic
-> data — and what would a real exotic-propulsion signature have to look
-> like?"**
+## Step 2 — Paste this one message
 
-Yes, that UAP. We picked it on purpose, and not to be cheeky (okay, a
-little to be cheeky). It's the perfect stress test, because it's exactly
-the kind of question the old system handles *badly*: too speculative for a
-journal's front door, too interesting to ignore, and guaranteed to get
-mocked rather than engaged. If the format can make *this* question land as
-sober, rigorous, and impossible to wave away, it can do it for your
-perfectly respectable idea in your perfectly respectable subfield with
-both hands tied. Whatever your idea is — quantum optics or qualia, protein
-folding or flying saucers — drop it in wherever you see the example.
-(Believers: you finally get a venue that takes the question seriously.
-Skeptics: you get to watch honest labeling defuse the whole thing.
-Everybody wins. That's sort of the point.)
+Copy the block below, **change only the two bracketed parts**, and paste it
+into Claude Code. That's the whole setup.
 
----
+> Go to https://github.com/m4gr4th34/open-dossier-template and read its
+> README, plus the files AUTHORING.md, CLAUDE.md, and GETTING-STARTED.md in
+> that repo. Then create a new dossier for me from that template, following
+> its "Spawning a new dossier" ritual.
+>
+> Name the new GitHub repository: **dossier-[SHORT-NAME-FOR-YOUR-IDEA]**
+> I am: **[YOUR NAME], [your affiliation, or "independent researcher, city"]**
+>
+> My research idea is: **[describe your idea in a sentence or two]**
+>
+> If I'm not yet signed in to GitHub on this machine, walk me through it
+> first. Before you start writing the paper, do the prior-art
+> reconnaissance step with me and show me what you find. Ask me before
+> anything that publishes or pushes.
 
-### Step 1 — Spawn your repository (2 min)
+Claude Code will: connect to your GitHub, create the repo, clone the
+template, and start the research conversation. It will ask permission before
+each real action — that's normal and good. Say yes when you're ready.
 
-Open your AI agent and paste this, edited for your idea:
+## Step 3 — Do the part only you can do
 
-> "Go to https://github.com/m4gr4th34/open-dossier-template and follow the
-> 'Spawning a new dossier' ritual in its README to create a new dossier
-> from it. Name the new repo dossier-uap-propulsion. I'm [your name],
-> [your affiliation or 'independent researcher, city']. Read AUTHORING.md
-> and CLAUDE.md in the template before you start — they have the
-> production rules."
+Claude Code does the writing, the math, the citations, the verification
+code, and the web pages. **You do four things**, and it will prompt you for
+each:
 
-The agent clones the template and does the rename pass. You now own a repo
-with all the machinery. (You wrote zero lines of code. This will keep
-happening. Get used to it.)
+1. **The idea** — you already gave it.
+2. **Reality-check the prior-art map** — it shows you what's known; you tell
+   it what it's missing or got wrong. (This is the real research.)
+3. **Decide what's solid vs. open** — make sure every claim is labeled
+   honestly: proven things asserted, unproven things marked as open
+   questions. The one rule: every label must be true.
+4. **Read the draft and the self-explaining edition** — tell it what's
+   unclear; it tightens.
 
-### Step 2 — Map the terrain honestly (the part that feels like research)
+Just talk to it in plain English. There's no syntax to learn.
 
-This is a conversation, not a form:
+## Step 4 — Publish (Claude Code walks you through it)
 
-> "Do a prior-art reconnaissance on inferring UAP propulsion from public
-> data. Sort everything into three buckets, each sourced: ESTABLISHED
-> (documented sensor records, official acknowledgments, the AARO/NASA/Navy
-> material, kinematic claims with their measurement caveats); ADJACENT
-> (proposed mechanisms, energy/acceleration analyses); and OPEN (the
-> exotic-propulsion question nobody has actually closed). Build the claim
-> ledger and label every entry by how well it's really verified — no
-> inflation, no dismissal."
+When the dossier is ready, say:
 
-The agent searches and hands you a map. **Your job — the actual brain
-work:** read it with everything you know switched on. The agent has read
-more than you but understood it less; you have the taste. Correct it, tell
-it what it's underweighting, push back. This back-and-forth *is* the
-research, and it's the part no machine does for you.
+> Walk me through DEPLOY.md to publish this.
 
-> **Why honesty is the power move, not the timid one.** Stating flatly —
-> as ESTABLISHED, with citations — that objects with anomalous kinematics
-> are documented and that relevant data is restricted is not playing it
-> safe. It's standing on bedrock nobody can shove you off. And parking
-> "it's exotic propulsion" in the OPEN bucket isn't a retreat; it's what
-> makes the whole thing impossible to laugh off *and* impossible to
-> ignore. Bold claim, honest label. That combination is undismissable —
-> and it works exactly the same way for your idea as for this one.
+It will guide you, click by click, to:
+- turn on the free website (GitHub Pages),
+- connect Zenodo once (free, "log in with GitHub") for your DOI,
+- and tag the first release.
 
-### Step 3 — Draft it (the agent does the typing you've always hated)
+The moment you publish that release, your paper is **live, citable with a
+DOI archived at CERN, and timestamped on the Bitcoin blockchain** — no
+journal, no gatekeeper, no fee.
 
-> "Draft the manuscript from paper/manuscript-template.tex per
-> AUTHORING.md. State the established facts plainly and confidently — they
-> are documented, not speculation. Label the exotic-propulsion inference
-> OPEN and frame it as a challenge to the field, spelling out the specific
-> signature that would settle it. I want the bold claim on the page,
-> correctly labeled."
+## Step 5 — Share it
 
-The agent writes the formal paper, sets the math, formats every citation,
-and fills the claim ledger. No LaTeX tantrums, no bibliography drudgery,
-no fighting the figure placement. **Your job:** make sure every label is
-true *in both directions* — don't let it shrink a real anomaly into
-"alleged," and don't let it promote the open question to settled fact.
-That symmetry is your whole credibility, and it's the one thing only you
-can certify.
-
-### Step 4 — Let it attack its own work (automatic)
-
-> "Run the verification script and the citation audit. Then do an
-> adversarial red-team pass as the most hostile skeptical referee you can
-> imagine — the one who wants to laugh this off — and publish every
-> finding, including the ones I won't enjoy."
-
-Every number recomputes; every citation gets checked; the toughest
-objections get written *into the paper* and answered. This is Reviewer 2,
-except instant, on your side, and not anonymous-grudge-flavored. **Your
-job:** the gut check. A claim that survives this pass is worth more than
-ten exclamation points.
-
-### Step 5 — Build the readable editions (the agent leads)
-
-> "Build all three web surfaces per AUTHORING.md: the interactive edition
-> with the verification console, the self-explaining edition where every
-> term and citation expands in place so a smart outsider needs no
-> prerequisites, and the audit trail."
-
-Out comes a publication a curious 17-year-old can read end to end, and a
-skeptical professor can read without a single eye-roll — because every
-claim is exactly as strong as its evidence. **Your job:** read the
-self-explaining edition as the toughest fair reader you can picture. Where
-do they snag? Tell the agent; tighten it.
-
-### Step 6 — Publish (you press the buttons)
-
-> "Walk me through DEPLOY.md."
-
-The agent guides you: switch on the website, connect Zenodo once, tag the
-first release. The instant you publish, your DOI is minted at CERN, your
-release is anchored in the Bitcoin blockchain, and the site goes live.
-
-**You're published.** Citable, timestamped, self-checking. No journal, no
-gatekeeper, no submission fee, no eight-month wait. Your priority on the
-idea is now cryptographically yours, on a date nobody can forge or erase.
-
-### Step 7 — Let the world in
-
-Share the link. Readers — fans and critics — file GitHub issues against
-specific claims; you answer in public; corrections become dated amendments
-folded into the living document. Your OPEN claims are open invitations:
-the first person to settle one, either way, gets credited in your next
-version. The paper is alive — it improves in the open, and every version
-is preserved forever. (Compare: the old way, where your correction is an
-erratum nobody reads, three issues later.)
+Claude Code will give you your live link
+(`https://YOURUSERNAME.github.io/dossier-yourname/`). Send it to anyone.
+Readers can run your checks, read the self-explaining edition, and file
+issues against specific claims — public, versioned review. Corrections
+become dated amendments. Your paper stays alive.
 
 ---
 
-## Why this is the future, not a gimmick
+## When you're stuck
 
-- **Science just got an afternoon long.** The thing that used to take a
-  year of writing, formatting, submitting, waiting, and revising now takes
-  one sitting. The bottleneck was never the idea. It was everything
-  around the idea. That's gone.
-- **You stop fighting the tools and the tedium.** No LaTeX, no column
-  wars, no word limits, no bibliography by hand, no graph-pixel agony, no
-  anonymous knife-fights. You think; the agent assembles.
-- **You can't fool yourself, and neither can anyone else.** A
-  self-checking script and a public red-team keep your own enthusiasm
-  honest — and the one rule, *every label is true*, is what earns the
-  trust of people not yet convinced. Conviction and evidence live in
-  different columns. Keep them straight and you're unimpeachable.
-- **It's yours the instant you publish.** Timestamped priority, no queue,
-  no gatekeeper deciding whether you're allowed to have had the idea.
-- **It welcomes the bold and the careful alike.** A wild conjecture and a
-  careful incremental result get the same treatment: state it, label it
-  honestly, ship it, invite the world to check. That's just how science
-  was always supposed to work — now with the paperwork deleted and the
-  receipts attached.
+Tell Claude Code exactly what you see — "I clicked X and got Y" — and let it
+diagnose. It can read error messages and fix them. You are never expected to
+debug anything yourself.
 
-The first scientists to publish this way will look, in hindsight, like the
-first people who emailed instead of mailed. Everyone else will catch up.
+## Once you've published your first one (optional power-up)
 
-Bring the idea you actually care about. Skip the year of misery. Publish
-it honestly, today, and let the world check your work.
+Publishing more dossiers? You can keep each research topic tidy in its own
+**Claude Project** (the Projects tab in the desktop app — different from
+Code). A Project remembers the context and instructions for one line of
+research across many sessions. Workflow that scales well:
+- One Claude **Project** per research topic (holds your strategy and notes).
+- One GitHub **repo** + one Claude Code **folder** per dossier (holds the
+  actual publication).
+- Decide and plan in the Project chat; execute and publish in Code.
 
-**Your idea goes where the UAP example was. Start at Step 1.**
+But don't bother with this for your first dossier — just get one published.
+Organization is a reward you give yourself after the first win, not a hoop
+to jump through before it.
