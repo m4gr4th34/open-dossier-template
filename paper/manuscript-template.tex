@@ -1,0 +1,128 @@
+\documentclass[11pt]{article}
+% =====================================================================
+% OPEN DOSSIER MANUSCRIPT TEMPLATE
+% This is the formal/citable surface of your dossier. It compiles with
+% plain pdflatex everywhere, including arXiv. Read AUTHORING.md (repo
+% root) before filling this in — it defines the production rules this
+% template assumes, especially:
+%   * The Triple Lockstep: every number here must also exist in
+%     verification/verify_numbers.py and the index.html JS console,
+%     with identical tolerances, updated together in the same commit.
+%   * The honest-language rule: claims verified by code or source-check
+%     may assert ("yields", "is"); claims with ledger status
+%     OPEN-UNVERIFIED must hedge ("is expected to", "we conjecture")
+%     AND say in the text that the claim is open and invited.
+%   * Amendments are dated "Note added" sections, never silent edits.
+% =====================================================================
+\usepackage[margin=1.1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{authblk}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+
+\title{\textbf{TODO: Your Title — Specific, Honest, No Hype}}
+
+% Per arXiv and APS policy, AI systems may not be listed as authors.
+% AI assistance is disclosed in the Acknowledgments instead.
+\author[1]{TODO Your Name}
+\affil[1]{TODO Your Affiliation (or: Independent Researcher, City, Country)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+TODO. State the problem, the proposal, the headline quantitative claims
+(every number here must have a check in verify\_numbers.py), and the
+honest comparison to the state of the art. If a central claim is
+published unverified by design, the abstract must reflect the hedged
+language, not the assertive form. One paragraph.
+\end{abstract}
+
+\section{Introduction}
+TODO. The problem as a story: what is the gap, why does it persist, what
+is the one-sentence idea. End by enumerating the paper's claims with
+their ledger ids in comments, e.g.:
+% C01: ... (NUM, verify_numbers.py #1)
+% C02: ... (NOVEL, prior-art search DATE)
+
+\section{Relation to prior work}
+% This section is mandatory in the format. Separate explicitly:
+\textbf{Established.} TODO: what the field has demonstrated, with
+citations — be generous and precise; these become citation chips in
+paper.html and every one is audited in dossier.html.
+
+\textbf{Adjacent.} TODO: the nearest existing work and why it differs.
+
+\textbf{New here.} TODO: the claims original to this paper, each phrased
+``to the best of our knowledge'' — your prior-art search is a recall
+ceiling, not an oracle.
+
+\section{The proposal}
+TODO. The mechanism. Verified derivations may assert; open derivations
+must hedge and point to the claim ledger, e.g.: ``We state plainly that
+this derivation has not been carried through here: it is published as an
+explicitly open claim (claim CNN of the public ledger), and its
+confirmation or refutation is invited as a community contribution.''
+
+\section{Analysis}
+TODO. The quantitative spine. Every number that appears in prose,
+tables, or figures must be recomputed by verification/verify\_numbers.py
+from assumptions stated \emph{in this text}. Tables state their
+parameters in the caption so a reader (or script) can recompute rows.
+
+\section{Discussion and open problems}
+TODO. State the open findings from your adversarial review here as
+caveats, in the paper itself — a weakness stated is armor; a weakness
+discovered by a referee is a wound.
+
+% =====================================================================
+% AMENDMENT PATTERN — copy when needed; never silently edit claims:
+%
+% \section*{Note added (DD Month YYYY)}
+% State: what changed, what is and is NOT affected, the repository
+% issue number, and that archived releases remain frozen at Zenodo
+% while this living record supersedes them.
+% =====================================================================
+
+\section*{Reproducibility}
+Every quantitative claim in this paper is recomputed from its stated
+assumptions by an open verification script
+(\texttt{verification/verify\_numbers.py}) which runs under continuous
+integration on every revision of the public repository, and which any
+reader can execute in the browser at the interactive edition of this
+paper. The repository, including the claim ledger, citation audit,
+adversarial review, and all amendments, is at:
+\url{https://github.com/TODO-USER/TODO-REPO}
+
+\section*{Acknowledgments}
+% MANDATORY HONESTY: describe the AI assistance actually used, and the
+% author's ACTUAL review basis. Template language consistent with the
+% format's doctrine (edit to match your true process):
+The author acknowledges the substantive use of an AI assistant (TODO:
+which) in this work, including TODO: literature search, drafting, rate
+modeling, verification tooling. This paper is published in the Open
+Dossier format, whose governing invariant is honest labeling rather than
+universal verification: every claim is typed and routed to a verifier in
+a public claim ledger; numerical claims are recomputed by an open script
+under continuous integration; citations are audited against primary
+sources; and claims that no human or machine has independently
+verified are labeled as open rather than asserted. The author's review
+was conducted at the level of TODO: state it truthfully (e.g.,
+consistency, plausibility, and reality checks on end results), and
+responsibility for the work rests with the author on that explicitly
+stated basis. Confirmations, refutations, and corrections are invited
+through the public repository, where they become part of this paper's
+versioned record.
+
+\begin{thebibliography}{99}
+% Every entry here is audited in verification/citation_audit.md and
+% summarized in plain language in paper.html's CITES database. Never
+% cite what you have not checked; flag what you could only triangulate.
+\bibitem{Key1} TODO Author(s), Title, Journal \textbf{Vol}, Page (Year).
+\bibitem{Key2} TODO Author(s), Title, Journal \textbf{Vol}, Page (Year).
+\end{thebibliography}
+
+\end{document}

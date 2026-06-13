@@ -32,6 +32,7 @@ This format eats its own cooking: its first deployment lost its automation files
 4. Work through the `TODO` markers in order:
 
 ```
+AUTHORING.md        ← production playbook — hand to your AI agent (read, don't edit)
 index.html          ← replace title, abstract, concept cards, JS checks
 paper.html          ← self-explaining edition: replace placeholder sections, terms, and citation chips
 dossier.html        ← replace red-team findings and citation table
@@ -41,11 +42,13 @@ claim_ledger.csv    ← replace placeholder rows with your typed claims
 .zenodo.json        ← fill in title, author, description
 CITATION.cff        ← fill in title, author, repo URL
 paper/              ← add manuscript.tex and manuscript.pdf
+  manuscript-template.tex ← LaTeX scaffold — copy to manuscript.tex and fill in
 ```
 
-5. Connect Zenodo: zenodo.org → Log in with GitHub → your repo → toggle ON.
-6. Tag `v1.0.0` as a release → Zenodo auto-DOIs it, CI auto-timestamps it.
-7. Enable GitHub Pages: Settings → Pages → Deploy from branch main / root.
+5. The fastest path: hand AUTHORING.md plus your research idea to any capable AI agent (Claude Code reads it automatically alongside CLAUDE.md). It contains the full production playbook — your job is the ideas, the intuition, the reality checks, and the sign-offs; the playbook covers everything else.
+6. Connect Zenodo: zenodo.org → Log in with GitHub → your repo → toggle ON.
+7. Tag `v1.0.0` as a release → Zenodo auto-DOIs it, CI auto-timestamps it.
+8. Enable GitHub Pages: Settings → Pages → Deploy from branch main / root.
 
 Your paper is live, DOI'd, and blockchain-timestamped. Total new setup time after the first dossier: ~20 minutes.
 
