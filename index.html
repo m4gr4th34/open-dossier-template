@@ -29,6 +29,8 @@
   .cta{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 4px}
   .btn{font-family:var(--mono);font-size:13.5px;font-weight:600;text-decoration:none;padding:11px 16px;border:1.5px solid var(--ink);color:var(--ink);background:var(--card)}
   .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn-publish{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn-publish:hover{background:#0a615f}
   section{padding:40px 0 8px}
   h2{font-family:var(--serif);font-weight:600;font-size:26px;margin:0 0 4px}
   .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
@@ -73,6 +75,14 @@
 .provenance a.pv-item .pv-v{color:var(--teal)}
 #pv-state{color:var(--open,#b07d1f)}
 @media(max-width:560px){.provenance .pv-item{flex:1 1 45%;border-bottom:1px solid var(--line)}}
+.publish-cta{margin:46px 0 8px;padding:22px 24px;border:1.5px solid var(--teal);background:var(--teal-soft,#e3f0f0);
+  display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;justify-content:space-between}
+.publish-cta .pc-text{flex:1 1 320px;min-width:0}
+.publish-cta .pc-h{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--ink);margin:0 0 3px}
+.publish-cta .pc-sub{font-size:14px;color:var(--ink2);margin:0}
+.publish-cta a.pc-btn{flex:0 0 auto;font-family:var(--mono);font-size:14px;font-weight:600;text-decoration:none;
+  background:var(--teal);color:#fff;padding:12px 20px;white-space:nowrap}
+.publish-cta a.pc-btn:hover{background:#0a615f}
 </style>
 </head>
 <body>
@@ -94,6 +104,7 @@
     <a class="btn" href="paper/manuscript.pdf">Read the PDF</a>
     <a class="btn" href="dossier.html">Audit trail</a>
     <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source &amp; issues</a>
+    <a class="btn btn-publish" href="https://github.com/m4gr4th34/open-dossier-template">Publish your own →</a>
   </div>
 </header>
 
@@ -139,6 +150,14 @@
     </details>
   </div>
 </section>
+
+<div class="publish-cta">
+  <div class="pc-text">
+    <p class="pc-h">Want to publish like this?</p>
+    <p class="pc-sub">Open Dossier is a free template — executable claims, a self-explaining edition, a DOI and blockchain timestamp on every release. From idea to live publication in an afternoon, with an AI agent doing the heavy lifting. No LaTeX, no gatekeepers, no fees.</p>
+  </div>
+  <a class="pc-btn" href="https://github.com/m4gr4th34/open-dossier-template">Publish your own →</a>
+</div>
 
 <footer>
   <b>How to review this paper:</b> run the checks above, read the <a href="dossier.html">audit trail</a> (red-team findings published, not hidden), then <a href="https://github.com/YOURUSER/YOURREPO/issues">file an issue against any claim</a>. Every revision is versioned; nothing is memory-holed. Releases archived at CERN with a DOI; hashes anchored in the Bitcoin blockchain automatically on every release.

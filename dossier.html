@@ -61,6 +61,14 @@
   footer{margin-top:44px;padding:22px 0 56px;border-top:3px solid var(--ink);font-size:13.5px;color:var(--ink2)}
   .mono{font-family:var(--mono)}
   @media(max-width:560px){th:nth-child(1),td:nth-child(1){display:none}}
+  .publish-cta{margin:46px 0 8px;padding:22px 24px;border:1.5px solid var(--teal);background:var(--teal-soft,#e3f0f0);
+    display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;justify-content:space-between}
+  .publish-cta .pc-text{flex:1 1 320px;min-width:0}
+  .publish-cta .pc-h{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--ink);margin:0 0 3px}
+  .publish-cta .pc-sub{font-size:14px;color:var(--ink2);margin:0}
+  .publish-cta a.pc-btn{flex:0 0 auto;font-family:var(--mono);font-size:14px;font-weight:600;text-decoration:none;
+    background:var(--teal);color:#fff;padding:12px 20px;white-space:nowrap}
+  .publish-cta a.pc-btn:hover{background:#0a615f}
 </style>
 </head>
 <body>
@@ -123,6 +131,14 @@
     <li><b>Publication</b><span>Repo live → GitHub Pages → Zenodo DOI (auto) → OpenTimestamps (auto) → community review via issues.</span></li>
   </ol>
 </section>
+
+<div class="publish-cta">
+  <div class="pc-text">
+    <p class="pc-h">Want to publish like this?</p>
+    <p class="pc-sub">Open Dossier is a free template — executable claims, a self-explaining edition, a DOI and blockchain timestamp on every release. From idea to live publication in an afternoon, with an AI agent doing the heavy lifting. No LaTeX, no gatekeepers, no fees.</p>
+  </div>
+  <a class="pc-btn" href="https://github.com/m4gr4th34/open-dossier-template">Publish your own →</a>
+</div>
 
 <footer>
   <a href="index.html">← Back to the paper</a> &nbsp;·&nbsp;
