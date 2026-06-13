@@ -17,6 +17,9 @@ to.
 ## Before you start (one-time, ~10 min)
 
 1. **Claude desktop app** with a Pro or Max plan — you have this.
+   (A Pro plan runs about the price of a couple of fancy coffees a month — a
+   rounding error against what it replaces: a year of formatting, submitting,
+   and waiting. Cheapest research assistant in history.)
 2. **A GitHub account** — free at github.com. Pick a username; write it down.
    You'll use it in a moment.
 3. **A Zenodo account** — also free, but you don't need it yet. You'll set it
