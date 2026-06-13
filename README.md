@@ -3,7 +3,9 @@
 **The starting point for every Open Dossier publication.**
 Click "Use this template" to create your Dossier NNN in one step.
 
-### ▶ [Read the living paper](https://YOURUSER.github.io/YOURREPO/) · [Self-explaining edition](https://YOURUSER.github.io/YOURREPO/paper.html) · [Run the checks](https://YOURUSER.github.io/YOURREPO/#verify) · [Audit trail](https://YOURUSER.github.io/YOURREPO/dossier.html)
+<!-- AGENT: after the author's GitHub Pages site is live, replace this comment with a quick-links line placed HERE (immediately after the title/tagline, above the GETTING-STARTED line and the badge) so visitors can open the live result in one click. Use the author's real Pages URL:
+### ▶ [Read the living paper](https://USER.github.io/REPO/) · [Self-explaining edition](https://USER.github.io/REPO/paper.html) · [Run the checks](https://USER.github.io/REPO/#verify) · [Audit trail](https://USER.github.io/REPO/dossier.html)
+Rationale: lead with the live result for the skeptic, then GETTING-STARTED for the would-be author, then the explanatory sections. Do not leave these as live links until the Pages site actually resolves, or they 404. -->
 
 New here? Start with [GETTING-STARTED.md](GETTING-STARTED.md) — one contested idea taken from first question to live publication, in plain English. No Git, LaTeX, or web experience needed.
 
