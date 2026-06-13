@@ -57,10 +57,13 @@ weapon. Substitute your own contested idea at every step.
 
 Open your AI agent and say:
 
-> "Create a new dossier from the open-dossier-template using the
-> 'Spawning a new dossier' ritual in the template's README. Name it
+> "Go to https://github.com/m4gr4th34/open-dossier-template and
+> follow the 'Spawning a new dossier' ritual in its README to
+> create a new dossier from it. Name the new repo
 > dossier-uap-propulsion. I'm [your name], [your affiliation or
-> 'independent researcher, city']."
+> 'independent researcher, city']. Read AUTHORING.md and CLAUDE.md
+> in the template before you start — they contain the production
+> rules."
 
 The agent clones the template and does the rename pass. You now own a repo
 with all the machinery.
