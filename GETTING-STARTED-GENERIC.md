@@ -278,8 +278,9 @@ chat; execute and publish with your agent.**
 
 ### Step A — Have your AI agent create the repo first (the "wiring" step)
 
-In your AI agent, before any deep work, spawn the repository so there's
-something for the project to connect to. Paste:
+First, start a fresh AI agent session pointed at a new, empty folder for this
+topic (e.g. `~/dossiers/dossier-[short-name]`). Each dossier gets its own
+folder so repos never tangle. Then, in that session, paste:
 
 > Go to https://github.com/m4gr4th34/open-dossier-template, read its README,
 > AUTHORING.md, CLAUDE.md, and GETTING-STARTED.md, and create a new dossier
