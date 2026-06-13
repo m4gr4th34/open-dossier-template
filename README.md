@@ -3,6 +3,8 @@
 **The starting point for every Open Dossier publication.**
 Click "Use this template" to create your Dossier NNN in one step.
 
+### ▶ [Read the living paper](https://YOURUSER.github.io/YOURREPO/) · [Self-explaining edition](https://YOURUSER.github.io/YOURREPO/paper.html) · [Run the checks](https://YOURUSER.github.io/YOURREPO/#verify) · [Audit trail](https://YOURUSER.github.io/YOURREPO/dossier.html)
+
 New here? Start with [GETTING-STARTED.md](GETTING-STARTED.md) — one contested idea taken from first question to live publication, in plain English. No Git, LaTeX, or web experience needed.
 
 [![claims: verified](https://github.com/m4gr4th34/open-dossier-template/actions/workflows/verify.yml/badge.svg)](https://github.com/m4gr4th34/open-dossier-template/actions/workflows/verify.yml)
