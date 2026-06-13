@@ -3,6 +3,8 @@
 **The starting point for every Open Dossier publication.**
 Click "Use this template" to create your Dossier NNN in one step.
 
+New here? Start with [GETTING-STARTED.md](GETTING-STARTED.md) — one contested idea taken from first question to live publication, in plain English. No Git, LaTeX, or web experience needed.
+
 [![claims: verified](https://github.com/m4gr4th34/open-dossier-template/actions/workflows/verify.yml/badge.svg)](https://github.com/m4gr4th34/open-dossier-template/actions/workflows/verify.yml)
 
 ---
@@ -32,6 +34,7 @@ This format eats its own cooking: its first deployment lost its automation files
 4. Work through the `TODO` markers in order:
 
 ```
+GETTING-STARTED.md  ← plain-English walkthrough — start here if you're new
 AUTHORING.md        ← production playbook — hand to your AI agent (read, don't edit)
 index.html          ← replace title, abstract, concept cards, JS checks
 paper.html          ← self-explaining edition: replace placeholder sections, terms, and citation chips
