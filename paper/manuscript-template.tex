@@ -21,6 +21,16 @@
 \usepackage{authblk}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+% TODO: after your first release, replace TODO-AFTER-FIRST-RELEASE (both the
+% \href target and the visible text) with your Zenodo version DOI, so every
+% page of the PDF carries the citable DOI in its running footer.
+\fancyfoot[L]{\footnotesize Open Dossier NNN \textbullet\ DOI \href{https://doi.org/TODO-AFTER-FIRST-RELEASE}{TODO-AFTER-FIRST-RELEASE}}
+\fancyfoot[R]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
 
 \title{\textbf{TODO: Your Title — Specific, Honest, No Hype}}
 
@@ -32,6 +42,7 @@
 
 \begin{document}
 \maketitle
+\thispagestyle{fancy}
 
 \begin{abstract}
 TODO. State the problem, the proposal, the headline quantitative claims

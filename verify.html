@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verifying the Bitcoin timestamp — Open Dossier</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,800;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap');
+  :root{
+    --ink:#101d26; --ink2:#42525c; --paper:#f6f8f9; --card:#ffffff;
+    --teal:#0e7c7b; --coral:#e4572e; --violet:#6b4e9b;
+    --pass:#1e8e5a; --fail:#c9362c; --open:#b07d1f;
+    --line:#d8e0e4;
+    --serif:'Spectral', Georgia, 'Times New Roman', serif;
+    --mono:'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+  a{color:var(--teal)}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  header{padding:56px 0 28px;border-bottom:3px solid var(--ink)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+  .eyebrow b{color:var(--coral);font-weight:600}
+  h1{font-family:var(--serif);font-weight:800;font-size:clamp(26px,4.4vw,40px);line-height:1.14;margin:.45em 0 .3em;letter-spacing:-0.01em}
+  .byline{font-family:var(--serif);font-style:italic;color:var(--ink2);font-size:17px}
+  section{padding:34px 0 4px}
+  h2{font-family:var(--serif);font-weight:600;font-size:25px;margin:0 0 4px}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;color:var(--teal)}
+  p{max-width:70ch}
+  p.lede{color:var(--ink2);max-width:66ch;margin-top:6px}
+  ul.proofs{list-style:none;padding:0;margin:14px 0}
+  ul.proofs li{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--teal);padding:13px 16px;margin:8px 0;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+  ul.proofs a{font-family:var(--mono);font-size:13.5px;font-weight:600}
+  ul.proofs .rel{font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+  ol.steps{counter-reset:st;list-style:none;padding:0;margin:14px 0}
+  ol.steps li{counter-increment:st;background:var(--card);border:1px solid var(--line);padding:14px 16px 14px 60px;position:relative;margin:8px 0;max-width:74ch}
+  ol.steps li::before{content:counter(st);position:absolute;left:16px;top:12px;font-family:var(--serif);font-weight:800;font-size:24px;color:var(--violet)}
+  ol.steps b{display:block;margin-bottom:4px}
+  ol.steps span{color:var(--ink2);font-size:14.5px}
+  pre{background:var(--ink);color:#eef3f4;font-family:var(--mono);font-size:13px;padding:12px 14px;overflow:auto;margin:10px 0;border-radius:2px}
+  code{font-family:var(--mono);font-size:13px;background:var(--card);border:1px solid var(--line);padding:1px 5px}
+  pre code{background:none;border:none;padding:0;color:inherit}
+  footer{margin-top:44px;padding:22px 0 56px;border-top:3px solid var(--ink);font-size:13.5px;color:var(--ink2)}
+  footer .mono{font-family:var(--mono)}
+  @media (max-width:560px){ ul.proofs li{flex-direction:column;gap:2px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">An Open Dossier · <b>NNN</b> · independent verification</div>
+  <h1>Verifying this paper's Bitcoin timestamp</h1>
+  <div class="byline">Trust the math, not the institution.</div>
+</header>
+
+<section>
+  <div class="kicker">What this proves</div>
+  <h2>A hash, frozen in the blockchain</h2>
+  <p class="lede">Every tagged release of this dossier is packaged into an archive, and that
+  archive's cryptographic hash is submitted to <a href="https://opentimestamps.org" target="_blank" rel="noopener">OpenTimestamps</a>,
+  which anchors it in the Bitcoin blockchain. Because the hash is embedded in a block that the
+  entire Bitcoin network agrees on, anyone can later prove that this exact content existed
+  at or before that block's timestamp — without trusting GitHub, Zenodo, the author, or any
+  other institution. If even one byte of the archive had been altered afterward, its hash
+  would no longer match the anchored proof. The proof is the receipt; the blockchain is the
+  notary that cannot be bribed or back-dated.</p>
+</section>
+
+<section>
+  <div class="kicker">The proof files</div>
+  <h2>Where the .ots receipts live</h2>
+  <p>After this dossier's first release, the <code>timestamps/</code> folder of the repository
+  holds one <code>.ots</code> proof file per release — each the OpenTimestamps proof for that
+  release's source archive (named for the release tag, e.g. <code>&lt;tag&gt;.tar.gz.ots</code>).
+  Browse and download them at
+  <a href="https://github.com/YOURUSER/YOURREPO/tree/main/timestamps" target="_blank" rel="noopener"><code>timestamps/</code></a>,
+  picking the one matching the release you want to check. (Until the first release is published
+  and the auto-timestamp workflow runs, this folder will be empty.)</p>
+</section>
+
+<section>
+  <div class="kicker">How to verify it yourself</div>
+  <h2>Step by step</h2>
+  <ol class="steps">
+    <li>
+      <b>Install the OpenTimestamps client</b>
+      <span>A small, open-source Python tool. With Python 3 installed:</span>
+      <pre><code>pip install opentimestamps-client</code></pre>
+    </li>
+    <li>
+      <b>Get the matching release archive</b>
+      <span>From the <a href="https://github.com/YOURUSER/YOURREPO/releases" target="_blank" rel="noopener">GitHub releases page</a>,
+      download the "Source code (tar.gz)" for the same release the proof belongs to — e.g.
+      <code>&lt;tag&gt;.tar.gz</code> for that release's proof. The archive and its <code>.ots</code> file must be the pair.</span>
+    </li>
+    <li>
+      <b>Verify the proof against the archive</b>
+      <span>Run the client against the proof file; it checks the archive's hash and looks up the
+      anchoring Bitcoin block:</span>
+      <pre><code>ots verify &lt;tag&gt;.tar.gz.ots</code></pre>
+      <span>A successful run reports the Bitcoin block height and the UTC time the content was
+      provably anchored. (If the proof is still fresh, run <code>ots upgrade &lt;tag&gt;.tar.gz.ots</code>
+      first to pull in the confirmed block attestation.)</span>
+    </li>
+    <li>
+      <b>Prefer no command line? Use the website.</b>
+      <span>Go to <a href="https://opentimestamps.org" target="_blank" rel="noopener">opentimestamps.org</a>,
+      drop in the <code>.ots</code> proof file alongside the matching release archive, and it verifies in
+      the browser — same blockchain, no install.</span>
+    </li>
+  </ol>
+</section>
+
+<footer>
+  <b>Back to the paper:</b> <a href="index.html">interactive edition</a> ·
+  <a href="paper.html">self-explaining edition</a> ·
+  <a href="dossier.html">audit trail</a> ·
+  <a href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener">source &amp; releases</a>
+  <br><br><span class="mono">An Open Dossier · CC BY 4.0 · timestamps anchored via OpenTimestamps · every verification label is true</span>
+</footer>
+
+</div>
+</body>
+</html>

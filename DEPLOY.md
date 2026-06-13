@@ -36,6 +36,11 @@ Paste the DOI badge into README.md and add the doi: line to
 CITATION.cff. Releases are for milestones; plain commits for
 everything else. Never modify timestamps/.
 
+After your first release, update the DOI in three places (or confirm
+provenance.json auto-updated): provenance.json, the manuscript.tex footer,
+and CITATION.cff. The provenance bar and verify.html read provenance.json
+automatically.
+
 ## Maintenance notes
 - OpenTimestamps proofs mature over hours; `ots upgrade
   timestamps/*.ots` later folds in the Bitcoin block attestation.

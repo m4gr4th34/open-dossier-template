@@ -27,12 +27,26 @@ jobs:
           echo "ARCHIVE=${TAG}.tar.gz" >> $GITHUB_ENV
       - name: Stamp with OpenTimestamps
         run: ots stamp "${{ env.ARCHIVE }}"
-      - name: Commit proof to repository
+      - name: Update provenance.json for this release
+        run: |
+          # NOTE: this template ships placeholder DOI values. After your first
+          # Zenodo release, replace TODO-AFTER-FIRST-RELEASE with your concept
+          # DOI (which always resolves to the latest version). The provenance
+          # bar and verify.html read this file automatically.
+          cat > provenance.json <<EOF
+          {
+            "release_tag": "${{ github.event.release.tag_name }}",
+            "version_doi": "TODO-AFTER-FIRST-RELEASE",
+            "concept_doi": "TODO-AFTER-FIRST-RELEASE",
+            "released": "$(date -u +%Y-%m-%d)"
+          }
+          EOF
+      - name: Commit proof and provenance to repository
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p timestamps
           mv "${{ env.ARCHIVE }}.ots" timestamps/
-          git add timestamps/
-          git commit -m "Auto-timestamp: ${{ github.event.release.tag_name }} anchored via OpenTimestamps"
+          git add timestamps/ provenance.json
+          git commit -m "Auto-timestamp: ${{ github.event.release.tag_name }} anchored via OpenTimestamps; update provenance.json"
           git push

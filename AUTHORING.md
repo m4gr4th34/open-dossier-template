@@ -120,6 +120,25 @@ qualifier, dossier.html finding update) in one commit.
   entry; flag what you couldn't confirm.
 - Status chips in the header must state real counts.
 
+## Provenance surfaces — DOI and Bitcoin timestamp
+
+Three surfaces carry the publication's provenance, and every one must stay
+true after each release:
+
+- **The provenance bar** (top of `index.html` and `paper.html`) and
+  **`verify.html`** read `provenance.json` at load time — so once that file
+  carries the real version DOI and release tag, both update automatically.
+  The `auto-timestamp` workflow rewrites `provenance.json` on each release
+  (release tag + date); you set the DOI fields once.
+- **The manuscript DOI footer** (`paper/manuscript.tex`, via `fancyhdr`) is
+  baked into the PDF at compile time and is NOT auto-updated — replace its
+  `TODO-AFTER-FIRST-RELEASE` placeholder with your version DOI after the
+  first release, then let `build-pdf.yml` rebuild the PDF.
+
+After each release, confirm the real version DOI is in `provenance.json`
+(or was written there by the workflow) and in the manuscript footer.
+DEPLOY.md's release step carries this reminder.
+
 ## Design identity (do not reinvent)
 
 The palette and type ARE the format's brand across all dossiers:
