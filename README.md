@@ -58,6 +58,7 @@ This format eats its own cooking: its first deployment lost its automation files
 GETTING-STARTED.md  ← start here — publish with the Claude desktop app
 GETTING-STARTED-GENERIC.md ← platform-agnostic version
 AUTHORING.md        ← production playbook — hand to your AI agent (read, don't edit)
+PROJECT-INSTRUCTIONS.md ← optional Claude Project "constitution" — fill in [TOPIC] + standing context
 index.html          ← replace title, abstract, concept cards, JS checks
 paper.html          ← self-explaining edition: replace placeholder sections, terms, and citation chips
 dossier.html        ← replace red-team findings and citation table
@@ -115,7 +116,7 @@ Two clicks remain that no tool can do for you, both one-time per dossier: the Ze
 Port the latest template improvements into an existing dossier. This is the subtle one, because a filled-in dossier and the template share machinery but not content, and a naive copy would bulldoze your paper. The instruction encodes that distinction:
 
 ```
-In the dossier-NNN clone: fetch the latest m4gr4th34/open-dossier-template into a temporary folder and compare it against this repo. Apply template-side improvements to MACHINERY ONLY: everything in .github/workflows/, the format spec at verification/research_pipeline.md, the doctrine sections of CLAUDE.md (preserving this repo's "Standing context" section untouched), and any CSS/JavaScript machinery changes in index.html, paper.html, and dossier.html — but never touch this repo's content: section text, terms, citation chips and CITES entries, checks in verify_numbers.py, claim_ledger.csv rows, manuscript files, or anything in timestamps/. Show me the full diff of what you propose before committing. Then commit as "Port template machinery updates [date]" and push. If any machinery change conflicts with local content edits, stop and ask me instead of guessing.
+In the dossier-NNN clone: fetch the latest m4gr4th34/open-dossier-template into a temporary folder and compare it against this repo. Apply template-side improvements to MACHINERY ONLY: everything in .github/workflows/, the format spec at verification/research_pipeline.md, the doctrine sections of CLAUDE.md and PROJECT-INSTRUCTIONS.md (preserving each file's "Standing context" section untouched), and any CSS/JavaScript machinery changes in index.html, paper.html, and dossier.html — but never touch this repo's content: section text, terms, citation chips and CITES entries, checks in verify_numbers.py, claim_ledger.csv rows, manuscript files, or anything in timestamps/. Show me the full diff of what you propose before committing. Then commit as "Port template machinery updates [date]" and push. If any machinery change conflicts with local content edits, stop and ask me instead of guessing.
 ```
 
 The diff-before-commit and stop-on-conflict clauses are the safety rails — you stay the editor-in-chief of every port.

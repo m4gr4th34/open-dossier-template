@@ -167,3 +167,83 @@ new name, new folder, same one-paste setup.
 > research's context and notes across sessions. Optional, and best saved for
 > after your first publication — don't let organization slow down your first
 > win.
+
+---
+
+## Optional power path: run a dossier as a Claude Project (web)
+
+Once you're publishing seriously — or tackling a topic sophisticated enough
+that you'll work on it across many sessions — you'll want a **Claude Project**
+as the home base for that line of research. A Project is a persistent
+strategy room: it remembers your context and instructions across every
+conversation, and it can sync (read-only) the dossier's GitHub repo so the
+chat always sees the current state of your paper. Pair it with Claude Code
+(which does the actual writing and publishing) and you have the full setup:
+**think and plan in the Project chat; execute and publish in Code.**
+
+> **Important — do these in the right order.** A Project *reads* a GitHub
+> repo; Claude Code *creates* it. So the repo must exist first. Follow the
+> steps in sequence and the wiring is clean.
+
+### Step A — Have Claude Code create the repo first (the "wiring" step)
+
+In Claude Code, before any deep work, spawn the repository so there's
+something for the Project to connect to. Paste:
+
+> Go to https://github.com/m4gr4th34/open-dossier-template, read its README,
+> AUTHORING.md, CLAUDE.md, and GETTING-STARTED.md, and create a new dossier
+> from it following the "Spawning a new dossier" ritual. Name the repo
+> **dossier-[short-name]**. I'm **[name], [affiliation]**. Do the full
+> rename pass, push the initial commit so the repo exists on GitHub, and
+> confirm the repo URL. We'll do the actual research next — for now I just
+> want the repo created and pushed so I can wire up a Claude Project to it.
+
+When it finishes you'll have a live GitHub repo (e.g.
+`github.com/[you]/dossier-[short-name]`) containing the template scaffold.
+Copy that URL.
+
+### Step B — Create the Claude Project (web interface)
+
+In a browser at claude.ai (the Project file-sync feature is web-only):
+
+1. **Projects** (left sidebar) → **New project**.
+2. Name it for the topic, e.g. "Dossier — [Your Topic]".
+3. Give it a one-line description.
+
+### Step C — Point the Project's Instructions at the constitution file
+
+Your new repo already contains **`PROJECT-INSTRUCTIONS.md`** — the versioned
+"constitution" for this dossier's Project. Rather than pasting a wall of
+doctrine here, point the Project at that file. Click into the Project's
+**Instructions** and paste a single line:
+
+```
+Read PROJECT-INSTRUCTIONS.md in the synced repo and follow it as your constitution for every conversation in this project.
+```
+
+Then open `PROJECT-INSTRUCTIONS.md` in the repo and fill in its two bracketed
+spots — the topic line and the Standing-context list — for your dossier
+(Claude Code can do this for you). Because the constitution lives in the repo,
+it's versioned and upgrades with the normal template-machinery sync, so your
+Project never goes stale.
+
+### Step D — Connect the repo to the Project (read-only sync)
+
+In the Project, find the **Files** panel (right side). Click **+** →
+**GitHub** → choose your `dossier-[short-name]` repo → select everything
+EXCEPT `paper/manuscript.pdf` (the .tex covers it; the PDF wastes context).
+Hit **Sync**. The Project now sees your live repo. Re-hit **Sync** at the
+start of any session, or after Code pushes, so the chat reads the latest.
+
+### Step E — Work the loop
+
+From now on: **decide and plan here in the Project chat → it hands you a
+paste-ready instruction → run it in Claude Code → Code pushes → hit Sync →
+review back here.** The Project remembers everything across sessions; Code
+does the hands-on work; GitHub holds the truth.
+
+> **Keeping the doctrine in the repo too.** The repo also carries a
+> `CLAUDE.md` file that Claude Code reads automatically every session — so
+> the same rules bind both rooms. The Project Instructions (via
+> `PROJECT-INSTRUCTIONS.md`) and the repo's `CLAUDE.md` are deliberately
+> parallel; if you revise your working rules, update both.

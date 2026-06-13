@@ -257,3 +257,87 @@ new name, new folder, same one-paste setup.
 > research's context and notes across sessions. Optional, and best saved for
 > after your first publication — don't let organization slow down your first
 > win.
+
+---
+
+## Optional power path: run a dossier as a persistent project/workspace
+
+Once you're publishing seriously — or tackling a topic sophisticated enough
+that you'll work on it across many sessions — you'll want **a persistent
+project/workspace in your AI tool, if it has one** as the home base for that
+line of research. It's a persistent strategy room: it remembers your context
+and instructions across every conversation, and if it can sync (read-only)
+the dossier's GitHub repo, the chat always sees the current state of your
+paper. Pair it with your AI agent (which does the actual writing and
+publishing) and you have the full setup: **think and plan in the project
+chat; execute and publish with your agent.**
+
+> **Important — do these in the right order.** The project *reads* a GitHub
+> repo; your AI agent *creates* it. So the repo must exist first. Follow the
+> steps in sequence and the wiring is clean.
+
+### Step A — Have your AI agent create the repo first (the "wiring" step)
+
+In your AI agent, before any deep work, spawn the repository so there's
+something for the project to connect to. Paste:
+
+> Go to https://github.com/m4gr4th34/open-dossier-template, read its README,
+> AUTHORING.md, CLAUDE.md, and GETTING-STARTED.md, and create a new dossier
+> from it following the "Spawning a new dossier" ritual. Name the repo
+> **dossier-[short-name]**. I'm **[name], [affiliation]**. Do the full
+> rename pass, push the initial commit so the repo exists on GitHub, and
+> confirm the repo URL. We'll do the actual research next — for now I just
+> want the repo created and pushed so I can wire up a project to it.
+
+When it finishes you'll have a live GitHub repo (e.g.
+`github.com/[you]/dossier-[short-name]`) containing the template scaffold.
+Copy that URL.
+
+### Step B — Create the project/workspace
+
+In your AI tool (repo file-sync, if it's offered, is usually in the web
+interface):
+
+1. Find the projects/workspaces area → create a new one.
+2. Name it for the topic, e.g. "Dossier — [Your Topic]".
+3. Give it a one-line description.
+
+### Step C — Point the project's instructions at the constitution file
+
+Your new repo already contains **`PROJECT-INSTRUCTIONS.md`** — the versioned
+"constitution" for this dossier's project. Rather than pasting a wall of
+doctrine here, point the project at that file. In the project's
+**instructions** (or system prompt), paste a single line:
+
+```
+Read PROJECT-INSTRUCTIONS.md in the synced repo and follow it as your constitution for every conversation in this project.
+```
+
+Then open `PROJECT-INSTRUCTIONS.md` in the repo and fill in its two bracketed
+spots — the topic line and the Standing-context list — for your dossier (your
+AI agent can do this for you). Because the constitution lives in the repo,
+it's versioned and upgrades with the normal template-machinery sync, so your
+project never goes stale.
+
+### Step D — Connect the repo (read-only sync)
+
+If your AI tool can sync a GitHub repo into the project read-only, connect
+your `dossier-[short-name]` repo and include everything EXCEPT
+`paper/manuscript.pdf` (the .tex covers it; the PDF wastes context). Re-sync
+at the start of any session, or after your agent pushes, so the chat reads
+the latest. (If your tool can't sync files, just paste the repo URL and ask
+it to read the current state from GitHub at the start of a session.)
+
+### Step E — Work the loop
+
+From now on: **decide and plan here in the project chat → it hands you a
+paste-ready instruction → run it with your AI agent → it pushes → re-sync →
+review back here.** The project remembers everything across sessions; your
+agent does the hands-on work; GitHub holds the truth.
+
+> **Keeping the doctrine in the repo too.** The repo also carries a
+> `CLAUDE.md` file that an agent reads automatically every session (if it
+> supports project-level instruction files) — so the same rules bind both
+> rooms. The project instructions (via `PROJECT-INSTRUCTIONS.md`) and the
+> repo's `CLAUDE.md` are deliberately parallel; if you revise your working
+> rules, update both.
