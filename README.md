@@ -59,6 +59,7 @@ GETTING-STARTED.md  ← start here — publish with the Claude desktop app
 GETTING-STARTED-GENERIC.md ← platform-agnostic version
 AUTHORING.md        ← production playbook — hand to your AI agent (read, don't edit)
 PROJECT-INSTRUCTIONS.md ← optional Claude Project "constitution" — fill in [TOPIC] + standing context
+PROJECT-INSTRUCTIONS.example.md ← worked example of a filled-in constitution — study before filling your own
 index.html          ← replace title, abstract, concept cards, JS checks
 paper.html          ← self-explaining edition: replace placeholder sections, terms, and citation chips
 dossier.html        ← replace red-team findings and citation table

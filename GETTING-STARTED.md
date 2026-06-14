@@ -235,6 +235,8 @@ In PROJECT-INSTRUCTIONS.md in this repo, fill in the two bracketed spots and com
 Leave all the doctrine, geography, and division-of-labor sections exactly as they are.
 ```
 
+Not sure how much detail to put in Standing context? See `PROJECT-INSTRUCTIONS.example.md` in the template for a worked example on a genuinely hard topic.
+
 Because the constitution lives in the repo, it's versioned and upgrades with
 the normal template-machinery sync, so your Project never goes stale.
 
