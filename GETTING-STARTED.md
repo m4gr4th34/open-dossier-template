@@ -93,7 +93,7 @@ When the dossier is ready, say:
 
 It will guide you, click by click, to:
 - turn on the free website (GitHub Pages),
-- connect Zenodo once (free, "log in with GitHub") for your DOI,
+- connect Zenodo once for your DOI (free, "log in with GitHub" — if your fresh repo isn't listed, hit "Sync now"; full steps in DEPLOY.md),
 - and tag the first release.
 
 The moment you publish that release, your paper is **live, citable with a

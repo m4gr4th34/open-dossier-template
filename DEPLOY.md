@@ -25,8 +25,13 @@ Settings → Pages → Deploy from a branch → main, / (root) → Save.
 Live at https://YOURUSER.github.io/dossier-NNN/ in ~2 minutes.
 
 ## Step 5 — Connect Zenodo once (3 min)
-zenodo.org → Log in with GitHub → your name → GitHub → toggle your
-repo ON. Every release now self-archives at CERN with a DOI.
+Zenodo (for your DOI): go to zenodo.org → log in with GitHub → click your
+username (top right) → GitHub in the dropdown (left side). Find your
+dossier-[name] repo in the list and flip its toggle ON. If the repo isn't
+listed yet (common for a freshly-created repo), click Sync now at the top of
+that list and refresh. If it still doesn't appear, don't worry — you only need
+it ON before your first release, so you can return and do this at the publish
+step.
 
 ## Step 6 — Publish: tag a release
 Releases → Create a new release → tag v1.0.0 → publish. Automatically:
