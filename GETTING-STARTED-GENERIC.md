@@ -315,15 +315,22 @@ Read PROJECT-INSTRUCTIONS.md in the synced repo and follow it as your constituti
 ```
 
 Then have your AI agent fill in the constitution's two blanks. Paste this into
-your AI agent, edited for your dossier:
+your AI agent, edited for your dossier.
+
+Here's a complete worked example (for a deliberately hard topic — a UAP-propulsion dossier). Copy its shape, swap in your own topic and context:
 
 ```
 In PROJECT-INSTRUCTIONS.md in this repo, fill in the two bracketed spots and commit + push:
-- The topic line: this dossier is "[NNN or short-name]: [one-line description of your topic]"
+- The topic line: this dossier is "UAP Propulsion: What can be inferred about UAP propulsion from the public kinematic data — and what would a real exotic-propulsion signature have to look like?"
 - The Standing context section — replace its bracketed placeholders with:
-  - Open claims: [list any claims you already know will be open/unverified, or "none yet — to be determined during drafting"]
-  - Open red-team findings: [usually "none yet" at the start]
-  - Anything a fresh session must know: [the topic's sensitivities, the key prior work, and the boldest claims and exactly how they should be labeled]
+  - Open claims: None formally entered yet — to be built during prior-art recon. Anticipated structure: the ESTABLISHED bucket (documented sensor records, official acknowledgments, AARO/NASA/Navy material, kinematic observations with their measurement caveats) will be asserted with citations; the exotic/non-human-propulsion inference will be the central OPEN-UNVERIFIED claim, posted as an open challenge with the specific physical signature that would settle it.
+  - Open red-team findings: None yet — adversarial pass comes after the first draft.
+  - Anything a fresh session must know:
+    - Framing discipline (critical): This is a charged topic. The format's credibility depends on labeling with total precision. State documented facts (anomalous kinematics are recorded; relevant data is demonstrably restricted) plainly as ESTABLISHED with sources — that is bedrock, not speculation, and being timid about it is a mistake. But the exotic-propulsion conclusion stays in the OPEN bucket, hedged, framed as a challenge — that is what makes the dossier undismissable rather than mockable. Truth in labeling cuts BOTH ways: never soft-pedal a real anomaly into "alleged," and never assert the exotic conclusion as settled. That symmetry IS the credibility.
+    - Model to emulate: Avi Loeb and Garry Nolan — believe boldly in private, but publish with labels a hostile referee cannot attack. Restraint as a weapon, not as timidity.
+    - The author's position: personally convinced UAP are real and that there is institutional secrecy, after years of research — but conviction and demonstration are different columns of the ledger, and the dossier honors that distinction. The author's certainty informs which questions to pursue; it does not get to set a claim's verification label.
+    - Key prior work to map in recon: the AARO reports, the NASA UAP independent study, the Navy/ODNI kinematic data and FLIR videos, and any peer-reviewed physical-anomaly work (e.g. Nolan-lineage materials analysis). Treat sensationalist or unsourced material as adjacent-at-best and flag it.
+    - The boldest claim and its label: "the kinematics imply non-human/exotic propulsion" → OPEN-UNVERIFIED, open challenge, with the falsifiable signature spelled out. The publishable, defensible spine is the honest separation of what the data shows from what it would take to prove exotic propulsion.
 Leave all the doctrine, geography, and division-of-labor sections exactly as they are.
 ```
 
