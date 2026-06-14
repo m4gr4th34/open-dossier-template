@@ -317,7 +317,17 @@ Read PROJECT-INSTRUCTIONS.md in the synced repo and follow it as your constituti
 Then have your AI agent fill in the constitution's two blanks. Paste this into
 your AI agent, edited for your dossier.
 
-Here's a complete worked example (for a deliberately hard topic — a UAP-propulsion dossier). Copy its shape, swap in your own topic and context:
+```
+In PROJECT-INSTRUCTIONS.md in this repo, fill in the two bracketed spots and commit + push:
+- The topic line: this dossier is "[NNN or short-name]: [one-line description of your topic]"
+- The Standing context section — replace its bracketed placeholders with:
+  - Open claims: [list any claims you already know will be open/unverified, or "none yet — to be determined during drafting"]
+  - Open red-team findings: [usually "none yet" at the start]
+  - Anything a fresh session must know: [the topic's sensitivities, the key prior work, and the boldest claims and exactly how they should be labeled]
+Leave all the doctrine, geography, and division-of-labor sections exactly as they are.
+```
+
+Not sure how much to write? Here's the same block filled in for a deliberately hard topic — a UAP-propulsion dossier. This shows the level of rigor to aim for; copy its shape and swap in your own topic and context:
 
 ```
 In PROJECT-INSTRUCTIONS.md in this repo, fill in the two bracketed spots and commit + push:
