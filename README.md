@@ -7,6 +7,12 @@ Click "Use this template" to create your Dossier NNN in one step.
 ### ▶ [Read the living paper](https://USER.github.io/REPO/) · [Self-explaining edition](https://USER.github.io/REPO/paper.html) · [Run the checks](https://USER.github.io/REPO/#verify) · [Audit trail](https://USER.github.io/REPO/dossier.html)
 Rationale: lead with the live result for the skeptic, then GETTING-STARTED for the would-be author, then the explanatory sections. Do not leave these as live links until the Pages site actually resolves, or they 404. -->
 
+<!-- DRAFT BANNER: present during pre-release. At first release, the "Spawning"/release ritual replaces this block with the standard live-document links (no "work in progress" caveat). See DEPLOY.md and the Rituals section. -->
+### 📖 Live preview (work in progress)
+> **This dossier is an active draft — not yet released.** Sections, claims, and checks may be incomplete. Shared early so the ideas can be read and discussed as they develop.
+
+▶ **[Read the self-explaining edition](https://YOURUSER.github.io/YOURREPO/paper.html)** · [Interactive edition](https://YOURUSER.github.io/YOURREPO/) · [Audit trail](https://YOURUSER.github.io/YOURREPO/dossier.html)
+
 ## Get started in an afternoon
 
 You got into science for the ideas — not for wrestling LaTeX, trimming to word limits, formatting bibliographies at 1 a.m., or waiting eight months on Reviewer 2. This deletes all of that.
@@ -120,6 +126,14 @@ In the dossier-NNN clone: fetch the latest m4gr4th34/open-dossier-template into 
 ```
 
 The diff-before-commit and stop-on-conflict clauses are the safety rails — you stay the editor-in-chief of every port.
+
+### Pre-release drafting & preview
+
+Enable **GitHub Pages from your first commit** (Settings → Pages → deploy from `main` / root). A dossier is meant to be read as it develops, not held back until it's "done" — Pages makes the live self-explaining edition, interactive edition, and audit trail readable and shareable the moment you push.
+
+The **draft-preview banner** at the top of the README is present **by default** and signals honestly that the work is unresolved: sections, claims, and checks may be incomplete. This lets you read the self-explaining edition and share early ideas — with the right expectations set — before any release.
+
+**At first release:** remove the draft-banner block (or replace it with the standard live-document links, without the "work in progress" caveat) — the work is no longer a work-in-progress, and a released dossier should not advertise itself as a draft. This is a **content edit the author makes deliberately, not machinery**: it changes what the dossier claims about its own status, so it is never auto-applied by a template sync.
 
 ---
 

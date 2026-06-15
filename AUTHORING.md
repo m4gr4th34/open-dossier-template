@@ -139,6 +139,14 @@ After each release, confirm the real version DOI is in `provenance.json`
 (or was written there by the workflow) and in the manuscript footer.
 DEPLOY.md's release step carries this reminder.
 
+**Draft banner — pre-release only.** The README ships a draft-preview banner
+("work in progress") that is present by default while drafting, so a
+shared-early dossier signals honestly that it's unresolved. It MUST be cleared
+at first release (see DEPLOY.md's release step and the README Rituals section)
+— a published dossier should never display "work in progress." Clearing it is a
+deliberate content edit the author makes at release, not machinery, so it is
+never auto-applied by a template sync.
+
 **Publish CTA — keep it canonical.** The publish-like-this CTA band (before the footer on index.html, paper.html, and dossier.html) intentionally points at the canonical open-dossier-template's GETTING-STARTED.md — the instructions-first front door — not at this dossier's own repo and not at the template's repo root. Every dossier funnels new authors straight into the step-by-step guide. Leave these URLs as the canonical GETTING-STARTED.md.
 
 ## The Project constitution (`PROJECT-INSTRUCTIONS.md`)

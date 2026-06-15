@@ -38,7 +38,9 @@ Releases → Create a new release → tag v1.0.0 → publish. Automatically:
 Zenodo mints your DOI; the auto-timestamp workflow anchors the release
 hash in the Bitcoin blockchain and commits the proof to timestamps/.
 Paste the DOI badge into README.md and add the doi: line to
-CITATION.cff. Releases are for milestones; plain commits for
+CITATION.cff. Remove the draft-preview banner from README.md (and confirm the
+live pages no longer carry "work in progress" language) — your dossier is now
+released, not a draft. Releases are for milestones; plain commits for
 everything else. Never modify timestamps/.
 
 After your first release, update the DOI in three places (or confirm
