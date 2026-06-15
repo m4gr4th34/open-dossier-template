@@ -102,6 +102,18 @@ blocks. The narrative must be complete without opening any of them.
 amber box AT THE EXACT POINT the claim is made — naming its ledger id and
 posting it as an open challenge with named credit for whoever closes it.
 
+**EXPLORATORY-CONJECTURE — the walled sandbox.** The most speculative label
+(below OPEN-UNVERIFIED): deliberately speculative material for gedanken
+experiments, asserting no truth value, admissible only if it states its premise,
+predicts a distinct measurable signature, and names its cost (a conjecture that
+predicts nothing and costs nothing is cut). Quarantine it to a clearly-labeled
+exploratory section — never the abstract, the main results, or the ledger except
+as a row tagged EXPLORATORY-CONJECTURE — and never let it be a premise for a
+higher-status claim. The self-explaining edition may present such material in a
+visually distinct exploratory section — reuse the `.openclaim` amber styling but
+with an **EXPLORATORY** tag (not OPEN) — so readers always know they've entered
+the speculative sandbox, not the verified results.
+
 **Amendments.** Post-publication corrections appear as dated
 `AMENDED · DD MMM YYYY` `.openclaim` blocks at the exact site of the
 amended claim, stating: what changed, what is NOT affected, the issue
