@@ -39,6 +39,22 @@ Claim statuses run from most defensible to most speculative: verified/PASS →
 OPEN-CAVEATED → OPEN-UNVERIFIED → and, below all of them, the most speculative
 tier:
 
+**OPEN-CAVEATED** — a claim that is established, but only under an explicitly
+stated restriction. The gap is one of verification WORK, not truth: the result
+holds within its stated scope, and closing the caveat (extending the
+derivation, computing the general case) is bounded work that could be done. It
+is NOT for claims whose truth hinges on a contingent external fact that may or
+may not hold — those are OPEN-UNVERIFIED. The test: can the gap be closed by
+doing more verification work? → OPEN-CAVEATED; does the claim instead depend on
+a fact that must be true but is not established? → OPEN-UNVERIFIED. Unlike
+OPEN-UNVERIFIED, an OPEN-CAVEATED claim is verified within its scope (true, with
+a caveat), not merely unverified; unlike EXPLORATORY-CONJECTURE, it asserts a
+truth value (within scope) rather than none. Worked example: a result proven
+only for the Gaussian case is OPEN-CAVEATED (the general case is more
+verification work); a result that holds only assuming the measured range is
+accurate is OPEN-UNVERIFIED (it hinges on a contingent fact — the measurement —
+that has not been verified).
+
 **EXPLORATORY-CONJECTURE** — deliberately speculative material for gedanken
 experiments and idea exploration; asserts NO truth value. Admissible only if it
 (a) states its premise — the explicit "if"; (b) predicts a distinct, measurable

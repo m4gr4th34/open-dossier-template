@@ -29,6 +29,21 @@ verification script, and its claim ledger all live here.
   not re-derivation** — stated publicly in the acknowledgments. Surface
   anything that looks inconsistent rather than smoothing it over.
 - One falsely-labeled claim kills the format's credibility. Guard it.
+- **OPEN-CAVEATED** — a claim that is established, but only under an explicitly
+  stated restriction. The gap is one of verification WORK, not truth: the
+  result holds within its stated scope, and closing the caveat (extending the
+  derivation, computing the general case) is bounded work that could be done.
+  NOT for claims whose truth hinges on a contingent external fact that may or
+  may not hold — those are OPEN-UNVERIFIED. The test: can the gap be closed by
+  doing more verification work? → OPEN-CAVEATED; does the claim instead depend
+  on a fact that must be true but isn't established? → OPEN-UNVERIFIED. Unlike
+  OPEN-UNVERIFIED, an OPEN-CAVEATED claim IS verified within its scope (true,
+  with a caveat), not merely unverified; unlike EXPLORATORY-CONJECTURE, it
+  asserts a truth value (within scope) rather than none. Worked example: a
+  result proven only for the Gaussian case is OPEN-CAVEATED (the general case
+  is more verification work); a result that holds only assuming the measured
+  range is accurate is OPEN-UNVERIFIED (it hinges on a contingent fact — the
+  measurement — that has not been verified).
 - **EXPLORATORY-CONJECTURE** — deliberately speculative material for gedanken
   experiments and idea exploration. Asserts NO truth value. Admissible only if
   it (a) states its premise — the explicit "if"; (b) predicts a distinct,

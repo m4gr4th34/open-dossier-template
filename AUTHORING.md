@@ -102,6 +102,18 @@ blocks. The narrative must be complete without opening any of them.
 amber box AT THE EXACT POINT the claim is made — naming its ledger id and
 posting it as an open challenge with named credit for whoever closes it.
 
+**OPEN-CAVEATED — verified within a stated scope.** A claim that holds, but
+only under an explicitly stated restriction. The gap is verification WORK, not
+truth: closing the caveat (extending the derivation, computing the general
+case) is bounded work that could be done — so the claim is true within its
+scope, not merely unverified. Separate it from OPEN-UNVERIFIED with the
+verification-work-vs-contingent-fact test: a result proven only for the
+Gaussian case is OPEN-CAVEATED (the general case is more verification work); a
+result that holds only assuming the measured range is accurate is
+OPEN-UNVERIFIED (its truth hinges on a contingent fact — the measurement — that
+has not been verified). State the caveat explicitly at the claim in prose; the
+ledger status is OPEN-CAVEATED.
+
 **EXPLORATORY-CONJECTURE — the walled sandbox.** The most speculative label
 (below OPEN-UNVERIFIED): deliberately speculative material for gedanken
 experiments, asserting no truth value, admissible only if it states its premise,
