@@ -79,7 +79,11 @@ each:
    it what it's missing or got wrong. (This is the real research.)
 3. **Decide what's solid vs. open** — make sure every claim is labeled
    honestly: proven things asserted, unproven things marked as open
-   questions. The one rule: every label must be true.
+   questions. (There's actually a small ladder of honest labels — from fully
+   verified, through "true but with a named caveat," to "open and unverified,"
+   down to "exploratory conjecture." Your AI agent knows them from the
+   doctrine; you just need to make sure each claim sits on the rung that's
+   actually true. The one rule: every label is true.)
 4. **Read the draft and the self-explaining edition** — tell it what's
    unclear; it tightens.
 

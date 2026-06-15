@@ -194,7 +194,9 @@ erratum nobody reads, three issues later.)
   no gatekeeper deciding whether you're allowed to have had the idea.
 - **It welcomes the bold and the careful alike.** A wild conjecture and a
   careful incremental result get the same treatment: state it, label it
-  honestly, ship it, invite the world to check. That's just how science
+  honestly, ship it, invite the world to check — each gets the label that's
+  honestly true, from verified down to clearly-marked exploratory conjecture
+  (the doctrine defines the full ladder; your agent applies it). That's just how science
   was always supposed to work — now with the paperwork deleted and the
   receipts attached.
 
