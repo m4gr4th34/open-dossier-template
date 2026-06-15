@@ -7,7 +7,7 @@ Click "Use this template" to create your Dossier NNN in one step.
 ### ▶ [Read the living paper](https://USER.github.io/REPO/) · [Self-explaining edition](https://USER.github.io/REPO/paper.html) · [Run the checks](https://USER.github.io/REPO/#verify) · [Audit trail](https://USER.github.io/REPO/dossier.html)
 Rationale: lead with the live result for the skeptic, then GETTING-STARTED for the would-be author, then the explanatory sections. Do not leave these as live links until the Pages site actually resolves, or they 404. -->
 
-<!-- DRAFT BANNER: present during pre-release. At first release, the "Spawning"/release ritual replaces this block with the standard live-document links (no "work in progress" caveat). See DEPLOY.md and the Rituals section. -->
+<!-- DRAFT BANNER: present during pre-release. At first release, the "Spawning"/release ritual replaces this block with the standard live-document links (no "work in progress" caveat). See DEPLOY.md and the Rituals section. AGENT: replace YOURUSER/YOURREPO in these links with the real repo path during the spawn rename pass, so the author's draft preview works immediately. -->
 ### 📖 Live preview (work in progress)
 > **This dossier is an active draft — not yet released.** Sections, claims, and checks may be incomplete. Shared early so the ideas can be read and discussed as they develop.
 
@@ -112,10 +112,18 @@ Two repeatable workflows run this template. Each is a single instruction block y
 Birth a new dossier from the template. Paste into the Code tab, editing the number and title:
 
 ```
-Create a new public GitHub repo named dossier-NNN from my template repo m4gr4th34/open-dossier-template, and clone it into this folder. Use the gh CLI (gh repo create m4gr4th34/dossier-NNN --template m4gr4th34/open-dossier-template --public --clone); if gh isn't installed or authenticated, walk me through installing and logging in first. Then do the rename pass: in README.md, index.html, paper.html, dossier.html, CITATION.cff, and .zenodo.json, replace every "open-dossier-template" and "DOSSIER NNN"/"dossier-NNN" placeholder with dossier-NNN and the working title "[YOUR TITLE]", and set my name and affiliation (Irfan Ali-Khan, Independent Researcher, Saratoga, California) where the author placeholders are. Then enable GitHub Pages on the new repo from branch main, root folder, using gh api. Show me what changed, commit as "Initialize Dossier NNN from template", and push.
+Create a new public GitHub repo named dossier-NNN from my template repo m4gr4th34/open-dossier-template, and clone it into this folder. Use the gh CLI (gh repo create m4gr4th34/dossier-NNN --template m4gr4th34/open-dossier-template --public --clone); if gh isn't installed or authenticated, walk me through installing and logging in first. Then do the rename pass: in README.md, index.html, paper.html, dossier.html, CITATION.cff, and .zenodo.json, replace every "open-dossier-template" and "DOSSIER NNN"/"dossier-NNN" placeholder with dossier-NNN and the working title "[YOUR TITLE]", replace the YOURUSER/YOURREPO links in the README draft-preview banner with the new repo's real GitHub Pages path so the draft preview resolves once Pages is enabled, and set my name and affiliation (Irfan Ali-Khan, Independent Researcher, Saratoga, California) where the author placeholders are. Then enable GitHub Pages on the new repo from branch main, root folder, using gh api. Show me what changed, commit as "Initialize Dossier NNN from template", and push.
 ```
 
 Two clicks remain that no tool can do for you, both one-time per dossier: the Zenodo toggle (zenodo.org → GitHub → flip the new repo on — do it at birth so the first release auto-DOIs) and, in Claude.ai, creating the matching Project with the repo synced into Files and the dispatcher instructions pasted. (Automating the Zenodo step via their API token is already on the tooling roadmap — a real v2 ticket.)
+
+### Pre-release drafting & preview
+
+Enable **GitHub Pages from your first commit** (Settings → Pages → deploy from `main` / root). A dossier is meant to be read as it develops, not held back until it's "done" — Pages makes the live self-explaining edition, interactive edition, and audit trail readable and shareable the moment you push.
+
+The **draft-preview banner** at the top of the README is present **by default** and signals honestly that the work is unresolved: sections, claims, and checks may be incomplete. This lets you read the self-explaining edition and share early ideas — with the right expectations set — before any release.
+
+**At first release:** remove the draft-banner block (or replace it with the standard live-document links, without the "work in progress" caveat) — the work is no longer a work-in-progress, and a released dossier should not advertise itself as a draft. This is a **content edit the author makes deliberately, not machinery**: it changes what the dossier claims about its own status, so it is never auto-applied by a template sync.
 
 ### Syncing template improvements into an existing dossier
 
@@ -126,14 +134,6 @@ In the dossier-NNN clone: fetch the latest m4gr4th34/open-dossier-template into 
 ```
 
 The diff-before-commit and stop-on-conflict clauses are the safety rails — you stay the editor-in-chief of every port.
-
-### Pre-release drafting & preview
-
-Enable **GitHub Pages from your first commit** (Settings → Pages → deploy from `main` / root). A dossier is meant to be read as it develops, not held back until it's "done" — Pages makes the live self-explaining edition, interactive edition, and audit trail readable and shareable the moment you push.
-
-The **draft-preview banner** at the top of the README is present **by default** and signals honestly that the work is unresolved: sections, claims, and checks may be incomplete. This lets you read the self-explaining edition and share early ideas — with the right expectations set — before any release.
-
-**At first release:** remove the draft-banner block (or replace it with the standard live-document links, without the "work in progress" caveat) — the work is no longer a work-in-progress, and a released dossier should not advertise itself as a draft. This is a **content edit the author makes deliberately, not machinery**: it changes what the dossier claims about its own status, so it is never auto-applied by a template sync.
 
 ---
 
