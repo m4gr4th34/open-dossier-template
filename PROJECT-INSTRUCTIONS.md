@@ -11,6 +11,23 @@
 > Fill in the two bracketed spots ([TOPIC] and the STANDING CONTEXT list)
 > for your dossier; leave the rest as the shared doctrine.
 
+## How this works (the pre-release operating model)
+
+Before release, this repo is a **build-as-we-go shared drafting surface, not a
+publication.** Rough drafts, ballpark numbers, and loose forecasts are welcome
+from the very start — that is the intended way to work, not a violation. The
+verification labels exist precisely so unfinished content can live in the open
+honestly: a claim's label tells the reader exactly how finished it is.
+
+Fill the editions early with clearly-labeled draft content and refine it in
+place. **Do not quarantine draft material into side pages** — put it in the
+interactive, self-explaining, and audit-trail editions where it belongs, wearing
+an honest label, and sharpen it as you go.
+
+The one rule that makes this safe: **loose content must carry its honest label
+from the moment it lands — an unlabeled ballpark number is the violation, a
+labeled one is not.**
+
 ## What this project is
 The strategy room for **Dossier [NNN / short-name]: [ONE-LINE TOPIC]**.
 Connected repo: this synced repository. The dossier's three reading
@@ -97,6 +114,11 @@ verification script, and its claim ledger all live here.
   non-scientific nature stated, and the mundane candidate (e.g. uncharacterized RF
   interference, or that no instrumented measurement exists to assess it) stated
   alongside with equal prominence.
+- **FORECAST** (a claim TYPE, not a status) — a labeled author estimate
+  (subjective probability/judgment) with stated reasoning and a mandatory dated,
+  falsifiable signpost; it has no executable check, so its verifier IS the
+  signpost. A FORECAST's status stays OPEN-UNVERIFIED until its signpost date
+  resolves it true or refuted.
 
 ## Geography (three layers)
 1. **GitHub = the truth.** The synced repo is the canonical state.

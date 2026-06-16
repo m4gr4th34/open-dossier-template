@@ -13,6 +13,23 @@ Rationale: lead with the live result for the skeptic, then GETTING-STARTED for t
 
 ▶ **[Read the self-explaining edition](https://YOURUSER.github.io/YOURREPO/paper.html)** · [Interactive edition](https://YOURUSER.github.io/YOURREPO/) · [Audit trail](https://YOURUSER.github.io/YOURREPO/dossier.html)
 
+## How this works (the pre-release operating model)
+
+Before release, this repo is a **build-as-we-go shared drafting surface, not a
+publication.** Rough drafts, ballpark numbers, and loose forecasts are welcome
+from the very start — that is the intended way to work, not a violation. The
+verification labels exist precisely so unfinished content can live in the open
+honestly: a claim's label tells the reader exactly how finished it is.
+
+Fill the editions early with clearly-labeled draft content and refine it in
+place. **Do not quarantine draft material into side pages** — put it in the
+interactive, self-explaining, and audit-trail editions where it belongs, wearing
+an honest label, and sharpen it as you go.
+
+The one rule that makes this safe: **loose content must carry its honest label
+from the moment it lands — an unlabeled ballpark number is the violation, a
+labeled one is not.**
+
 ## Get started in an afternoon
 
 You got into science for the ideas — not for wrestling LaTeX, trimming to word limits, formatting bibliographies at 1 a.m., or waiting eight months on Reviewer 2. This deletes all of that.

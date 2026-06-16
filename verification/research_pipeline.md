@@ -34,6 +34,12 @@ Claim types and their mandated verifiers:
 | DERIV | a derivation or proof step | symbolic recomputation or human review or OPEN-UNVERIFIED |
 | NOVEL | nobody has done X | Phase 0 search record + "to our knowledge" phrasing |
 | EST | engineering projection | script + clearly labeled as projection in text |
+| FORECAST | a labeled author estimate (subjective probability/judgment) with stated reasoning | no executable check — its verifier IS a mandatory dated, falsifiable signpost that later resolves it true/refuted |
+
+FORECAST is a claim TYPE, not a status: a FORECAST carries status OPEN-UNVERIFIED
+until its dated signpost arrives and resolves it true or refuted. The signpost
+(an explicit date + a falsifiable outcome) is mandatory — a forecast without one
+is inadmissible.
 
 Claim statuses run from most defensible to most speculative: verified/PASS →
 OPEN-CAVEATED → OPEN-UNVERIFIED → and, below all of them, the most speculative

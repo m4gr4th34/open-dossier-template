@@ -25,6 +25,17 @@ Any edit to a number updates all three in the same commit. When a check
 fails: **fix the paper, never widen the tolerance.** The tolerances in the
 checks are exactly what the manuscript states — not padded.
 
+**Known limitation (and roadmap).** Today the synchronized copies — the
+manuscript prose, the Python verifier, the browser JS console, and the claim
+ledger — are kept in lockstep **by hand**, and that manual sync is the single
+biggest latent error source in the format: a number can be updated in three
+places and silently missed in the fourth. Future direction (roadmap, not a
+current change, and not something to re-architect now): render the editions'
+checks from a **single source** — the claim ledger, or a shared JSON that the
+prose, the verifier, and the console all read — so the copies cannot diverge.
+Until then the discipline is manual: every numeric edit touches all four in one
+commit.
+
 ---
 
 ## Surface 1 — The formal manuscript (`paper/manuscript.tex`)
@@ -37,6 +48,11 @@ Start from `paper/manuscript-template.tex`. Conventions:
   claims with ledger status OPEN-UNVERIFIED must hedge ("is expected to",
   "we conjecture") AND state in the text that the claim is open, labeled,
   and invited as a community contribution.
+- **FORECAST claims** are a distinct claim TYPE (not a status): a labeled author
+  estimate — subjective probability or judgment — with stated reasoning and a
+  mandatory dated, falsifiable signpost. There is no executable check; the
+  signpost IS the verifier. Phrase it as an estimate, never a result, and carry
+  ledger status OPEN-UNVERIFIED until the signpost date resolves it true/refuted.
 - A `Relation to prior work` section explicitly separates established /
   adjacent / new, with "to the best of our knowledge" phrasing on novelty.
 - A `Reproducibility` section (mandatory boilerplate in the template)

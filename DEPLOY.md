@@ -40,8 +40,12 @@ hash in the Bitcoin blockchain and commits the proof to timestamps/.
 Paste the DOI badge into README.md and add the doi: line to
 CITATION.cff. Remove the draft-preview banner from README.md (and confirm the
 live pages no longer carry "work in progress" language) — your dossier is now
-released, not a draft. Releases are for milestones; plain commits for
-everything else. Never modify timestamps/.
+released, not a draft. A CI check (`verification/check_placeholders.py`) enforces
+this gate: while the draft-preview banner is present it only warns, but once the
+banner is gone any surviving fill-in placeholder (YOURUSER, YOUR NAME,
+TODO-AFTER-FIRST-RELEASE, NNN, PLACEHOLDER, …) on a publication surface fails the
+build — so you can't release with placeholders still showing. Releases are for
+milestones; plain commits for everything else. Never modify timestamps/.
 
 After your first release, update the DOI in three places (or confirm
 provenance.json auto-updated): provenance.json, the manuscript.tex footer,
