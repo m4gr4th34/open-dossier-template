@@ -319,9 +319,11 @@ Read PROJECT-INSTRUCTIONS.md in the synced repo and follow it as your constituti
 Then have your AI agent fill in the constitution's two blanks. Paste this into
 your AI agent, edited for your dossier.
 
+Fill in the blank version below for your topic; use the worked example that follows it as a model for the depth and labeling discipline to aim for (it's an example, not text to submit).
+
 ```
 In PROJECT-INSTRUCTIONS.md in this repo, fill in the two bracketed spots and commit + push:
-- The topic line: this dossier is "[NNN or short-name]: [one-line description of your topic]"
+- The topic line: in the "## What this project is" section, replace the placeholder "Dossier [NNN / short-name]: [ONE-LINE TOPIC]" with your topic — keep the word "Dossier" in front, and leave the "Connected repo:" line untouched.
 - The Standing context section — replace its bracketed placeholders with:
   - Open claims: [list any claims you already know will be open/unverified, or "none yet — to be determined during drafting"]
   - Open red-team findings: [usually "none yet" at the start]
@@ -348,6 +350,23 @@ Leave all the doctrine, geography, and division-of-labor sections exactly as the
 
 Because the constitution lives in the repo, it's versioned and upgrades with
 the normal template-machinery sync, so your project never goes stale.
+
+Then mirror the same Standing Context into CLAUDE.md. CLAUDE.md is what your AI
+agent reads automatically each session (if it supports project-level instruction
+files), and it ships with a `## Standing context` TODO stub. Paste this so the
+two stay in lockstep:
+
+```
+In CLAUDE.md, replace the "## Standing context" TODO stub with the same Standing Context you just put in PROJECT-INSTRUCTIONS.md, so the strategy-room chat and the working agent share the same framing. Show me the diff; leave every other section unchanged.
+```
+
+Why this matters: the project chat reads PROJECT-INSTRUCTIONS.md and your AI
+agent reads CLAUDE.md — if they drift, the two rooms disagree.
+
+Then: re-sync the repo into your project so the chat reads your new constitution
+(if your tool syncs files; otherwise point it at the repo), and start your
+prior-art reconnaissance in the project chat. When that chat hands you a
+paste-ready instruction, run it with your AI agent. That's the loop.
 
 ### Step D — Connect the repo (read-only sync)
 
