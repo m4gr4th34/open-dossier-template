@@ -126,6 +126,35 @@ visually distinct exploratory section — reuse the `.openclaim` amber styling b
 with an **EXPLORATORY** tag (not OPEN) — so readers always know they've entered
 the speculative sandbox, not the verified results.
 
+**REPORTED — NON-SCIENTIFIC SOURCE, UNCORROBORATED — an off-ladder provenance tag.**
+(Rarely used; mainly for dossiers investigating phenomena where non-scientific
+reports are part of the landscape.) A reported observation or claim recorded for
+completeness or to flag a question worth investigating, from a source that does not
+meet evidentiary standards (no published methodology, no raw or instrumented data,
+no independent corroboration, no peer review — e.g. entertainment media, anecdote,
+social media). It asserts no truth value and is explicitly NOT the author's claim.
+It is not a rung on the verification ladder — it measures provenance (where a
+reported item came from), not how well-backed a claim is. Admissibility (all
+mandatory): (1) the source is named explicitly and its non-scientific nature stated
+plainly; (2) **mundane-explanation wall** — where an ordinary candidate explanation
+exists, state it with at least equal prominence to the reported anomaly; where no
+ordinary explanation is known, state that absence explicitly ("no ordinary
+explanation has been identified") — never leave it as an implied void, because an
+unexplained-by-omission report reads as significance it has not earned (recording an
+anomaly while suppressing its plausible ordinary explanation is inadmissible
+one-sided framing); (3) **premise wall** (inherited from EXPLORATORY-CONJECTURE, in
+full) — never a premise for a higher-status claim, never in the abstract or main
+results, lives only in a clearly-walled "reported anomalies" register visibly
+separated from the physics; it informs which questions to ask and gets no vote on
+any claim's status. Distinguish it from CITE (a real evidentiary source — the
+opposite of this), OPEN-UNVERIFIED (the author's own unchecked claim, not someone
+else's report), and EXPLORATORY-CONJECTURE (a structured hypothesis — this makes no
+hypothesis at all). Worked example: a recurring EM signal reported only on a
+television program → REPORTED — NON-SCIENTIFIC SOURCE, UNCORROBORATED, with the
+source named, its non-scientific nature stated, and the mundane candidate (e.g.
+uncharacterized RF interference, or that no instrumented measurement exists to
+assess it) stated alongside with equal prominence.
+
 **Amendments.** Post-publication corrections appear as dated
 `AMENDED · DD MMM YYYY` `.openclaim` blocks at the exact site of the
 amended claim, stating: what changed, what is NOT affected, the issue

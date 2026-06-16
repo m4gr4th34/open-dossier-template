@@ -56,6 +56,47 @@ verification script, and its claim ledger all live here.
   as a row explicitly tagged EXPLORATORY-CONJECTURE, and it may never be used as
   a premise for a claim of any higher verification status. It is a sandbox with
   walls, not a loophole.
+- **REPORTED — NON-SCIENTIFIC SOURCE, UNCORROBORATED** (provenance label — rarely
+  used; included for completeness. Applies mainly to dossiers investigating
+  phenomena where non-scientific reports are part of the landscape; most dossiers
+  will never need it.) A reported observation or claim recorded in the dossier for
+  completeness or to flag a question worth investigating, originating from a source
+  that does not meet evidentiary standards — no published methodology, no raw or
+  instrumented data, no independent corroboration, no peer review (e.g.
+  entertainment media, anecdote, social media). It asserts no truth value and is
+  explicitly NOT the author's claim. This label sits on a different axis from the
+  others. The verification ladder (verified → OPEN-CAVEATED → OPEN-UNVERIFIED →
+  EXPLORATORY-CONJECTURE) measures how well-backed a claim the author is making or
+  exploring. This label measures provenance — where a reported item came from — for
+  material the author records but does not adopt. It is a tag on origin, not a rung
+  on the ladder.
+  Admissibility requirements (all mandatory): (1) The source is named explicitly
+  and its non-scientific nature stated plainly. (2) Mundane-explanation wall: where
+  an ordinary candidate explanation exists, it must be stated with at least equal
+  prominence to the reported anomaly. Where no ordinary explanation is known, that
+  absence must itself be stated ("no ordinary explanation has been identified") —
+  never left as an implied void, because an unexplained-by-omission report reads as
+  significance it has not earned. Recording an anomaly while suppressing its
+  plausible ordinary explanation is inadmissible one-sided framing. (3) Premise wall
+  (inherited from EXPLORATORY-CONJECTURE, in full): it may never serve as a premise
+  for any higher-status claim, never enters the abstract or main results, and lives
+  only in a clearly-walled "reported anomalies" register, visibly separated from the
+  physics. Its function is to inform which questions to ask; it gets no vote on any
+  claim's verification status.
+  Boundaries: vs. CITE — CITE means a real, evidentiary source supports the claim.
+  This means the source explicitly does not meet that bar; the non-evidentiary
+  provenance is the whole point. vs. OPEN-UNVERIFIED — OPEN-UNVERIFIED is the
+  author's own asserted claim, merely unchecked. This is someone else's reported
+  claim from a non-evidentiary source — a provenance problem, not an
+  unfinished-verification one. vs. EXPLORATORY-CONJECTURE — conjecture is a
+  structured physics hypothesis (premise / predicted signature / named cost). This
+  is a raw reported observation with no such structure; it makes no hypothesis at
+  all.
+  Worked example: A recurring EM signal reported only on a television program →
+  REPORTED — NON-SCIENTIFIC SOURCE, UNCORROBORATED, with the source named, its
+  non-scientific nature stated, and the mundane candidate (e.g. uncharacterized RF
+  interference, or that no instrumented measurement exists to assess it) stated
+  alongside with equal prominence.
 
 ## Geography (three layers)
 1. **GitHub = the truth.** The synced repo is the canonical state.
