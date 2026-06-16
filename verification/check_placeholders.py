@@ -44,6 +44,7 @@ SURFACES = [
     "CITATION.cff",
     ".zenodo.json",
     "provenance.json",
+    "avenues.json",
     "claim_ledger.csv",
     "paper/manuscript.tex",
 ]

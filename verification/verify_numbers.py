@@ -22,6 +22,8 @@ Run locally:  python verification/verify_numbers.py
 CI runs this: on every push (see .github/workflows/verify.yml)
 """
 
+import json
+import os
 import sys
 
 PASS, FAIL = "PASS", "FAIL"
@@ -40,28 +42,27 @@ def check(label, computed, claimed_lo, claimed_hi, fmt="{:.4g}"):
 
 
 # ----------------------------------------------------------------
-# AVENUES — keep in lockstep with the AVENUES array in index.html.
+# AVENUES — single-sourced from the canonical avenues.json at the repo
+# root, the SAME file index.html's console reads, so the data can't drift.
 #   status   : ESTABLISHED | OPEN-UNVERIFIED | FORECAST | REPORTED
 #   forecast : subjective probability (%) for a FORECAST avenue, else None
 #   signpost : dated, falsifiable signpost — MANDATORY for a FORECAST
-# Placeholder data; replace with your survey's avenues. Exits green as-is.
+# Placeholder data ships green; replace the avenues in avenues.json.
 # ----------------------------------------------------------------
-AVENUES = [
-    {"name": "PLACEHOLDER avenue A", "status": "ESTABLISHED",     "forecast": None, "signpost": None},
-    {"name": "PLACEHOLDER avenue B", "status": "OPEN-UNVERIFIED", "forecast": None, "signpost": None},
-    {"name": "PLACEHOLDER avenue C", "status": "FORECAST",        "forecast": 35,   "signpost": "2030"},
-    {"name": "PLACEHOLDER avenue D", "status": "REPORTED",        "forecast": None, "signpost": None},
-]
+HERE = os.path.dirname(os.path.abspath(__file__))
+AVENUES_PATH = os.path.join(HERE, os.pardir, "avenues.json")
+with open(AVENUES_PATH, encoding="utf-8") as f:
+    AVENUES = json.load(f).get("avenues", [])
 
 
 print("=" * 72)
 print("SURVEY CONSISTENCY — same checks as the index.html console")
 print("=" * 72)
 
-forecasts     = [a for a in AVENUES if a["status"] == "FORECAST"]
-with_signpost = sum(1 for a in forecasts if a["signpost"])
+forecasts     = [a for a in AVENUES if a.get("status") == "FORECAST"]
+with_signpost = sum(1 for a in forecasts if a.get("signpost"))
 out_of_range  = sum(1 for a in AVENUES
-                    if a["forecast"] is not None and (a["forecast"] < 0 or a["forecast"] > 100))
+                    if a.get("forecast") is not None and (a.get("forecast") < 0 or a.get("forecast") > 100))
 
 # (1) Every avenue renders a card — at least one avenue in the landscape.
 check("Consistency: at least one avenue in the landscape", len(AVENUES), 1, 9999)

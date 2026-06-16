@@ -232,12 +232,7 @@
 //              a number on it; the card flags it in red)
 //   cites    : array of citation keys (match dossier.html's audit)
 // ---------------------------------------------------------------
-const AVENUES = [
-  {name:"PLACEHOLDER avenue A", thesis:"One-line thesis — what this avenue is and why it's in play.", status:"ESTABLISHED",     forecast:null, signpost:null,   cites:["REF1","REF2"]},
-  {name:"PLACEHOLDER avenue B", thesis:"One-line thesis for an avenue with a central open question.",   status:"OPEN-UNVERIFIED", forecast:null, signpost:null,   cites:["REF3"]},
-  {name:"PLACEHOLDER avenue C", thesis:"One-line thesis for an avenue you're making a forward bet on.",  status:"FORECAST",        forecast:35,   signpost:"2030", cites:["REF4"]},
-  {name:"PLACEHOLDER avenue D", thesis:"One-line thesis sourced only to an interested party / roadmap.", status:"REPORTED",        forecast:null, signpost:null,   cites:["REF5"]},
-];
+let AVENUES = [];
 
 const STATUS = {
   "ESTABLISHED":     {cls:"s-est",      tcls:"t-est"},
@@ -268,7 +263,6 @@ function renderCards(){
     '</div>'
   ).join('');
 }
-renderCards();
 
 // ---------------------------------------------------------------
 // CONSISTENCY CONSOLE — survey-shaped checks computed from AVENUES.
@@ -295,7 +289,18 @@ const fmt = v => v >= 1e4 ? v.toExponential(2) : (Number.isInteger(v) ? String(v
 const runBtn = document.getElementById('run');
 const logEl  = document.getElementById('log');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-document.getElementById('ncheck').textContent = buildChecks().length;
+function renderLandscapeError(){
+  document.getElementById('av-grid').innerHTML =
+    '<div class="av-card"><div class="av-top"><span class="av-name">Landscape unavailable</span></div>'+
+    '<p class="av-thesis">The avenue data loads from <span class="mono">avenues.json</span>. '+
+    'View this page on the live site or a local server — a file:// double-click can\'t fetch it.</p></div>';
+  document.getElementById('ncheck').textContent = '0';
+}
+fetch('avenues.json').then(r=>r.json()).then(d=>{
+  AVENUES = Array.isArray(d.avenues) ? d.avenues : [];
+  renderCards();
+  document.getElementById('ncheck').textContent = buildChecks().length;
+}).catch(renderLandscapeError);
 
 runBtn.addEventListener('click', () => {
   runBtn.disabled = true; logEl.innerHTML = '';

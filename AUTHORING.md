@@ -25,18 +25,32 @@ Any edit to a number updates all three in the same commit. When a check
 fails: **fix the paper, never widen the tolerance.** The tolerances in the
 checks are exactly what the manuscript states — not padded.
 
-**Known limitation (and roadmap).** Today the synchronized copies — the
-manuscript prose, the Python verifier, the browser JS console, and the claim
-ledger — are kept in lockstep **by hand**, and that manual sync is the single
-biggest latent error source in the format: a number can be updated in three
-places and silently missed in the fourth. Future direction (roadmap, not a
-current change, and not something to re-architect now): render the editions'
-checks from a **single source** — the claim ledger, or a shared JSON that the
-prose, the verifier, and the console all read — so the copies cannot diverge.
-Until then the discipline is manual: every numeric edit touches all four in one
-commit.
+**Known limitation (and roadmap).** The survey scaffold now single-sources its
+avenue **data** via `avenues.json` — read by both `index.html` and
+`verification/verify_numbers.py` — which closes the data-drift hole: the
+editions and the verifier can no longer disagree about what the avenues are.
+What remains hand-mirrored is the three consistency-**check implementations**
+across Python and JS — simple invariants (at least one avenue; every FORECAST
+carries a dated signpost; all forecast probabilities in [0,100]) that rarely
+change. Full logic unification — generating one set of checks from the other,
+or a shared declarative spec — stays the roadmap direction if the checks
+proliferate. (The manuscript prose and claim ledger are still hand-synced too;
+every numeric edit touches all of them in one commit.)
 
 ---
+
+## Choosing the shape: survey (default) or single-result
+
+Most dossiers are surveys — you scope a field before you dive — so the scaffold
+ships **survey-shaped by default**: `index.html` renders the avenue landscape
+from the canonical `avenues.json`, and both the consistency console and
+`verification/verify_numbers.py` read that **same file**, so the data can't
+drift between page and verifier. A focused **single-result** finding uses the
+documented alternate instead: the slider-explorer / live-headline / presets
+block, preserved as an OPTIONAL comment in `index.html` — Dossier 001 is the
+worked example of that shape. State plainly in your project which shape you're
+using; the editions, the console, and the verifier all follow from that one
+choice.
 
 ## Surface 1 — The formal manuscript (`paper/manuscript.tex`)
 
