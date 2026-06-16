@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Self-Explaining Edition — DOSSIER NNN (Open Dossier)</title>
-<meta name="description" content="YOUR ONE-LINE DESCRIPTION. The full paper, written to explain itself.">
+<meta name="description" content="YOUR ONE-LINE DESCRIPTION. A survey that explains itself.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;600&display=swap');
   :root{
     --ink:#101d26;--ink2:#42525c;--paper:#f6f8f9;--card:#ffffff;
-    --teal:#0e7c7b;--teal-soft:#e3f0f0;--coral:#e4572e;--violet:#6b4e9b;--violet-soft:#efe9f6;
-    --pass:#1e8e5a;--open:#b07d1f;--line:#d8e0e4;
+    --teal:#0e7c7b;--teal-soft:#e3f0f0;--coral:#e4572e;--coral-soft:#fbe9e3;--violet:#6b4e9b;--violet-soft:#efe9f6;
+    --pass:#1e8e5a;--open:#b07d1f;--open-soft:#fdf6e9;--line:#d8e0e4;
     --serif:'Spectral',Georgia,serif;
     --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
     --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
@@ -28,6 +28,7 @@
   .howto .mono{font-family:var(--mono);font-size:13px}
   h2{font-family:var(--serif);font-weight:600;font-size:27px;margin:48px 0 6px;line-height:1.2}
   h2 .num{color:var(--coral);font-family:var(--mono);font-size:15px;font-weight:600;vertical-align:middle;margin-right:10px}
+  h3{font-family:var(--serif);font-weight:600;font-size:20px;margin:26px 0 2px}
   p{margin:14px 0;max-width:68ch}
 
   /* tappable terms */
@@ -51,13 +52,26 @@
   details.deeper{background:var(--card);border:1px solid var(--line);margin:16px 0}
   details.deeper summary{cursor:pointer;padding:12px 15px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--violet);list-style:none}
   details.deeper summary::-webkit-details-marker{display:none}
-  details.deeper summary::before{content:'▸ ';color:var(--violet)}
-  details.deeper[open] summary::before{content:'▾ '}
+  details.deeper summary::before{content:'\25B8 ';color:var(--violet)}
+  details.deeper[open] summary::before{content:'\25BE '}
   details.deeper .body{padding:0 15px 14px;font-size:15px;color:var(--ink2)}
   details.deeper .eq{font-family:var(--mono);font-size:14px;background:var(--paper);padding:10px 12px;margin:8px 0;overflow-x:auto}
 
-  .openclaim{background:#fdf6e9;border:1px solid var(--open);border-left:5px solid var(--open);padding:14px 16px;margin:18px 0;font-size:15.5px}
-  .openclaim .tag{font-family:var(--mono);font-size:11px;color:var(--open);border:1px solid var(--open);padding:2px 7px;margin-right:8px}
+  /* ===== honest-label callouts at the claim site =====
+     One per survey status that needs a visible home in prose:
+       .openclaim  amber   OPEN-UNVERIFIED  (the author's own open claim)
+       .forecast   violet  FORECAST         (labeled estimate + dated signpost)
+       .reported   coral   REPORTED         (interested-party / not independently reproduced)
+     ESTABLISHED needs no box — it is asserted plainly, with citations. */
+  .openclaim,.forecast,.reported{padding:14px 16px;margin:18px 0;font-size:15.5px;border:1px solid;border-left-width:5px}
+  .openclaim{background:var(--open-soft);border-color:var(--open)}
+  .forecast{background:var(--violet-soft);border-color:var(--violet)}
+  .reported{background:var(--coral-soft);border-color:var(--coral)}
+  .openclaim .tag,.forecast .tag,.reported .tag{font-family:var(--mono);font-size:11px;padding:2px 7px;margin-right:8px;border:1px solid}
+  .openclaim .tag{color:var(--open);border-color:var(--open)}
+  .forecast .tag{color:var(--violet);border-color:var(--violet)}
+  .reported .tag{color:var(--coral);border-color:var(--coral)}
+
   .punch{font-family:var(--serif);font-style:italic;font-size:20px;border-left:4px solid var(--coral);padding:6px 0 6px 16px;margin:26px 0;max-width:60ch}
   footer{margin-top:56px;padding:22px 0 60px;border-top:3px solid var(--ink);font-size:14px;color:var(--ink2)}
   .mono{font-family:var(--mono)}
@@ -89,22 +103,22 @@
 <div class="wrap">
 
 <header>
-  <div class="eyebrow">An Open Dossier · <b>NNN</b> · self-explaining edition · v1.0</div>
+  <div class="eyebrow">An Open Dossier · <b>NNN</b> · self-explaining edition · survey · v1.0</div>
   <h1>YOUR PLAIN-LANGUAGE TITLE</h1>
   <div class="byline">YOUR NAME — YOUR AFFILIATION</div>
   <div class="provenance" role="contentinfo" aria-label="Provenance and verification">
     <span class="pv-item"><span class="pv-k">Reading</span><span class="pv-v" id="pv-state">live tip</span></span>
-    <a class="pv-item" id="pv-doi" href="#" target="_blank" rel="noopener"><span class="pv-k">Archived DOI</span><span class="pv-v" id="pv-doi-v">loading… ↗</span></a>
-    <a class="pv-item" href="verify.html" target="_blank" rel="noopener"><span class="pv-k">Bitcoin timestamp</span><span class="pv-v">verify proof ↗</span></a>
-    <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
+    <a class="pv-item" id="pv-doi" href="#" target="_blank" rel="noopener"><span class="pv-k">Archived DOI</span><span class="pv-v" id="pv-doi-v">loading\u2026 \u2197</span></a>
+    <a class="pv-item" href="verify.html" target="_blank" rel="noopener"><span class="pv-k">Bitcoin timestamp</span><span class="pv-v">verify proof \u2197</span></a>
+    <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history \u2197</span></a>
   </div>
   <div class="howto">
-    <b>How to read this:</b> the whole paper is on this one page, written to explain itself.
+    <b>How to read this:</b> the whole survey is on this one page, written to explain itself.
     Tap any <button class="term" data-d="Like this! Underlined-dashed words expand in place with a plain-language explanation. Tap again to close. You never leave the page.">underlined term</button>
-    for a plain-language explanation. Tap any <button class="cite" data-c="demo">ref</button> to see what that source actually showed, in two sentences. <span class="mono">No rabbit holes. No prerequisites.</span>
+    for a plain-language explanation. Tap any <button class="cite" data-c="demo">ref</button> to see what that source actually showed, in two sentences. Each avenue carries an honest label — <span class="mono">established, open, forecast, or reported</span> — colored to match the <a href="index.html">landscape</a>. <span class="mono">No rabbit holes. No prerequisites.</span>
   </div>
   <div class="cta">
-    <a class="btn" href="index.html">Explore the result</a>
+    <a class="btn" href="index.html">The landscape</a>
     <a class="btn primary" href="paper.html">Self-explaining edition</a>
     <a class="btn" href="paper/manuscript.pdf">Read the PDF</a>
     <a class="btn" href="dossier.html">Audit trail</a>
@@ -114,52 +128,105 @@
 
 <!-- ============================================================
      AUTHOR INSTRUCTIONS (delete this comment when done):
-     1. Write your paper as numbered narrative sections below.
-        Plain language first; math goes in details.deeper blocks.
-     2. Wrap technical terms in:
-        <button class="term" data-d="3-5 sentence plain explanation">term</button>
-     3. Cite with chips:
-        <button class="cite" data-c="KEY">Venue 'YY</button>
-        ...and add KEY to the CITES database in the script below,
-        with who/what/src — what the source showed, in 2 sentences.
-     4. Any OPEN-UNVERIFIED claim gets an .openclaim box, in the text,
-        where the claim is made. Honest labels, always.
+     This is the SURVEY-shaped self-explaining edition. The arc:
+       01 the field, and why survey it (problem as a story)
+       02 established foundations (plain prose + citations)
+       03 the avenues, one by one (each labeled in place)
+       04 what would settle the open questions
+       05 synthesis
+     Conventions:
+     - Wrap technical terms:  <button class="term" data-d="3-5 sentence plain explanation">term</button>
+     - Cite with chips:       <button class="cite" data-c="KEY">Venue 'YY</button>  (+ add KEY to CITES below)
+     - ESTABLISHED claims are asserted plainly, with citations. No box.
+     - OPEN-UNVERIFIED claims get an amber .openclaim box at the claim site.
+     - FORECAST claims get a violet .forecast box: state the estimate, the
+       reasoning, and the MANDATORY dated, falsifiable signpost.
+     - REPORTED items get a coral .reported box: name the interested-party
+       source, state plainly it is not independently reproduced, and give
+       the mundane candidate explanation with equal prominence.
+     - A genuine scientific DISPUTE is not a new status: render it as an
+       ESTABLISHED meta-claim ("the field is divided on X") citing both sides.
      ============================================================ -->
 
-<h2><span class="num">01</span>YOUR FIRST SECTION TITLE</h2>
+<h2><span class="num">01</span>THE FIELD, AND WHY SURVEY IT</h2>
 
-<p>Your opening narrative. Here is a
-<button class="term" data-d="Replace this with a 3-5 sentence plain-language explanation of the term, written for a smart non-specialist. What is it, why does it matter here, what is the one surprising thing about it?">tappable term</button>
-and here is a claim with a source
-<button class="cite" data-c="ref1">Journal 'YY</button>.
-Write the whole argument this way — every concept explained where it first appears.</p>
+<p>Open with the field as a story: what is the question everyone in this area is
+circling, why is it hard, and why is a map of the whole landscape — rather than one
+more result — the useful thing to publish right now? Introduce your first
+<button class="term" data-d="Replace this with a 3-5 sentence plain-language explanation of the term, written for a smart non-specialist. What is it, why does it matter to this field, and what is the one surprising thing about it?">tappable term</button>
+here, and your first sourced claim
+<button class="cite" data-c="ref1">Journal 'YY</button>.</p>
+
+<p class="punch">End the opening with the one line a reader should carry into the rest of the survey.</p>
+
+<h2><span class="num">02</span>ESTABLISHED FOUNDATIONS</h2>
+
+<p>State plainly what the field has actually demonstrated — the bedrock every avenue
+shares. These are ESTABLISHED claims: asserted directly, each with a citation
+<button class="cite" data-c="ref2">Journal 'YY</button>. Being confident here is correct, not
+incautious; documented facts are bedrock, and timidity about them is its own kind of
+dishonesty. Save the hedging for the claims that have earned it.</p>
 
 <details class="deeper"><summary>Go deeper: NAME THE TECHNICAL LAYER</summary>
-<div class="body">Equations and formal detail live here, collapsed by default.
-<div class="eq">your_equation = goes / here</div>
-Cite within deeper blocks the same way <button class="cite" data-c="ref2">Journal 'YY</button>.</div>
+<div class="body">Equations and formal detail live here, collapsed by default. The
+narrative above must be complete without opening this.
+<div class="eq">your_equation = goes / here</div></div>
 </details>
 
-<h2><span class="num">02</span>YOUR SECOND SECTION TITLE</h2>
+<h2><span class="num">03</span>THE AVENUES</h2>
 
-<p>Continue the narrative. If a claim is published unverified by design, label it honestly where it appears:</p>
+<p>The heart of the survey: walk each avenue in turn, and label each exactly as
+strongly as its evidence allows. The four conventions below show every status home.</p>
 
+<h3>Avenue A — a mature, documented direction</h3>
+<p>Describe it in plain language and assert what is established about it, with sources
+<button class="cite" data-c="ref1">Journal 'YY</button>. No callout box — established prose carries itself.</p>
+
+<h3>Avenue B — a direction with a central open question</h3>
+<p>Lay out the avenue, then mark the open question honestly, right where it arises:</p>
 <div class="openclaim">
 <span class="tag">OPEN-UNVERIFIED</span><b>Honest label:</b> DESCRIBE THE UNVERIFIED CLAIM. State that it is claim <span class="mono">CNN</span> in the public ledger and an open challenge: <b>the first person to confirm or refute it gets named credit in the next version.</b>
 </div>
+
+<h3>Avenue C — a direction you are making a forward bet on</h3>
+<p>Where you offer a judgment about how an avenue will develop, label it as a forecast —
+never smuggle an estimate in as a fact:</p>
+<div class="forecast">
+<span class="tag">FORECAST</span><b>Labeled estimate:</b> STATE THE ESTIMATE (e.g. ~35%) AND THE REASONING BEHIND IT. <b>Signpost:</b> name the dated, falsifiable event that will later mark this right or wrong (e.g. "by 2030, X is demonstrated at scale Y"). A forecast without a dated signpost is just an opinion with a number on it; the signpost is its verifier.
+</div>
+
+<h3>Avenue D — a direction sourced only to an interested party</h3>
+<p>Some avenues live mostly on vendor roadmaps, press-release figures, or claims that
+have not been independently reproduced. Record them — but mark the provenance plainly:</p>
+<div class="reported">
+<span class="tag">REPORTED</span><b>Non-independent source:</b> NAME THE INTERESTED-PARTY SOURCE and state plainly it is not independently reproduced. Give the mundane candidate explanation with at least equal prominence (or state that none has been identified). This is recorded for completeness; it is NOT the author's claim, and it gets no vote on any other claim's status.
+</div>
+
+<h2><span class="num">04</span>WHAT WOULD SETTLE THE OPEN QUESTIONS</h2>
+
+<p>For each open avenue, spell out the specific result, measurement, or signpost that
+would move it from open to established. This is what turns a survey from a snapshot into
+an instrument: a reader knows exactly what work is worth doing next, and your OPEN claims
+become standing invitations with named credit attached.</p>
+
+<h2><span class="num">05</span>SYNTHESIS</h2>
+
+<p>Pull the landscape together: which avenues are solid, which are live bets, which are
+mostly noise, and what the honest shape of the field is once every claim wears its true
+label. Close on the line you want to leave the reader with.</p>
 
 <p class="punch">End with the line your readers should carry away.</p>
 
 <div class="publish-cta">
   <div class="pc-text">
     <p class="pc-h">Want to publish like this?</p>
-    <p class="pc-sub">You just read a paper that explains itself. You can publish one too — Open Dossier is a free template, and an AI agent does the drafting, typesetting, citations, and verification. Idea to live publication in an afternoon.</p>
+    <p class="pc-sub">You just read a survey that explains itself. You can publish one too — Open Dossier is a free template, and an AI agent does the drafting, typesetting, citations, and verification. Idea to live publication in an afternoon.</p>
   </div>
-  <a class="pc-btn" href="https://github.com/m4gr4th34/open-dossier-template/blob/main/GETTING-STARTED.md">Publish your own →</a>
+  <a class="pc-btn" href="https://github.com/m4gr4th34/open-dossier-template/blob/main/GETTING-STARTED.md">Publish your own \u2192</a>
 </div>
 
 <footer>
-  <b>About this edition:</b> this page is the complete paper in self-explaining form. The <a href="paper/manuscript.pdf">formal PDF</a> exists for tradition and archives; the <a href="index.html">interactive edition</a> carries the verification console; the <a href="dossier.html">audit trail</a> carries the receipts.
+  <b>About this edition:</b> this page is the complete survey in self-explaining form. The <a href="paper/manuscript.pdf">formal PDF</a> exists for tradition and archives; the <a href="index.html">landscape</a> carries the avenue cards and the consistency console; the <a href="dossier.html">audit trail</a> carries the citation audit and the receipts.
   <br><br><span class="mono">An Open Dossier · CC BY 4.0 · AI-assistance: DESCRIBE YOUR USE and state your actual review basis · every verification label is true</span>
 </footer>
 
@@ -169,9 +236,9 @@ Cite within deeper blocks the same way <button class="cite" data-c="ref2">Journa
 // citation database — add an entry per chip:
 // KEY: {who:"Author(s) (Year)", what:"What they showed, 2 sentences, plain language.", src:"Journal Vol, Page"}
 const CITES = {
-  demo: {who:"This is a citation chip", what:"Tap any chip like this one and you get the source plus a two-sentence plain-language summary of what it actually showed — instead of a bare [7] sending you down a rabbit hole.", src:"You never leave the page."},
-  ref1: {who:"REPLACE — Author et al. (Year)", what:"REPLACE — what this source demonstrated, in plain language, and why it matters to this paper.", src:"Journal Vol, Page (Year)"},
-  ref2: {who:"REPLACE — Author et al. (Year)", what:"REPLACE.", src:"Journal Vol, Page (Year)"}
+  demo: {who:"This is a citation chip", what:"Tap any chip like this one and you get the source plus a two-sentence plain-language summary of what it actually showed \u2014 instead of a bare [7] sending you down a rabbit hole.", src:"You never leave the page."},
+  ref1: {who:"REPLACE \u2014 Author et al. (Year)", what:"REPLACE \u2014 what this source demonstrated, in plain language, and why it matters to this survey.", src:"Journal Vol, Page (Year)"},
+  ref2: {who:"REPLACE \u2014 Author et al. (Year)", what:"REPLACE.", src:"Journal Vol, Page (Year)"}
 };
 // one shared toggle behavior for terms and citations
 function closeCard(btn){ const c = btn._card; if(c){ c.remove(); btn._card = null; btn.setAttribute('aria-expanded','false'); } }
@@ -180,8 +247,7 @@ function toggle(btn, html, extraClass){
   const card = document.createElement('span');
   card.className = 'popcard' + (extraClass ? ' ' + extraClass : '');
   card.innerHTML = html;
-  // insert after the end of the current paragraph-level parent for clean layout
-  const block = btn.closest('p, .howto, .body, .openclaim') || btn.parentNode;
+  const block = btn.closest('p, .howto, .body, .openclaim, .forecast, .reported') || btn.parentNode;
   block.insertAdjacentElement('afterend', card);
   btn._card = card; btn.setAttribute('aria-expanded','true');
 }
@@ -205,10 +271,10 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
     v.textContent='DOI after first release';
     d.href='https://github.com/YOURUSER/YOURREPO';
   } else {
-    d.href='https://doi.org/'+p.version_doi; v.textContent=p.version_doi+' ↗';
+    d.href='https://doi.org/'+p.version_doi; v.textContent=p.version_doi+' \u2197';
   }
   document.getElementById('pv-state').textContent='release '+p.release_tag+' (+ live edits)';
-}).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository ↗';
+}).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository \u2197';
   document.getElementById('pv-doi').href='https://github.com/YOURUSER/YOURREPO';});
 </script>
 </body>

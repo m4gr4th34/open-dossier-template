@@ -8,7 +8,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,800;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap');
   :root{
     --ink:#101d26;--ink2:#42525c;--paper:#f6f8f9;--card:#ffffff;
-    --teal:#0e7c7b;--coral:#e4572e;--violet:#6b4e9b;
+    --teal:#0e7c7b;--teal-soft:#e3f0f0;--coral:#e4572e;--coral-soft:#fbe9e3;--violet:#6b4e9b;
     --pass:#1e8e5a;--fail:#c9362c;--open:#b07d1f;--line:#d8e0e4;
     --serif:'Spectral',Georgia,serif;
     --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
@@ -26,12 +26,22 @@
   .statusbar{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
   .chip{font-family:var(--mono);font-size:12.5px;padding:7px 12px;border:1.5px solid var(--ink);background:var(--card);display:flex;gap:8px;align-items:center}
   .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
-  .dot.g{background:var(--pass)}.dot.o{background:var(--open)}.dot.t{background:var(--teal)}
+  .dot.g{background:var(--pass)}.dot.o{background:var(--open)}.dot.t{background:var(--teal)}.dot.v{background:var(--violet)}.dot.c{background:var(--coral)}
   section{padding:38px 0 8px}
   h2{font-family:var(--serif);font-weight:600;font-size:25px;margin:0 0 4px}
   .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
   .kicker.teal{color:var(--teal)}.kicker.coral{color:var(--coral)}.kicker.violet{color:var(--violet)}
   p.lede{color:var(--ink2);max-width:64ch;margin-top:6px}
+
+  /* citations */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card)}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+  td.st{font-family:var(--mono);font-size:11.5px;white-space:nowrap}
+  td.st.v{color:var(--pass)}
+  td.st.fl{color:var(--open)}
+  td.st.rp{color:var(--coral)}
+  details.block summary{cursor:pointer;font-family:var(--mono);font-size:13px;padding:10px 0;color:var(--teal)}
 
   /* findings */
   .finding{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--open);margin:10px 0}
@@ -42,14 +52,6 @@
   .tag.res{color:var(--pass);border:1px solid var(--pass)}
   .tag.open{color:var(--open);border:1px solid var(--open)}
   .finding .body{padding:0 16px 14px;color:var(--ink2);max-width:70ch}
-
-  /* citations */
-  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card)}
-  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
-  td.st{font-family:var(--mono);font-size:11.5px;white-space:nowrap}
-  td.st.v{color:var(--pass)}.td.st.fl{color:var(--open)}
-  details.block summary{cursor:pointer;font-family:var(--mono);font-size:13px;padding:10px 0;color:var(--teal)}
 
   /* pipeline */
   ol.phases{list-style:none;counter-reset:ph -1;padding:0;margin:14px 0}
@@ -83,12 +85,13 @@
   <h1>Audit Trail — YOUR TITLE</h1>
   <div class="byline">YOUR NAME · companion verification record</div>
   <div class="statusbar">
-    <span class="chip"><span class="dot g"></span>claims&nbsp;<b>N / N pass</b></span>
+    <span class="chip"><span class="dot t"></span>avenues&nbsp;<b>N surveyed</b></span>
+    <span class="chip"><span class="dot v"></span>forecasts&nbsp;<b>N (all signposted)</b></span>
     <span class="chip"><span class="dot g"></span>citations&nbsp;<b>N verified · N flagged</b></span>
     <span class="chip"><span class="dot o"></span>red team&nbsp;<b>N resolved · N open</b></span>
   </div>
   <div class="cta">
-    <a class="btn" href="index.html">Explore the result</a>
+    <a class="btn" href="index.html">The landscape</a>
     <a class="btn" href="paper.html">Self-explaining edition</a>
     <a class="btn" href="paper/manuscript.pdf">Read the PDF</a>
     <a class="btn primary" href="dossier.html">Audit trail</a>
@@ -96,15 +99,32 @@
   </div>
 </header>
 
+<!-- ============================================================
+     SURVEY-shaped audit trail. For a survey the citation audit is
+     the centrepiece (most verification weight sits there, since
+     there is no single headline number), so it leads. Red-team
+     findings follow. The pipeline is unchanged machinery.
+     ============================================================ -->
+
+<section>
+  <div class="kicker violet">SOURCES — THE CENTREPIECE</div>
+  <h2>Citation audit</h2>
+  <p class="lede">In a survey, the citations carry the verification weight: every avenue stands on its sources, so every source is checked against the primary work or triangulated through three or more independent citing works. Interested-party sources (vendor roadmaps, press releases) are marked REPORTED, not verified — the provenance is the point.</p>
+  <table>
+    <thead><tr><th>#</th><th>Reference</th><th>Status</th></tr></thead>
+    <tbody id="cites"></tbody>
+  </table>
+</section>
+
 <section>
   <div class="kicker coral">ADVERSARIAL REVIEW</div>
   <h2>Red-team findings</h2>
-  <p class="lede">A hostile pass over the finished draft, published with the paper. Resolved findings were fixed before launch; open findings are stated as caveats in the manuscript.</p>
+  <p class="lede">A hostile pass over the finished survey, published with it. Resolved findings were fixed before launch; open findings are stated as caveats in the avenues themselves.</p>
 
   <!-- RESOLVED FINDING EXAMPLE -->
   <details class="finding resolved">
     <summary><span class="tag res">RESOLVED</span>DESCRIBE WHAT WAS CAUGHT AND FIXED</summary>
-    <div class="body">What was wrong, how it was found, what was corrected. The catch is the point — this is armor, not embarrassment.</div>
+    <div class="body">What was wrong, how it was found, what was corrected. The catch is the point — this is armor, not embarrassment. (For a survey, common catches: an avenue mislabeled ESTABLISHED on an interested-party source; a forecast missing its signpost; a REPORTED item stated without its mundane explanation.)</div>
   </details>
 
   <!-- OPEN FINDING EXAMPLE -->
@@ -117,29 +137,17 @@
 </section>
 
 <section>
-  <div class="kicker violet">SOURCES</div>
-  <h2>Citation audit</h2>
-  <p class="lede">All bibliography entries checked against primary sources or triangulated through three or more independent citing works.</p>
-  <details class="block"><summary>Show all entries</summary>
-  <table>
-    <thead><tr><th>#</th><th>Reference</th><th>Status</th></tr></thead>
-    <tbody id="cites"></tbody>
-  </table>
-  </details>
-</section>
-
-<section>
   <div class="kicker teal">THE METHOD</div>
   <h2>The Open Dossier pipeline</h2>
   <p class="lede">The architecture that produced this record — reusable for every subsequent dossier.</p>
   <ol class="phases">
     <li><b>Prior-art reconnaissance</b><span>Extract candidate novelty claims; search each one, its components, and combinations; produce the established / adjacent / open table.</span></li>
-    <li><b>Claim ledger</b><span>Every claim typed — CITE, NUM, DERIV, NOVEL, EST — routed to its mandated verifier.</span></li>
-    <li><b>Drafting</b><span>Manuscript written against the open ledger. Reproducibility section and AI-assistance disclosure are mandatory.</span></li>
-    <li><b>Mechanical verification</b><span>Every number recomputed by script; every citation checked. Fail = fix the paper, never the tolerance.</span></li>
+    <li><b>Claim ledger</b><span>Every claim typed — CITE, NUM, DERIV, NOVEL, EST, FORECAST — routed to its mandated verifier. A FORECAST's verifier is its dated, falsifiable signpost.</span></li>
+    <li><b>Drafting</b><span>Survey written against the open ledger. Reproducibility section and AI-assistance disclosure are mandatory.</span></li>
+    <li><b>Mechanical verification</b><span>Consistency checks recomputed by script; every citation checked. Fail = fix the paper, never the tolerance.</span></li>
     <li><b>Adversarial review</b><span>Fresh AI sessions briefed as hostile referees. Findings published RESOLVED or OPEN.</span></li>
     <li><b>Human review</b><span>Consistency and reality checks on end results. Per-claim waiver allowed — at exactly one price: the label tells the truth.</span></li>
-    <li><b>Publication</b><span>Repo live → GitHub Pages → Zenodo DOI (auto) → OpenTimestamps (auto) → community review via issues.</span></li>
+    <li><b>Publication</b><span>Repo live \u2192 GitHub Pages \u2192 Zenodo DOI (auto) \u2192 OpenTimestamps (auto) \u2192 community review via issues.</span></li>
   </ol>
 </section>
 
@@ -148,11 +156,11 @@
     <p class="pc-h">Want to publish like this?</p>
     <p class="pc-sub">Open Dossier is a free template — executable claims, a self-explaining edition, a DOI and blockchain timestamp on every release. From idea to live publication in an afternoon, with an AI agent doing the heavy lifting. No LaTeX, no gatekeepers, no fees.</p>
   </div>
-  <a class="pc-btn" href="https://github.com/m4gr4th34/open-dossier-template/blob/main/GETTING-STARTED.md">Publish your own →</a>
+  <a class="pc-btn" href="https://github.com/m4gr4th34/open-dossier-template/blob/main/GETTING-STARTED.md">Publish your own \u2192</a>
 </div>
 
 <footer>
-  <a href="index.html">← Back to the paper</a> &nbsp;·&nbsp;
+  <a href="index.html">\u2190 Back to the landscape</a> &nbsp;·&nbsp;
   Open Dossier format · CC BY 4.0 (paper) / MIT (code)
 </footer>
 
@@ -162,17 +170,21 @@
 // ---------------------------------------------------------------
 // CITATION TABLE — fill in your references here.
 // Format: ["KEY", "Author(s) — Venue, volume, page (year)", "STATUS"]
-// STATUS codes: "V" = verified primary, "T" = triangulated, "F" = flagged
+// STATUS codes: "V" = verified primary, "T" = triangulated,
+//               "F" = flagged, "R" = REPORTED (interested-party /
+//               not independently reproduced — provenance, not a pass)
 // ---------------------------------------------------------------
 const cites = [
   ["REF1", "Author et al. — Journal Vol, Page (Year)", "V"],
   ["REF2", "Author et al. — Journal Vol, Page (Year)", "T"],
+  ["REF5", "Vendor roadmap / press release (Year)", "R"],
   // add all your references here
 ];
 const lab = {
   V: ["VERIFIED — primary source", "v"],
-  T: ["VERIFIED — triangulated ×3", "v"],
-  F: ["FLAGGED — check before submission", "fl"]
+  T: ["VERIFIED — triangulated \u00d73", "v"],
+  F: ["FLAGGED — check before submission", "fl"],
+  R: ["REPORTED — interested party, not independent", "rp"]
 };
 document.getElementById('cites').innerHTML = cites.map((c, i) =>
   '<tr><td>' + (i+1) + '</td><td>' + c[1] + '</td>' +

@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DOSSIER NNN — YOUR TITLE (Open Dossier)</title>
-<meta name="description" content="YOUR ONE-LINE DESCRIPTION. Every claim executable in your browser.">
+<meta name="description" content="YOUR ONE-LINE DESCRIPTION. A survey of the field; every claim honestly labeled, consistency checks runnable in your browser.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,800;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap');
   :root{
     --ink:#101d26;--ink2:#42525c;--paper:#f6f8f9;--card:#ffffff;
-    --teal:#0e7c7b;--coral:#e4572e;--violet:#6b4e9b;
-    --pass:#1e8e5a;--fail:#c9362c;--line:#d8e0e4;
+    --teal:#0e7c7b;--teal-soft:#e3f0f0;--coral:#e4572e;--coral-soft:#fbe9e3;--violet:#6b4e9b;--violet-soft:#efe9f6;
+    --pass:#1e8e5a;--fail:#c9362c;--open:#b07d1f;--open-soft:#fdf6e9;--line:#d8e0e4;
     --serif:'Spectral',Georgia,serif;
     --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
     --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
@@ -35,7 +35,36 @@
   .kicker.teal{color:var(--teal)}.kicker.coral{color:var(--coral)}.kicker.violet{color:var(--violet)}
   p.lede{color:var(--ink2);max-width:66ch;margin-top:6px}
 
-  /* verification console */
+  /* ===== survey landscape — card grid (survey-default keystone) ===== */
+  .av-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
+  .av-card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--line);padding:15px 16px 16px;display:flex;flex-direction:column;gap:9px}
+  .av-card.t-est{border-top-color:var(--pass)}
+  .av-card.t-open{border-top-color:var(--open)}
+  .av-card.t-forecast{border-top-color:var(--violet)}
+  .av-card.t-reported{border-top-color:var(--coral)}
+  .av-card .av-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .av-card .av-name{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.2}
+  .av-card .av-thesis{color:var(--ink2);font-size:14.5px;margin:0}
+  .av-card .av-meta{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:4px}
+  .av-card .fc{font-family:var(--mono);font-size:13px}
+  .av-card .fc .pct{font-weight:600}
+  .av-card .fc .by{color:var(--ink2)}
+  .av-card .fc.missing{color:var(--fail)}
+  .av-card .srcs{display:flex;flex-wrap:wrap;gap:5px}
+  .av-card .srcs .ref{font-family:var(--mono);font-size:11px;color:var(--violet);background:var(--violet-soft);border:1px solid var(--violet);border-radius:9px;padding:0 7px}
+  .av-card .srcs .none{color:var(--ink2);font-size:12px;font-family:var(--mono)}
+
+  /* ===== status chips — one home per honest label (incl. new REPORTED token #4) ===== */
+  .s-chip{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;padding:2px 8px;border:1px solid;white-space:nowrap;display:inline-block;flex:0 0 auto}
+  .s-est{color:var(--pass);border-color:var(--pass)}
+  .s-open{color:var(--open);border-color:var(--open)}
+  .s-forecast{color:var(--violet);border-color:var(--violet)}
+  .s-reported{color:var(--coral);border-color:var(--coral);background:var(--coral-soft)}
+  .s-default{color:var(--ink2);border-color:var(--line)}
+  .legend{display:flex;flex-wrap:wrap;gap:14px 18px;margin-top:14px;font-size:13px;color:var(--ink2)}
+  .legend span.item{display:inline-flex;align-items:center;gap:7px}
+
+  /* verification/consistency console */
   .console{background:var(--card);border:1.5px solid var(--ink);margin-top:18px}
   .console-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
   .console-head .label{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
@@ -87,7 +116,7 @@
 <div class="wrap">
 
 <header>
-  <div class="eyebrow">An Open Dossier · <b>NNN</b> · v1.0 · MONTH YEAR</div>
+  <div class="eyebrow">An Open Dossier · <b>NNN</b> · survey · v1.0 · MONTH YEAR</div>
   <h1>YOUR TITLE HERE</h1>
   <div class="byline">YOUR NAME — YOUR AFFILIATION</div>
   <div class="provenance" role="contentinfo" aria-label="Provenance and verification">
@@ -96,9 +125,9 @@
     <a class="pv-item" href="verify.html" target="_blank" rel="noopener"><span class="pv-k">Bitcoin timestamp</span><span class="pv-v">verify proof ↗</span></a>
     <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
   </div>
-  <p class="abstract">YOUR ABSTRACT. Replace this with your paper's abstract. End it with: <b>Don't trust this paper — run it.</b></p>
+  <p class="abstract">YOUR SURVEY ABSTRACT. This dossier surveys [field]: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
   <div class="cta">
-    <a class="btn primary" href="index.html">Explore the result</a>
+    <a class="btn primary" href="index.html">The landscape</a>
     <a class="btn" href="paper.html">Self-explaining edition</a>
     <a class="btn" href="paper/manuscript.pdf">Read the PDF</a>
     <a class="btn" href="dossier.html">Audit trail</a>
@@ -106,17 +135,36 @@
   </div>
 </header>
 
-<!-- OPTIONAL: Add an interactive explorer section here if your paper
-     has quantitative claims with adjustable parameters. See dossier-001
-     for a worked example with range sliders and a live readout. -->
+<!-- ============================================================
+     SURVEY LANDSCAPE — the survey-shaped scaffold's centrepiece.
+     One card per avenue/option in the field. Drive it from the
+     AVENUES array in the script below (single source -> cards).
+     Each card: name + one-line thesis, an honest status label,
+     an optional dated forecast, and its sources. The card's top
+     border is colored by status for at-a-glance scanning.
+     STATUS values: ESTABLISHED / OPEN-UNVERIFIED / FORECAST /
+     REPORTED (others fall back to a neutral chip + border).
+     ============================================================ -->
+<section id="landscape">
+  <div class="kicker teal">THE LANDSCAPE · SURVEY</div>
+  <h2>Avenues at a glance</h2>
+  <p class="lede">Every avenue in this survey, each with its honest status label and — where the avenue is a forward bet — a dated forecast. <span class="mono">The labels are the verification here: each is exactly as strong as its evidence.</span></p>
+  <div class="av-grid" id="av-grid"></div>
+  <div class="legend">
+    <span class="item"><span class="s-chip s-est">ESTABLISHED</span> documented, cited</span>
+    <span class="item"><span class="s-chip s-open">OPEN-UNVERIFIED</span> the author's open claim</span>
+    <span class="item"><span class="s-chip s-forecast">FORECAST</span> labeled estimate + dated signpost</span>
+    <span class="item"><span class="s-chip s-reported">REPORTED</span> interested-party / not independently reproduced</span>
+  </div>
+</section>
 
 <section id="verify">
-  <div class="kicker teal">CLAIMS · EXECUTABLE</div>
-  <h2>Run the paper</h2>
-  <p class="lede">Every quantitative claim recomputed from its stated assumptions. Same arithmetic as <span class="mono">verification/verify_numbers.py</span>, which CI reruns on every commit.</p>
+  <div class="kicker teal">CONSISTENCY · EXECUTABLE</div>
+  <h2>Run the checks</h2>
+  <p class="lede">A survey's verification weight sits mostly in the <a href="dossier.html">citation audit</a>; the console here runs the <em>consistency</em> checks — cross-avenue totals, internal arithmetic, and the rule that every forecast carries a dated signpost. Same arithmetic as <span class="mono">verification/verify_numbers.py</span>, which CI reruns on every commit.</p>
   <div class="console">
     <div class="console-head">
-      <span class="label">verification console · N checks</span>
+      <span class="label">consistency console · <span id="ncheck">N</span> checks</span>
       <button id="run">Run all checks</button>
     </div>
     <div id="log" aria-live="polite">
@@ -128,15 +176,20 @@
   </div>
 </section>
 
-<!-- CONCEPT CARDS: add one per key idea the reader needs to understand
-     your result. Each expands inline — no page navigation required. -->
+<!-- OPTIONAL (single-result alternate): if THIS dossier is a focused
+     single-result finding rather than a survey, replace the landscape
+     card grid with a slider explorer + a live headline number + a
+     presets table reproducing each row of your results table.
+     dossier-001 is the worked example of that shape. Keep the console
+     either way. -->
+
 <section>
   <div class="kicker violet">LEARN AS YOU READ</div>
   <h2>Key concepts</h2>
   <div class="cards">
     <details class="card">
       <summary>Concept 1 — NAME IT</summary>
-      <div class="body">Explain this concept in 3–5 sentences, written for a smart non-specialist. What is it, why does it matter to your result, and what's the one surprising thing about it?</div>
+      <div class="body">Explain this concept in 3-5 sentences, written for a smart non-specialist. What is it, why does it matter to this field, and what's the one surprising thing about it?</div>
     </details>
     <details class="card">
       <summary>Concept 2 — NAME IT</summary>
@@ -158,7 +211,7 @@
 </div>
 
 <footer>
-  <b>How to review this paper:</b> run the checks above, read the <a href="dossier.html">audit trail</a> (red-team findings published, not hidden), then <a href="https://github.com/YOURUSER/YOURREPO/issues">file an issue against any claim</a>. Every revision is versioned; nothing is memory-holed. Releases archived at CERN with a DOI; hashes anchored in the Bitcoin blockchain automatically on every release.
+  <b>How to review this survey:</b> run the checks above, read the <a href="dossier.html">audit trail</a> (citation audit + red-team findings, published not hidden), then <a href="https://github.com/YOURUSER/YOURREPO/issues">file an issue against any card</a>. Every revision is versioned; nothing is memory-holed. Releases archived at CERN with a DOI; hashes anchored in the Bitcoin blockchain automatically on every release.
   <br><br>
   <span class="mono">Open Dossier format · CC BY 4.0 (paper) / MIT (code) · AI-assistance: DESCRIBE YOUR USE HERE and state your actual review basis.</span>
 </footer>
@@ -167,22 +220,82 @@
 
 <script>
 // ---------------------------------------------------------------
-// VERIFICATION CONSOLE
-// Port your verify_numbers.py checks here as JavaScript.
+// SURVEY LANDSCAPE — single source of truth for the cards.
+// One object per avenue. Replace the PLACEHOLDER rows with yours.
+//   name     : avenue/option name
+//   thesis   : one-line plain-language thesis
+//   status   : ESTABLISHED | OPEN-UNVERIFIED | FORECAST | REPORTED
+//              (any other ladder status renders as a neutral chip)
+//   forecast : integer percent, or null  (only meaningful for FORECAST)
+//   signpost : dated, falsifiable signpost string — MANDATORY for a
+//              FORECAST (a forecast without one is just an opinion with
+//              a number on it; the card flags it in red)
+//   cites    : array of citation keys (match dossier.html's audit)
+// ---------------------------------------------------------------
+const AVENUES = [
+  {name:"PLACEHOLDER avenue A", thesis:"One-line thesis — what this avenue is and why it's in play.", status:"ESTABLISHED",     forecast:null, signpost:null,   cites:["REF1","REF2"]},
+  {name:"PLACEHOLDER avenue B", thesis:"One-line thesis for an avenue with a central open question.",   status:"OPEN-UNVERIFIED", forecast:null, signpost:null,   cites:["REF3"]},
+  {name:"PLACEHOLDER avenue C", thesis:"One-line thesis for an avenue you're making a forward bet on.",  status:"FORECAST",        forecast:35,   signpost:"2030", cites:["REF4"]},
+  {name:"PLACEHOLDER avenue D", thesis:"One-line thesis sourced only to an interested party / roadmap.", status:"REPORTED",        forecast:null, signpost:null,   cites:["REF5"]},
+];
+
+const STATUS = {
+  "ESTABLISHED":     {cls:"s-est",      tcls:"t-est"},
+  "OPEN-UNVERIFIED": {cls:"s-open",     tcls:"t-open"},
+  "FORECAST":        {cls:"s-forecast", tcls:"t-forecast"},
+  "REPORTED":        {cls:"s-reported", tcls:"t-reported"},
+};
+const statusMeta = s => STATUS[s] || {cls:"s-default", tcls:""};
+
+function chip(s){ return '<span class="s-chip '+statusMeta(s).cls+'">'+s+'</span>'; }
+function forecastCell(a){
+  if(a.status !== "FORECAST") return '';
+  if(!a.signpost)             return '<span class="fc missing">\u26A0 forecast needs a dated signpost</span>';
+  const pct = (a.forecast==null) ? '?' : a.forecast+'%';
+  return '<span class="fc"><span class="pct">~'+pct+'</span> <span class="by">by '+a.signpost+'</span></span>';
+}
+function sourcesCell(a){
+  if(!a.cites || !a.cites.length) return '<span class="srcs"><span class="none">no sources</span></span>';
+  return '<span class="srcs">'+a.cites.map(c=>'<span class="ref">'+c+'</span>').join('')+'</span>';
+}
+
+function renderCards(){
+  document.getElementById('av-grid').innerHTML = AVENUES.map(a =>
+    '<div class="av-card '+statusMeta(a.status).tcls+'">'+
+      '<div class="av-top"><span class="av-name">'+a.name+'</span>'+chip(a.status)+'</div>'+
+      '<p class="av-thesis">'+a.thesis+'</p>'+
+      '<div class="av-meta">'+forecastCell(a)+sourcesCell(a)+'</div>'+
+    '</div>'
+  ).join('');
+}
+renderCards();
+
+// ---------------------------------------------------------------
+// CONSISTENCY CONSOLE — survey-shaped checks computed from AVENUES.
+// Keep these in lockstep with verification/verify_numbers.py.
 // Pattern: checks.push(["label", computed_value, [lo, hi]])
-// See dossier-001/index.html for a full worked example.
 // ---------------------------------------------------------------
 function buildChecks(){
   const c = [];
-  // TODO: replace this placeholder with your actual checks
-  c.push(["PLACEHOLDER — replace with your first real check", 42, [41, 43]]);
+  const forecasts      = AVENUES.filter(a=>a.status==="FORECAST");
+  const withSignpost   = forecasts.filter(a=>!!a.signpost).length;
+  const outOfRange     = AVENUES.filter(a=>a.forecast!=null && (a.forecast<0 || a.forecast>100)).length;
+
+  // Every avenue renders a card.
+  c.push(["Consistency: at least one avenue in the landscape", AVENUES.length, [1, 9999]]);
+  // Mandatory-signpost rule: every FORECAST carries a dated signpost.
+  c.push(["Consistency: every FORECAST has a dated signpost", withSignpost, [forecasts.length, forecasts.length]]);
+  // Probabilities are well-formed.
+  c.push(["Consistency: all forecast probabilities lie in [0,100]", outOfRange, [0, 0]]);
+  // TODO: add your survey's real cross-avenue / arithmetic checks here.
   return c;
 }
 
-const fmt = v => v >= 1e4 ? v.toExponential(2) : v.toFixed(4);
+const fmt = v => v >= 1e4 ? v.toExponential(2) : (Number.isInteger(v) ? String(v) : v.toFixed(4));
 const runBtn = document.getElementById('run');
 const logEl  = document.getElementById('log');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.getElementById('ncheck').textContent = buildChecks().length;
 
 runBtn.addEventListener('click', () => {
   runBtn.disabled = true; logEl.innerHTML = '';
@@ -193,7 +306,7 @@ runBtn.addEventListener('click', () => {
     const row = document.createElement('div'); row.className = 'row'; row.style.opacity = '0';
     row.innerHTML = '<span class="badge ' + (ok?'p':'f') + '">' + (ok?'PASS':'FAIL') + '</span>' +
       '<span class="what">' + String(i+1).padStart(2,'0') + ' · ' + label + '</span>' +
-      '<span class="nums">' + fmt(val) + ' ∈ [' + fmt(lo) + ', ' + fmt(hi) + ']</span>';
+      '<span class="nums">' + fmt(val) + ' \u2208 [' + fmt(lo) + ', ' + fmt(hi) + ']</span>';
     logEl.appendChild(row);
     const show = () => { row.style.transition = 'opacity .25s'; row.style.opacity = '1'; };
     reduced ? show() : setTimeout(show, 90 * i);
@@ -201,7 +314,7 @@ runBtn.addEventListener('click', () => {
       const t = document.createElement('div'); t.className = 'tally';
       t.textContent = 'TOTAL: ' + checks.length + ' checks · ' + pass + ' pass · ' +
         (checks.length - pass) + ' fail' +
-        (pass === checks.length ? ' — the paper\u2019s numbers reproduce.' : ' — fix the paper, not the tolerance.');
+        (pass === checks.length ? ' — the survey is internally consistent.' : ' — fix the paper, not the tolerance.');
       const fin = () => { logEl.appendChild(t); runBtn.disabled = false; runBtn.textContent = 'Run again'; };
       reduced ? fin() : setTimeout(fin, 90 * i + 350);
     }
@@ -215,10 +328,10 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
     v.textContent='DOI after first release';
     d.href='https://github.com/YOURUSER/YOURREPO';
   } else {
-    d.href='https://doi.org/'+p.version_doi; v.textContent=p.version_doi+' ↗';
+    d.href='https://doi.org/'+p.version_doi; v.textContent=p.version_doi+' \u2197';
   }
   document.getElementById('pv-state').textContent='release '+p.release_tag+' (+ live edits)';
-}).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository ↗';
+}).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository \u2197';
   document.getElementById('pv-doi').href='https://github.com/YOURUSER/YOURREPO';});
 </script>
 </body>
