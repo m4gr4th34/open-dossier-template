@@ -253,7 +253,11 @@ Code paste-ready instructions. (Full role split and standing context:
 CLAUDE.md.)"* That explicit cannot-push guardrail is only safe once `CLAUDE.md`
 is the full constitution — so on an OLDER dossier still on the slim workbench
 `CLAUDE.md`, do the constitution-collapse migration (README Rituals →
-Structural migrations → Migration B) before pasting it. Treat it as machinery — per dossier, fill in
+Structural migrations → Migration B) before pasting it. A project that holds more
+than one dossier repo uses the multi-repo pointer variant instead (see
+GETTING-STARTED.md) — it keeps the same cannot-push role rule but works from the
+active dossier's `CLAUDE.md`, and asks which dossier is active when that's
+ambiguous. Treat it as machinery — per dossier, fill in
 only its `## What this project is` topic line and its `## Standing context`
 list; everything else is shared doctrine, upgraded via the template-machinery
 sync (it's on the machinery list in the README's Rituals section).

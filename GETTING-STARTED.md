@@ -229,6 +229,14 @@ Your full constitution is CLAUDE.md — read it and follow it. Note specifically
 
 **Caution — only once CLAUDE.md is the full constitution.** This pointer is only correct after CLAUDE.md is the full constitution. If you're upgrading an OLDER dossier whose CLAUDE.md is still the slim workbench version, complete the constitution-collapse migration (README Rituals → Structural migrations → Migration B) BEFORE pasting this pointer, or the strategy room will inherit the workbench's "push freely."
 
+**If this project contains MORE THAN ONE dossier repo, use this pointer instead** (the single-repo pointer above is the default; this is the alternative for a project that holds several dossiers):
+
+```
+This project contains multiple dossier repositories, each with its own CLAUDE.md serving as that dossier's constitution. For every conversation, work from the CLAUDE.md of the dossier being worked on and follow it as your constitution — including its role rules: this is the strategy room, you CANNOT push, you decide here and hand Code paste-ready instructions. If it is not clear from the conversation which dossier is active, ask before proceeding rather than assuming.
+```
+
+The same caution applies per repo: each dossier's CLAUDE.md must be the full constitution (Migration B done) before this pointer is safe for it.
+
 Then have Claude Code fill in the constitution's two blanks. Paste this into
 Claude Code, edited for your dossier.
 
