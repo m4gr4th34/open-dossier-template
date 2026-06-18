@@ -4,5 +4,12 @@
     {"name": "PLACEHOLDER avenue B", "thesis": "One-line thesis for an avenue with a central open question.",   "status": "OPEN-UNVERIFIED", "forecast": null, "signpost": null,   "cites": ["REF3"]},
     {"name": "PLACEHOLDER avenue C", "thesis": "One-line thesis for an avenue you're making a forward bet on.",  "status": "FORECAST",        "forecast": 35,   "signpost": "2030", "cites": ["REF4"]},
     {"name": "PLACEHOLDER avenue D", "thesis": "One-line thesis sourced only to an interested party / roadmap.", "status": "REPORTED",        "forecast": null, "signpost": null,   "cites": ["REF5"]}
-  ]
+  ],
+  "checks": {
+    "_comment": "Single source of truth for the consistency-check RULES. Both index.html's console and verification/verify_numbers.py read these, so a threshold can never drift between the page and the verifier. Change a rule HERE and both sides enforce it on next run. (The check LOGIC is still written in each language — see AUTHORING.md — but the rules it enforces live only here.)",
+    "min_avenues": 1,
+    "forecast_signpost_required": true,
+    "forecast_pct_min": 0,
+    "forecast_pct_max": 100
+  }
 }

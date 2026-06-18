@@ -25,15 +25,23 @@ Any edit to a number updates all three in the same commit. When a check
 fails: **fix the paper, never widen the tolerance.** The tolerances in the
 checks are exactly what the manuscript states — not padded.
 
-**Known limitation (and roadmap).** The survey scaffold now single-sources its
-avenue **data** via `avenues.json` — read by both `index.html` and
-`verification/verify_numbers.py` — which closes the data-drift hole: the
-editions and the verifier can no longer disagree about what the avenues are.
-What remains hand-mirrored is the three consistency-**check implementations**
-across Python and JS — simple invariants (at least one avenue; every FORECAST
-carries a dated signpost; all forecast probabilities in [0,100]) that rarely
-change. Full logic unification — generating one set of checks from the other,
-or a shared declarative spec — stays the roadmap direction if the checks
+**Known limitation (and roadmap).** The survey scaffold single-sources its avenue
+**data** AND its consistency-check **rules** via `avenues.json` — both read by
+`index.html` and `verification/verify_numbers.py`. The avenue list lives in
+`avenues.json"avenues"`; the check thresholds (minimum avenue count, whether a
+FORECAST signpost is mandatory, the forecast probability bounds) live in
+`avenues.json"checks"`. Change a rule there and the page and the verifier both
+enforce it on next run — a threshold can no longer drift between them.
+
+What is still written in each language is the check **logic itself** — the few
+lines that filter forecasts, count signposts, and compare against the rules.
+These are near-trivial and rarely change, and unifying them across Python and JS
+would require codegen or a declarative check-DSL that, for three invariants,
+would be harder to read than the code it replaces. So the residual is small and
+named: if you add a genuinely new *kind* of check (not just a new threshold),
+write it in both `buildChecks()` (index.html) and `verify_numbers.py`, and put
+any new threshold it needs in `avenues.json"checks"` so that part stays single-
+sourced. Full logic unification stays the roadmap direction only if the checks
 proliferate. (The manuscript prose and claim ledger are still hand-synced too;
 every numeric edit touches all of them in one commit.)
 

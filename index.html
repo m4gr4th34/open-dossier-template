@@ -233,6 +233,7 @@
 //   cites    : array of citation keys (match dossier.html's audit)
 // ---------------------------------------------------------------
 let AVENUES = [];
+let RULES = {};
 
 const STATUS = {
   "ESTABLISHED":     {cls:"s-est",      tcls:"t-est"},
@@ -265,23 +266,26 @@ function renderCards(){
 }
 
 // ---------------------------------------------------------------
-// CONSISTENCY CONSOLE — survey-shaped checks computed from AVENUES.
-// Keep these in lockstep with verification/verify_numbers.py.
-// Pattern: checks.push(["label", computed_value, [lo, hi]])
+// CONSISTENCY CONSOLE — checks computed from AVENUES; the RULES they
+// enforce are single-sourced from avenues.json's "checks" block (the
+// same file verify_numbers.py reads), so a threshold can't drift
+// between this page and the verifier. RULES is set by the loader below.
 // ---------------------------------------------------------------
 function buildChecks(){
   const c = [];
-  const forecasts      = AVENUES.filter(a=>a.status==="FORECAST");
-  const withSignpost   = forecasts.filter(a=>!!a.signpost).length;
-  const outOfRange     = AVENUES.filter(a=>a.forecast!=null && (a.forecast<0 || a.forecast>100)).length;
+  const minAvenues   = (RULES.min_avenues ?? 1);
+  const signpostReq  = (RULES.forecast_signpost_required ?? true);
+  const pctMin       = (RULES.forecast_pct_min ?? 0);
+  const pctMax       = (RULES.forecast_pct_max ?? 100);
 
-  // Every avenue renders a card.
-  c.push(["Consistency: at least one avenue in the landscape", AVENUES.length, [1, 9999]]);
-  // Mandatory-signpost rule: every FORECAST carries a dated signpost.
-  c.push(["Consistency: every FORECAST has a dated signpost", withSignpost, [forecasts.length, forecasts.length]]);
-  // Probabilities are well-formed.
-  c.push(["Consistency: all forecast probabilities lie in [0,100]", outOfRange, [0, 0]]);
-  // TODO: add your survey's real cross-avenue / arithmetic checks here.
+  const forecasts    = AVENUES.filter(a=>a.status==="FORECAST");
+  const withSignpost = forecasts.filter(a=>!!a.signpost).length;
+  const outOfRange   = AVENUES.filter(a=>a.forecast!=null && (a.forecast<pctMin || a.forecast>pctMax)).length;
+
+  c.push(["Consistency: at least one avenue in the landscape", AVENUES.length, [minAvenues, 9999]]);
+  const expSign = signpostReq ? forecasts.length : withSignpost;
+  c.push(["Consistency: every FORECAST has a dated signpost", withSignpost, [expSign, expSign]]);
+  c.push(["Consistency: all forecast probabilities lie in ["+pctMin+","+pctMax+"]", outOfRange, [0, 0]]);
   return c;
 }
 
@@ -298,6 +302,7 @@ function renderLandscapeError(){
 }
 fetch('avenues.json').then(r=>r.json()).then(d=>{
   AVENUES = Array.isArray(d.avenues) ? d.avenues : [];
+  RULES   = d.checks || {};
   renderCards();
   document.getElementById('ncheck').textContent = buildChecks().length;
 }).catch(renderLandscapeError);
