@@ -232,18 +232,20 @@ never auto-applied by a template sync.
 
 **Publish CTA — keep it canonical.** The publish-like-this CTA band (before the footer on index.html, paper.html, and dossier.html) intentionally points at the canonical open-dossier-template's GETTING-STARTED.md — the instructions-first front door — not at this dossier's own repo and not at the template's repo root. Every dossier funnels new authors straight into the step-by-step guide. Leave these URLs as the canonical GETTING-STARTED.md.
 
-## The Project constitution (`PROJECT-INSTRUCTIONS.md`)
+## The Project constitution (`CLAUDE.md`)
 
 For authors who run a dossier as a Claude Project (the optional power-path in
-GETTING-STARTED.md), the repo ships **`PROJECT-INSTRUCTIONS.md`** — a versioned
-"constitution" the Project's Instructions point at with one line: *"Read
-PROJECT-INSTRUCTIONS.md in the synced repo and follow it…"*. It is deliberately
-**parallel to `CLAUDE.md`**: the same doctrine, binding the strategy-room chat
-the way `CLAUDE.md` binds Claude Code. Treat it as machinery — per dossier, fill
-in only its `[TOPIC]` line and Standing-context list; everything else is shared
-doctrine, upgraded via the template-machinery sync (it's on the machinery list
-in the README's Rituals section). If you revise your working rules, update both
-`CLAUDE.md` and `PROJECT-INSTRUCTIONS.md` so the two rooms stay in lockstep.
+GETTING-STARTED.md), **`CLAUDE.md` is the single constitution** — the one file
+that binds both rooms. Claude Code reads it automatically every session, and the
+Project's Instructions point at the same file with one line: *"Read CLAUDE.md in
+the synced repo and follow it…"*. Treat it as machinery — per dossier, fill in
+only its `## What this project is` topic line and its `## Standing context`
+list; everything else is shared doctrine, upgraded via the template-machinery
+sync (it's on the machinery list in the README's Rituals section).
+**`PROJECT-INSTRUCTIONS.md`** is now only a back-compat redirect with no
+doctrine of its own — it exists so older Projects whose Instructions still point
+at it keep working; new Projects point straight at `CLAUDE.md`. There is no
+second copy to keep in lockstep: revise your working rules in `CLAUDE.md` alone.
 
 ## Design identity (do not reinvent)
 

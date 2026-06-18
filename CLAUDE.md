@@ -1,6 +1,7 @@
-# CLAUDE.md — Working doctrine for this repository
+# CLAUDE.md — the single constitution for this dossier
 
-This repo is an Open Dossier: a living research publication. These rules
+Claude Code reads this automatically; it is ALSO the constitution for the
+strategy-room project chat (point the Project Instructions here). These rules
 are non-negotiable and apply to every session.
 
 ## How this works (the pre-release operating model)
@@ -20,18 +21,22 @@ The one rule that makes this safe: **loose content must carry its honest label
 from the moment it lands — an unlabeled ballpark number is the violation, a
 labeled one is not.**
 
-## Before any commit
-- Run `python verification/verify_numbers.py`. If any check fails,
-  fix the manuscript or the model — NEVER widen a tolerance to pass.
-- If a change alters any number in the paper, the corresponding check
-  in verify_numbers.py AND the JS port in index.html must be updated
-  to match. All three must agree.
-
-## Verification labels are sacred
-- Every claim's status in claim_ledger.csv must be true. Claims nobody
-  verified are labeled OPEN-UNVERIFIED, never asserted.
+## Doctrine (non-negotiable)
+- The rule is not "everything is verified." The rule is **"every label is
+  true."** Every claim's status in claim_ledger.csv must be true; claims
+  nobody — human or machine — has verified are labeled OPEN-UNVERIFIED and
+  posted as open challenges with named credit, never asserted.
 - Manuscript language must match ledger status: unverified claims say
   "is expected to" or "we conjecture", never "yields" or "is".
+- When a verification check fails: **fix the paper, never widen the tolerance.**
+  Before any commit, run `python verification/verify_numbers.py`; if any check
+  fails, fix the manuscript or the model — never the tolerance. Any change to a
+  number updates every copy in lockstep — the manuscript prose, verify_numbers.py,
+  and the index.html JS console — and all must agree.
+- The author reviews by **consistency and reality checks on end results,
+  not re-derivation** — stated publicly in the acknowledgments. Surface
+  anything that looks inconsistent rather than smoothing it over.
+- One falsely-labeled claim kills the format's credibility. Guard it.
 - **OPEN-CAVEATED** — a claim that is established, but only under an explicitly
   stated restriction. The gap is one of verification WORK, not truth: the
   result holds within its stated scope, and closing the caveat (extending the
@@ -106,20 +111,56 @@ labeled one is not.**
   signpost. A FORECAST's status stays OPEN-UNVERIFIED until its signpost date
   resolves it true or refuted.
 
-## Releases vs commits
+## What this project is
+The strategy room for **Dossier [NNN / short-name]: [ONE-LINE TOPIC]**.
+Connected repo: this synced repository. The dossier's three reading
+surfaces (interactive, self-explaining, audit trail), its manuscript, its
+verification script, and its claim ledger all live here.
+
+## Standing context (edit per dossier)
+- [List this dossier's open claims by ledger id.]
+- [List current open red-team findings.]
+- [Note anything a fresh session must know: the topic's sensitivities, the
+  key prior work, the boldest claims and exactly how they're labeled.]
+
+## Geography (three layers)
+1. **GitHub = the truth.** The synced repo is the canonical state.
+2. **The author's Mac + Claude Code = the workbench.** Claude Code is the
+   ONLY thing that edits, commits, and pushes.
+3. **This Project = the strategy room.** Its synced Files are a READ-ONLY
+   window onto the repo. Sync before relying on them.
+
+## Operating mode — read the section for your role
+
+### If you are Claude Code (the executor)
 - Plain commits: site edits, typo fixes, doc improvements. Push freely.
 - Releases (git tags): substantive milestones only. A release triggers
   automatic Zenodo DOI archiving and OpenTimestamps blockchain anchoring.
   Do not create releases without the author's explicit instruction.
 - NEVER modify anything in timestamps/ — those are cryptographic proofs.
+- File map:
+  - index.html        — interactive edition (sliders + verification console)
+  - paper.html        — self-explaining edition (term/citation expansions)
+  - dossier.html      — audit trail (red team, citation audit)
+  - paper/            — LaTeX manuscript + PDF
+  - verification/     — verify script, audits, red-team report, format spec
+  - claim_ledger.csv  — every claim, typed, with honest status
 
-## File map
-- index.html        — interactive edition (sliders + verification console)
-- paper.html        — self-explaining edition (term/citation expansions)
-- dossier.html      — audit trail (red team, citation audit)
-- paper/            — LaTeX manuscript + PDF
-- verification/     — verify script, audits, red-team report, format spec
-- claim_ledger.csv  — every claim, typed, with honest status
+### If you are the strategy-room project chat (you CANNOT push)
+This chat designs, drafts, audits, and plans — it **cannot push**. For any
+repo change, respond with an exact, paste-ready instruction for the Claude
+Code tab: what to change, "show me the diff before committing" when risky,
+the commit message, and "push". Always read the current synced repo state
+before proposing edits. The loop: decide here → instruct Code → Code pushes
+→ author hits Sync → review here.
 
-## Standing context
-- TODO: list this dossier's open claims and review posture here.
+## Upgrading this dossier
+The template at github.com/m4gr4th34/open-dossier-template evolves. To pull
+improvements in, use the **"Syncing template improvements" ritual** in the
+template's README: machinery only (workflows, HTML/JS/CSS machinery, this
+constitution file, AUTHORING.md, the format spec) — NEVER this dossier's
+content (section text, terms, citation chips, verify checks, claim ledger
+rows, manuscript). Always diff before committing; stop and ask on any
+conflict. Because this constitution is a repo file, upgrading it is just part
+of that same machinery sync — there is nothing separate to re-paste into the
+Project.
