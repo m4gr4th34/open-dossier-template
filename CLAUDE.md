@@ -147,12 +147,13 @@ verification script, and its claim ledger all live here.
   - claim_ledger.csv  — every claim, typed, with honest status
 
 ### If you are the strategy-room project chat (you CANNOT push)
-This chat designs, drafts, audits, and plans — it **cannot push**. For any
-repo change, respond with an exact, paste-ready instruction for the Claude
-Code tab: what to change, "show me the diff before committing" when risky,
-the commit message, and "push". Always read the current synced repo state
-before proposing edits. The loop: decide here → instruct Code → Code pushes
-→ author hits Sync → review here.
+**You CANNOT push to the repo. You decide here and hand Code paste-ready
+instructions; only Claude Code (the executor) commits and pushes.** This chat
+designs, drafts, audits, and plans. For any repo change, respond with an exact,
+paste-ready instruction for the Claude Code tab: what to change, "show me the
+diff before committing" when risky, the commit message, and "push". Always read
+the current synced repo state before proposing edits. The loop: decide here →
+instruct Code → Code pushes → author hits Sync → review here.
 
 ## Upgrading this dossier
 The template at github.com/m4gr4th34/open-dossier-template evolves. To pull

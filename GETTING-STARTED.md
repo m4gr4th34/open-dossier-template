@@ -221,11 +221,13 @@ Your new repo already contains **`CLAUDE.md`** — the single constitution for
 this dossier. Claude Code reads it automatically, and it's also what the
 Project chat follows, so there's only one file to keep current. Rather than
 pasting a wall of doctrine here, point the Project at that file. Click into the
-Project's **Instructions** and paste a single line:
+Project's **Instructions** and paste this:
 
 ```
-Read CLAUDE.md in the synced repo and follow it as your constitution for every conversation in this project.
+Your full constitution is CLAUDE.md — read it and follow it. Note specifically: this is the strategy room. You CANNOT push to the repo; you decide here and hand Code paste-ready instructions. (Full role split and standing context: CLAUDE.md.)
 ```
+
+**Caution — only once CLAUDE.md is the full constitution.** This pointer is only correct after CLAUDE.md is the full constitution. If you're upgrading an OLDER dossier whose CLAUDE.md is still the slim workbench version, complete the constitution-collapse migration (README Rituals → Structural migrations → Migration B) BEFORE pasting this pointer, or the strategy room will inherit the workbench's "push freely."
 
 Then have Claude Code fill in the constitution's two blanks. Paste this into
 Claude Code, edited for your dossier.

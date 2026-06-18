@@ -246,8 +246,14 @@ never auto-applied by a template sync.
 For authors who run a dossier as a Claude Project (the optional power-path in
 GETTING-STARTED.md), **`CLAUDE.md` is the single constitution** — the one file
 that binds both rooms. Claude Code reads it automatically every session, and the
-Project's Instructions point at the same file with one line: *"Read CLAUDE.md in
-the synced repo and follow it…"*. Treat it as machinery — per dossier, fill in
+Project's Instructions point at the same file with the strategy-room pointer:
+*"Your full constitution is CLAUDE.md — read it and follow it. Note specifically:
+this is the strategy room. You CANNOT push to the repo; you decide here and hand
+Code paste-ready instructions. (Full role split and standing context:
+CLAUDE.md.)"* That explicit cannot-push guardrail is only safe once `CLAUDE.md`
+is the full constitution — so on an OLDER dossier still on the slim workbench
+`CLAUDE.md`, do the constitution-collapse migration (README Rituals →
+Structural migrations → Migration B) before pasting it. Treat it as machinery — per dossier, fill in
 only its `## What this project is` topic line and its `## Standing context`
 list; everything else is shared doctrine, upgraded via the template-machinery
 sync (it's on the machinery list in the README's Rituals section).

@@ -283,10 +283,18 @@ adds (machinery), keep `CLAUDE.md`'s Standing context, then replace
 `PROJECT-INSTRUCTIONS.md`'s body with the redirect stub. **Hard rule:** if the
 Standing context in `PROJECT-INSTRUCTIONS.md` differs in any way from the one in
 `CLAUDE.md`, STOP and ask which is canonical before demoting — never silently
-drop a filled-in Standing context. *Safe to defer?* Yes (low-urgency), but do it
-eventually so the two rooms can't drift. *Note:* existing Project Instructions
-keep pointing at `PROJECT-INSTRUCTIONS.md`; the redirect keeps them working with
-no change on your side.
+drop a filled-in Standing context. *Final step (manual, in claude.ai — NOT in
+the repo):* once `CLAUDE.md` is the full superset and `PROJECT-INSTRUCTIONS.md`
+is the redirect, update the claude.ai **Project → Instructions** box to the
+strategy-room pointer (the guarded "you CANNOT push" text in GETTING-STARTED.md
+Step C). That box lives in claude.ai project settings, not in the repo, so
+neither Code nor the chat can edit it — it is a manual author step, and it must
+come AFTER the `CLAUDE.md` upgrade, never before (paste it against a slim
+workbench `CLAUDE.md` and the strategy room inherits the workbench's "push
+freely"). *Safe to defer?* Yes (low-urgency), but do it eventually so the two
+rooms can't drift. *Note:* existing Project Instructions keep pointing at
+`PROJECT-INSTRUCTIONS.md`; the redirect keeps them working with no change on
+your side.
 
 **Migration C — `EST` -> `FORECAST` ledger relabeling.**
 *When it applies:* the template added the `FORECAST` claim type and your ledger
