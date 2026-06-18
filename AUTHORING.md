@@ -28,9 +28,10 @@ checks are exactly what the manuscript states — not padded.
 **Known limitation (and roadmap).** The survey scaffold single-sources its avenue
 **data** AND its consistency-check **rules** via `avenues.json` — both read by
 `index.html` and `verification/verify_numbers.py`. The avenue list lives in
-`avenues.json"avenues"`; the check thresholds (minimum avenue count, whether a
-FORECAST signpost is mandatory, the forecast probability bounds) live in
-`avenues.json"checks"`. Change a rule there and the page and the verifier both
+the `avenues` block of `avenues.json`; the check thresholds (minimum avenue
+count, whether a FORECAST signpost is mandatory, the forecast probability
+bounds) live in its `checks` block. Change a rule there and the page and the
+verifier both
 enforce it on next run — a threshold can no longer drift between them.
 
 What is still written in each language is the check **logic itself** — the few
@@ -40,8 +41,8 @@ would require codegen or a declarative check-DSL that, for three invariants,
 would be harder to read than the code it replaces. So the residual is small and
 named: if you add a genuinely new *kind* of check (not just a new threshold),
 write it in both `buildChecks()` (index.html) and `verify_numbers.py`, and put
-any new threshold it needs in `avenues.json"checks"` so that part stays single-
-sourced. Full logic unification stays the roadmap direction only if the checks
+any new threshold it needs in the `checks` block of `avenues.json` so that part
+stays single-sourced. Full logic unification stays the roadmap direction only if the checks
 proliferate. (The manuscript prose and claim ledger are still hand-synced too;
 every numeric edit touches all of them in one commit.)
 
