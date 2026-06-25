@@ -47,9 +47,11 @@ TODO-AFTER-FIRST-RELEASE, NNN, PLACEHOLDER, …) on a publication surface fails 
 build — so you can't release with placeholders still showing. Releases are for
 milestones; plain commits for everything else. Never modify timestamps/.
 
-After your first release, update the DOI in three places (or confirm
-provenance.json auto-updated): provenance.json, the manuscript.tex footer,
-and CITATION.cff. The provenance bar and verify.html read provenance.json
+After your first release, set the DOI by hand in three places — release
+automation never writes DOI fields: provenance.json (version_doi, and concept_doi
+once, permanently), the manuscript.tex footer, and CITATION.cff. The
+auto-timestamp workflow updates only release_tag and the release date in
+provenance.json. The provenance bar and verify.html read provenance.json
 automatically.
 
 ## Maintenance notes
@@ -57,3 +59,10 @@ automatically.
   timestamps/*.ots` later folds in the Bitcoin block attestation.
 - Port future template improvements using the Rituals section of the
   template README — machinery only, never your content.
+- Provenance invariant. Release automation never authors DOI fields.
+  version_doi/concept_doi are minted by Zenodo and backfilled by a human; the
+  auto-timestamp workflow touches only release_tag and the date, and is
+  structurally blocked (jq in-place update + a hard regression guard) from
+  altering any DOI. A released dossier still showing a placeholder DOI fails CI
+  until you backfill — that red build is the honest signal, and it clears the
+  moment the real DOI lands.

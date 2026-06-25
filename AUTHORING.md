@@ -220,16 +220,19 @@ true after each release:
 - **The provenance bar** (top of `index.html` and `paper.html`) and
   **`verify.html`** read `provenance.json` at load time — so once that file
   carries the real version DOI and release tag, both update automatically.
-  The `auto-timestamp` workflow rewrites `provenance.json` on each release
-  (release tag + date); you set the DOI fields once.
+  The `auto-timestamp` workflow updates only `release_tag` and the release date
+  in `provenance.json`, in place — it never authors the DOI fields. You set
+  `version_doi`/`concept_doi` yourself after Zenodo mints them (concept_doi
+  once, permanently); a real DOI can never be overwritten or downgraded by
+  automation.
 - **The manuscript DOI footer** (`paper/manuscript.tex`, via `fancyhdr`) is
   baked into the PDF at compile time and is NOT auto-updated — replace its
   `TODO-AFTER-FIRST-RELEASE` placeholder with your version DOI after the
   first release, then let `build-pdf.yml` rebuild the PDF.
 
-After each release, confirm the real version DOI is in `provenance.json`
-(or was written there by the workflow) and in the manuscript footer.
-DEPLOY.md's release step carries this reminder.
+After each release, backfill the new version DOI into `provenance.json` and the
+manuscript footer — the workflow does not do this (it owns only the release tag
+and date). DEPLOY.md's release step carries this reminder.
 
 **Draft banner — pre-release only.** The README ships a draft-preview banner
 ("work in progress") that is present by default while drafting, so a
