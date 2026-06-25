@@ -105,8 +105,17 @@
   .publish-cta .pc-h{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--ink);margin:0 0 3px}
   .publish-cta .pc-sub{font-size:14px;color:var(--ink2);margin:0}
   .publish-cta a.pc-btn{flex:0 0 auto;font-family:var(--mono);font-size:14px;font-weight:600;text-decoration:none;
-    background:var(--teal);color:#fff;padding:12px 20px;white-space:nowrap}
-  .publish-cta a.pc-btn:hover{background:#0a615f}
+    background:var(--teal);color:#fff;padding:12px 20px;white-space:nowrap;
+    border-radius:var(--r-sm);
+    background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
+    box-shadow:0 4px 14px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.32);
+    transition:filter .2s ease, box-shadow .2s ease, transform .12s ease}
+  .publish-cta a.pc-btn:hover{
+    background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
+    box-shadow:0 8px 22px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.36);
+    transform:translateY(-1px);
+    filter:brightness(1.04);
+  }
 
   /* ===== elevated-light "instrument" surface treatment ===== */
   table,.finding,ol.phases li,.provenance{
@@ -125,6 +134,7 @@
   .dot.v{box-shadow:0 0 7px -1px var(--violet)}
   .dot.c{box-shadow:0 0 7px -1px var(--coral)}
   .btn{border-radius:var(--r-sm); transition:box-shadow .2s ease, transform .2s ease}
+  .btn:not(.primary):hover{ box-shadow:var(--shadow-soft); transform:translateY(-2px); }
   .btn.primary{
     background:var(--teal);
     background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
@@ -132,7 +142,7 @@
   }
   .btn.primary:hover{
     background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
-    box-shadow:0 8px 22px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.36); transform:translateY(-1px);
+    box-shadow:0 8px 22px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.36);
   }
   .publish-cta{border-radius:var(--r-lg)}
   h1{font-weight:500; letter-spacing:-.014em}
