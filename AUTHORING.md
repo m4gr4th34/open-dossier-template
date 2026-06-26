@@ -2,9 +2,8 @@
 ## A production playbook for AI agents (and the humans directing them)
 
 **Who this file is for:** any capable AI agent handed a research idea and
-this repository. Follow it and the output is a complete dossier: formal
-PDF, interactive edition, self-explaining edition, audit trail, verified
-claims, honest labels. **The human's job is the ideas, the intuition, the
+this repository. Follow it and the output is a complete dossier: interactive edition, self-explaining edition, audit
+trail, lineage index, verified claims, honest labels. **The human's job is the ideas, the intuition, the
 reality checks, and the sign-offs. Everything else is yours.**
 
 Read `verification/research_pipeline.md` first — it defines the process
@@ -239,14 +238,16 @@ true after each release:
   `version_doi`/`concept_doi` yourself after Zenodo mints them (concept_doi
   once, permanently); a real DOI can never be overwritten or downgraded by
   automation.
-- **The manuscript DOI footer** (`paper/manuscript.tex`, via `fancyhdr`) is
-  baked into the PDF at compile time and is NOT auto-updated — replace its
-  `TODO-AFTER-FIRST-RELEASE` placeholder with your version DOI after the
-  first release, then let `build-pdf.yml` rebuild the PDF.
+- **The manuscript source footer** (`paper/manuscript.tex`, via `fancyhdr`)
+  carries a `TODO-AFTER-FIRST-RELEASE` DOI placeholder. The LaTeX manuscript is
+  an optional, on-demand artifact — the web editions are the paper, so it is not
+  shipped or auto-built. If a legacy venue ever needs a typeset document,
+  regenerate it from source and set its footer DOI to your version DOI by hand at
+  that point.
 
-After each release, backfill the new version DOI into `provenance.json` and the
-manuscript footer — the workflow does not do this (it owns only the release tag
-and date). DEPLOY.md's release step carries this reminder.
+After each release, backfill the new version DOI into `provenance.json` — the
+workflow does not do this (it owns only the release tag and date). DEPLOY.md's
+release step carries this reminder.
 
 **Draft banner — pre-release only.** The README ships a draft-preview banner
 ("work in progress") that is present by default while drafting, so a
@@ -299,7 +300,7 @@ know.
 
 **Asset discipline.** Freezing duplicates only the chapter's HTML (cheap). Shared assets
 (`katex/`, fonts, CSS) are referenced at the live root from the frozen copies, never
-re-copied; per-chapter heavy assets (the PDF, figures) are stored write-once. A lineage
+re-copied; per-chapter heavy assets (figures) are stored write-once. A lineage
 is one research **arc** — when an arc grows very long (dozens of chapters), that is the
 signal to begin a *new* arc in a new repo, not a limit to engineer around.
 

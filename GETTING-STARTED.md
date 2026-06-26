@@ -282,8 +282,7 @@ loop.
 ### Step D — Connect the repo to the Project (read-only sync)
 
 In the Project, find the **Files** panel (right side). Click **+** →
-**GitHub** → choose your `dossier-[short-name]` repo → select everything
-EXCEPT `paper/manuscript.pdf` (the .tex covers it; the PDF wastes context).
+**GitHub** → choose your `dossier-[short-name]` repo → select everything.
 Hit **Sync**. The Project now sees your live repo. Re-hit **Sync** at the
 start of any session, or after Code pushes, so the chat reads the latest.
 

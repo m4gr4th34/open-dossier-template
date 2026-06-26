@@ -91,8 +91,8 @@ verification/
 claim_ledger.csv    ← replace placeholder rows with your typed claims
 .zenodo.json        ← fill in title, author, description
 CITATION.cff        ← fill in title, author, repo URL
-paper/              ← add manuscript.tex and manuscript.pdf
-  manuscript-template.tex ← LaTeX scaffold — copy to manuscript.tex and fill in
+paper/              ← optional LaTeX source (the web editions are the paper; not shipped)
+  manuscript-template.tex ← LaTeX scaffold — copy to manuscript.tex only if a venue needs a typeset document
 ```
 
 5. The fastest path: hand AUTHORING.md plus your research idea to any capable AI agent (Claude Code reads it automatically alongside CLAUDE.md). It contains the full production playbook — your job is the ideas, the intuition, the reality checks, and the sign-offs; the playbook covers everything else.

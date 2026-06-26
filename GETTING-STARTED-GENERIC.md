@@ -373,8 +373,7 @@ paste-ready instruction, run it with your AI agent. That's the loop.
 ### Step D — Connect the repo (read-only sync)
 
 If your AI tool can sync a GitHub repo into the project read-only, connect
-your `dossier-[short-name]` repo and include everything EXCEPT
-`paper/manuscript.pdf` (the .tex covers it; the PDF wastes context). Re-sync
+your `dossier-[short-name]` repo and include everything. Re-sync
 at the start of any session, or after your agent pushes, so the chat reads
 the latest. (If your tool can't sync files, just paste the repo URL and ask
 it to read the current state from GitHub at the start of a session.)

@@ -142,7 +142,7 @@ verification script, and its claim ledger all live here.
   - index.html        — interactive edition (sliders + verification console)
   - paper.html        — self-explaining edition (term/citation expansions)
   - dossier.html      — audit trail (red team, citation audit)
-  - paper/            — LaTeX manuscript + PDF
+  - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)
   - verification/     — verify script, audits, red-team report, format spec
   - claim_ledger.csv  — every claim, typed, with honest status
 

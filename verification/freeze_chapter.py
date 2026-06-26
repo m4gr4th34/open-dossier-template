@@ -90,9 +90,9 @@ def rewire(html):
     """Repoint a frozen chapter's outward-local paths to the live root (../../).
 
     Two kinds of rewrite:
-      - shared ASSETS (katex/, paper/manuscript.pdf, + forward-compat assets/ and
-        paper/ images) -> ../../ so the frozen copy uses the single shared root
-        copy rather than a missing per-chapter one.
+      - shared ASSETS (katex/, + forward-compat assets/ and paper/ images)
+        -> ../../ so the frozen copy uses the single shared root copy rather
+        than a missing per-chapter one.
       - cross-edition + lineage NAV links (index/paper/dossier/verify/lineage.html)
         -> ../../ so a sealed chapter is not a navigational dead-end: its nav
         returns the reader to the LIVE series, NOT to its frozen siblings in the
@@ -112,7 +112,6 @@ def rewire(html):
     for q in ('"', "'"):
         # shared assets that actually exist in the editions today
         reps.append(("href=" + q + "katex/", "href=" + q + "../../katex/"))
-        reps.append(("href=" + q + "paper/manuscript.pdf" + q, "href=" + q + "../../paper/manuscript.pdf" + q))
         # forward-compat (only rewritten if present in a future figure-bearing chapter)
         reps.append(("href=" + q + "assets/", "href=" + q + "../../assets/"))
         reps.append(("src=" + q + "assets/", "src=" + q + "../../assets/"))
