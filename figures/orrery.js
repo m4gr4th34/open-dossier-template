@@ -171,12 +171,20 @@
       var w = bodyXY(b, t), p = project(w[0], w[1]);   // t=0 -> M0 phase
       return { cx: p[0], cy: p[1], r: num(b.r, 3), color: b.color || "#ddd", name: b.name || "" };
     });
+    // Poster-density lever (POSTER-ONLY — computeFrame is never called by the live
+    // path). spec.poster.{beltCount,oortCount} cap each cloud to a lighter DETERMINISTIC
+    // PREFIX of the already-scattered array (slice, NOT a re-scatter — seededScatter's
+    // i-th point is count-independent, so a prefix is a true representative subset).
+    // Absent cap -> no slice -> full density -> byte-identical to a poster-less spec.
+    var pc = spec.poster || {};
     var clouds = [];
-    (spec.belts || []).forEach(function (b) { clouds.push(computeBeltPoints(b)); });
-    if (spec.oort) clouds.push(computeOortPoints(spec.oort));
-    var beltLayers = clouds.map(function (bd) {
+    (spec.belts || []).forEach(function (b) { clouds.push({ bd: computeBeltPoints(b), cap: pc.beltCount }); });
+    if (spec.oort) clouds.push({ bd: computeOortPoints(spec.oort), cap: pc.oortCount });
+    var beltLayers = clouds.map(function (c) {
+      var bd = c.bd;
+      var pts = (c.cap != null) ? bd.points.slice(0, c.cap) : bd.points;  // dotR is count-independent
       return { transform: beltTransform(cx, cy, kk, panX, panY, 0),   // t=0 -> rotation 0
-        points: bd.points, color: bd.color, dotR: bd.dotR, baseOpacity: bd.baseOpacity };
+        points: pts, color: bd.color, dotR: bd.dotR, baseOpacity: bd.baseOpacity };
     });
     var sun = project(0, 0);
     return { W: W, H: H, scaleAU: scaleAU, ariaLabel: spec.title || "Zoom-orrery",

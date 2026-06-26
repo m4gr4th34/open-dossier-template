@@ -183,11 +183,33 @@ verify floor is untouched. On load, the runtime removes the `data-poster` `<svg>
 before rendering, so a JS-on reader sees exactly one (live) figure: the floor
 upgrades to the ceiling.
 
-**The poster-weight lever (a knob, not yet built).** The poster's point density
-is an *independent* knob from the live figure's. The sealed floor only needs to
-**communicate the finding** — a recognisable orrery — not match the live
-point-count. So a future `poster.beltCount` (or `poster.maxPoints`) override could
-render a much lighter sealed `<svg>` (say a few hundred belt points instead of
-thousands) **without changing the live figure at all**, since the two densities
-are decoupled. Worth doing when sealed-SVG weight matters; documented here, not
-built.
+**The poster-density lever.** The sealed poster's point density is an *independent*
+knob from the live figure's: the floor only needs to **communicate the finding** — a
+recognisable orrery, a recognisable galaxy — not match the live point-count. An
+optional top-level `poster` block caps each layer of the SEALED `<svg>` to a lighter
+representative sample, **without changing the live figure at all**:
+
+```jsonc
+"poster": { "beltCount": 300, "oortCount": 200 }                      // orrery: per belt layer + Oort
+"poster": { "starCount": 1800, "bulgeCount": 700, "haloCount": 450 }  // galaxy (and cosmic's nested galaxy)
+```
+
+How it stays honest:
+
+- **Poster-only.** The caps are read in `computeFrame` / `computeGalaxyFrame`, which
+  ONLY the poster path calls — the live `renderOrrery` / `renderGalaxy` never read
+  `poster`, so the interactive ceiling keeps its full density (the live galaxy still
+  draws its `MAX_STAR_NODES`).
+- **Deterministic subset, not a re-scatter.** A cap is a prefix of the SAME seeded
+  array (`seededScatter(seed, BIG, fn).slice(0, N)` === `seededScatter(seed, N, fn)`,
+  since point `i` is count-independent) — so the floor is a true representative subset
+  of the ceiling, reproducibly.
+- **Absent = full density.** No `poster` block → no caps → the sealed `<svg>` is
+  byte-identical to a poster-less spec (re-sealing rewrites nothing). For the galaxy,
+  an omitted star/bulge/halo cap falls back to today's `MAX_STAR_NODES` / uncapped /
+  uncapped.
+- **Cosmic** inherits it for free: `renderCosmicZoomPosterSVG` delegates to the galaxy
+  poster, so `poster` goes inside the nested `galaxy` block.
+
+In the demos this trims the sealed posters ~69% (orrery) and ~51% (galaxy / cosmic)
+while the floors still read unmistakably as the solar system and the Milky Way.

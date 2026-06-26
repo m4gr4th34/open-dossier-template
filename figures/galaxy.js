@@ -147,9 +147,18 @@
     var kk = GRAD / scaleLY, panX = 0, panY = 0, ca = 1, sa = 0;                    // start frame
 
     var disk = spec.disk, bsp = spec.bulge || {}, hsp = spec.halo || {};
-    var stars = cullLayer(computeGalaxyStars(spec), MAX_STAR_NODES, ca, sa, kk, cx, cy, panX, panY);
-    var bulge = cullLayer(computeGalaxyBulge(spec), 0, ca, sa, kk, cx, cy, panX, panY);
-    var halo  = cullLayer(computeGalaxyHalo(spec), 0, ca, sa, kk, cx, cy, panX, panY);
+    // Poster-density lever (POSTER-ONLY — computeGalaxyFrame is never called by the
+    // live path). spec.poster.{starCount,bulgeCount,haloCount} feed cullLayer's existing
+    // cap: a lighter DETERMINISTIC prefix of the same seeded scatter (cullLayer keeps the
+    // first-N visible in generation order). Absent -> today's exact caps (MAX_STAR_NODES /
+    // 0 / 0; 0 = uncapped) -> byte-identical to a poster-less spec.
+    var pc = spec.poster || {};
+    var starCap  = (pc.starCount  != null) ? pc.starCount  : MAX_STAR_NODES;
+    var bulgeCap = (pc.bulgeCount != null) ? pc.bulgeCount : 0;
+    var haloCap  = (pc.haloCount  != null) ? pc.haloCount  : 0;
+    var stars = cullLayer(computeGalaxyStars(spec), starCap, ca, sa, kk, cx, cy, panX, panY);
+    var bulge = cullLayer(computeGalaxyBulge(spec), bulgeCap, ca, sa, kk, cx, cy, panX, panY);
+    var halo  = cullLayer(computeGalaxyHalo(spec), haloCap, ca, sa, kk, cx, cy, panX, panY);
 
     var sun = spec.sun || { r: 26000, theta: 2.1, label: "You are here" };
     var sbx = num(sun.r, 26000) * Math.cos(num(sun.theta, 2.1));
