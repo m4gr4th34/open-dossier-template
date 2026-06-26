@@ -137,6 +137,20 @@ reader's first ten seconds.
 **Go-deeper drawers.** All equations live in collapsed `details.deeper`
 blocks. The narrative must be complete without opening any of them.
 
+**Equations — author as `data-tex`, prerender with KaTeX (agent-primary; hand-edit
+is the fallback).** Author every equation as LaTeX in a `data-tex` attribute and
+never hand-write the rendered math:
+
+- Display goes on `.eq`, inline on `span.math`:
+  `<div class="eq" data-tex="E = mc^2"></div>` · `<span class="math" data-tex="x_i"></span>`.
+- After writing or editing any `data-tex`, run `npm run render-math`. It prerenders
+  the LaTeX into committed static HTML + MathML (KaTeX, vendored and version-pinned),
+  so the math is baked into the page and **readers need zero JavaScript**. `data-tex`
+  stays the editable source of truth — change it and re-run (idempotent) to re-render.
+- This is an author-local step requiring Node, exactly like figures require
+  matplotlib (`verification/figure_style.py`); readers need nothing, and **CI does
+  not render math** — the stdlib-only verify floor stays untouched.
+
 **Honest labels inline.** Any OPEN-UNVERIFIED claim gets an `.openclaim`
 amber box AT THE EXACT POINT the claim is made — naming its ledger id and
 posting it as an open challenge with named credit for whoever closes it.

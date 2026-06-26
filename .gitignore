@@ -1,0 +1,6 @@
+# Node tooling for author-local math prerender (KaTeX). The vendored, pinned
+# output lives in katex/ and IS committed; the install tree is not.
+node_modules/
+
+# Author-local figure demo output (regenerated on demand).
+verification/figure_style_demo.png

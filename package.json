@@ -1,0 +1,13 @@
+{
+  "name": "open-dossier-template",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Open Dossier template — author-local tooling (vendored KaTeX for build-time prerendered math). Readers need no JS; CI never renders math.",
+  "license": "MIT",
+  "scripts": {
+    "render-math": "node render_math.js"
+  },
+  "dependencies": {
+    "katex": "0.16.47"
+  }
+}
