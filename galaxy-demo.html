@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Living Figures — spiral galaxy demo (Open Dossier)</title>
+<meta name="description" content="Phase 2.5 scaffold demo: a procedural spiral galaxy rendered live through the vendored figures runtime — the regime-proof from n-body to statistical structure. Not a frozen edition.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#17262c;--ink2:#586a6f;--paper:#f3f6f5;--card:#ffffff;
+    --teal:#0c8f86;--teal-soft:#e2efed;--coral:#cf5d36;--coral-soft:#fbe9e3;--violet:#6b4e9b;--violet-soft:#efe9f6;
+    --pass:#1d9b62;--open:#bd861d;--line:rgba(23,38,44,.085);
+    --serif:'Spectral',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --r-lg:16px; --r-sm:10px; --r-pill:999px;
+    --shadow-soft:0 2px 12px rgba(23,38,44,.05);
+    --shadow-lift:0 16px 44px rgba(23,38,44,.09);
+    --teal-glow:rgba(12,143,134,.30);
+    --lf-label:#5a6b70;
+  }
+  @supports (color: oklch(0 0 0)){
+    @media (color-gamut: p3){
+      :root{
+        --teal: oklch(0.585 0.15 187);
+        --coral: oklch(0.685 0.205 41);
+        --teal-glow: oklch(0.59 0.15 187 / .5);
+      }
+    }
+  }
+  ::selection{background:var(--teal-soft);color:var(--ink)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  header{padding:48px 0 22px;border-bottom:3px solid var(--ink)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+  .eyebrow b{color:var(--coral)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.14;margin:.35em 0 .25em;letter-spacing:-.014em}
+  .byline{font-family:var(--serif);font-style:italic;color:var(--ink2)}
+  main{padding:30px 0 8px}
+  p{max-width:68ch}
+  p.lede{color:var(--ink2)}
+  .note{font-family:var(--mono);font-size:12.5px;color:var(--ink2);background:var(--card);
+    border:1px solid var(--line);border-left:4px solid var(--open);border-radius:var(--r-sm);
+    padding:10px 14px;margin:18px 0;max-width:70ch}
+
+  /* ===== living-figure container — parallel to paper.html's .eq ===== */
+  .living-figure{
+    margin:22px 0; padding:14px 14px 12px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--r-lg); box-shadow:var(--shadow-soft);
+    overflow:hidden;
+  }
+  .lf-svg{
+    display:block; width:100%; height:auto; cursor:grab;
+    background:radial-gradient(120% 120% at 50% 46%, #0a0e1a 0%, #070a12 58%, #04060b 100%);
+    border-radius:var(--r-sm); touch-action:none;
+  }
+  .lf-svg:active{cursor:grabbing}
+  .lf-label{font-family:var(--mono)}
+
+  /* controls — themed buttons + ranges (same classes as the orrery demo) */
+  .lf-controls{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+    margin-top:12px; font-family:var(--mono); font-size:12.5px; color:var(--ink2);
+  }
+  .lf-btn{
+    font-family:var(--mono); font-size:12.5px; font-weight:600;
+    padding:7px 12px; border:1.5px solid var(--ink); background:var(--card); color:var(--ink);
+    border-radius:var(--r-sm); cursor:pointer; transition:box-shadow .2s ease, transform .12s ease;
+  }
+  .lf-btn:hover{box-shadow:var(--shadow-soft); transform:translateY(-1px)}
+  .lf-btn:focus-visible{outline:3px solid var(--coral); outline-offset:2px}
+  .lf-region{border-color:var(--teal); color:var(--teal)}
+  .lf-play{border-color:var(--teal); background:var(--teal); color:#fff}
+  .lf-field{display:flex; align-items:center; gap:7px; letter-spacing:.06em; text-transform:uppercase; font-size:11px}
+  .lf-range{accent-color:var(--teal); cursor:pointer}
+  .lf-readout{margin-left:auto; font-size:11.5px; color:var(--ink2); white-space:nowrap}
+  .lf-fallback{font-family:var(--mono); color:var(--coral)}
+
+  footer{margin-top:40px;padding:20px 0 56px;border-top:3px solid var(--ink);font-size:13.5px;color:var(--ink2)}
+  .mono{font-family:var(--mono)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Open Dossier · <b>living figures</b> · Phase 2.5 regime-proof</div>
+    <h1>A spiral galaxy, generated from a seed</h1>
+    <div class="byline">The same runtime that drives the deterministic n-body orrery here drives statistical structure: a four-arm log-spiral, a bulge and a halo, all <em>generated</em> from integer seeds — not stored. Rendered by <span class="mono">figures/galaxy.js</span> on the Phase 1 primitives in <span class="mono">figures/figures.js</span>.</div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+  <p class="lede">Drag to pan, scroll to zoom, or jump to a region. The zoom spans roughly ten orders of magnitude — from the whole galaxy down toward the Solar System. The orrery proved deterministic orbits; this proves the runtime extends to procedural <em>structure</em>, with an honest "you are here" that is correctly one point at galaxy scale.</p>
+
+  <figure class="living-figure" data-figure='{"version":"0.1.0","title":"The Milky Way — a procedural spiral galaxy","zoom":{"lo":0.00001,"hi":200000,"start":60000,"focus":"sun"},"time":{"baseSpeed":0.05,"playing":true},"disk":{"seed":80021,"count":9000,"arms":4,"rMin":1500,"rMax":48000,"pitch":4.3,"spread":0.55,"color":"#cdd8ff"},"bulge":{"seed":4407,"count":1200,"radius":9000,"color":"#ffe6b0"},"halo":{"seed":2231,"count":800,"rMin":20000,"rMax":85000,"color":"#8a93a8"},"sun":{"r":26000,"theta":2.3,"label":"You are here — the Solar System"},"regions":[{"name":"Whole galaxy","scale":70000},{"name":"Galactic center","scale":6000,"center":[0,0]},{"name":"Spiral arms","scale":28000},{"name":"Solar neighborhood","scale":400,"center":"sun"},{"name":"Solar system","scale":0.001,"center":"sun"}]}'>
+    <noscript>
+      This figure comes alive with JavaScript. A sealed, static SVG poster
+      (so it renders with no scripts at all) arrives in Phase 3 of the living-figures
+      scaffold; until then, enable JavaScript to explore the galaxy.
+    </noscript>
+  </figure>
+
+  <p class="note">SCAFFOLD NOTE — Phase 2.5 of N. This page proves the regime extension (deterministic n-body → statistical structure) and the ~10-order zoom with honest sub-pixel "you are here". It is deliberately <b>not</b> one of the four frozen editions, so the freeze script-src rewire gap (flagged in the Phase-1 audit) cannot bite here; that is handled in Phase 5. The static-poster floor (for JS-off readers) arrives in Phase 3.</p>
+</main>
+
+<footer>
+  <span class="mono">figures runtime — vendored, zero-dependency, reader-side, never run by CI.</span>
+</footer>
+</div>
+
+<!-- vendored runtime, root-relative (no CDN). figures.js MUST load before galaxy.js. -->
+<script src="figures/figures.js"></script>
+<script src="figures/galaxy.js"></script>
+<script>
+  (function () {
+    var fig = document.querySelector(".living-figure");
+    if (!fig) return;
+    if (window.DossierFigures && typeof window.DossierFigures.renderGalaxy === "function") {
+      // reads data-figure, renders into the element, leaves the attribute in place
+      window.DossierFigures.renderGalaxy(fig);
+    } else if (window.console) {
+      console.error("[galaxy-demo] DossierFigures.renderGalaxy not available — check script order");
+    }
+  })();
+</script>
+</body>
+</html>

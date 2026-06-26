@@ -161,17 +161,22 @@
     // zoomed out, in step with the planets. Composition intact: every point
     // still comes from seededScatter + solveKepler; only a transform advances.
     var beltLayers = [];
+    var shimmerLayers = [];   // layers given a per-point opacity twinkle (the Oort shell)
     function addBeltLayer(points, color, opacity, dotR, meanR) {
       var g = el("g", {});
       var frag = doc.createDocumentFragment();
+      var nodes = new Array(points.length);
       for (var i = 0; i < points.length; i++) {
-        frag.appendChild(el("circle", { cx: points[i][0], cy: points[i][1], r: dotR, fill: color, "fill-opacity": opacity }));
+        nodes[i] = el("circle", { cx: points[i][0], cy: points[i][1], r: dotR, fill: color, "fill-opacity": opacity });
+        frag.appendChild(nodes[i]);
       }
       g.appendChild(frag);
       gBelts.appendChild(g);
       // Rigid-rotation period from the belt's mean radius (Kepler's 3rd law,
       // P = a^1.5 yr) via sqrt — orbital geometry, not a runtime primitive.
-      beltLayers.push({ g: g, period: meanR * Math.sqrt(meanR) });
+      var layer = { g: g, period: meanR * Math.sqrt(meanR), nodes: nodes };
+      beltLayers.push(layer);
+      return layer;
     }
 
     (spec.belts || []).forEach(function (b) {
@@ -191,17 +196,20 @@
 
     if (spec.oort) {
       var o = spec.oort;
+      var oBase = 0.7;
       var opts = seededScatter(o.seed | 0, o.count | 0, function (rng) {
         var r = o.rMin + rng() * (o.rMax - o.rMin);
         var th = rng() * TAU;
         var rr = r * (0.85 + 0.15 * rng());                 // shell thickness jitter
-        return [rr * Math.cos(th), rr * Math.sin(th)];
+        return [rr * Math.cos(th), rr * Math.sin(th), rng() * TAU];   // 3rd value = twinkle phase
       });
       var omR = (o.rMin + o.rMax) / 2;
       // Same rigid-rotation law; the Oort's huge mean radius gives a ~10^5-yr
-      // period, so it stays visually static (a diffuse shell, as in the proof)
-      // with no special-casing.
-      addBeltLayer(opts, o.color || "#5d6b7a", 0.7, omR * 0.012, omR);
+      // period, so it stays visually static. It is NOT spun to fake motion;
+      // instead each shell point gets a gentle, per-point opacity SHIMMER so the
+      // shell reads as ALIVE without faking a rotation it does not physically have.
+      var oortLayer = addBeltLayer(opts, o.color || "#5d6b7a", oBase, omR * 0.012, omR);
+      shimmerLayers.push({ nodes: oortLayer.nodes, phases: opts.map(function (p) { return p[2]; }), base: oBase });
     }
 
     // --- orbits + bodies -------------------------------------------------
@@ -337,6 +345,23 @@
     container.appendChild(svg);
     container.appendChild(controls);
 
+    // Oort shimmer: a gentle per-point opacity twinkle (throttled ~12 Hz). The
+    // shell is physically static, so this conveys "alive" WITHOUT faking a spin.
+    // Math.sin is geometry, not a new primitive.
+    var SHIMMER_MS = 80, lastShimmer = 0;
+    function updateShimmer(now) {
+      if (now - lastShimmer < SHIMMER_MS) return;
+      lastShimmer = now;
+      var ph = now * 0.0016;
+      for (var L = 0; L < shimmerLayers.length; L++) {
+        var sl = shimmerLayers[L], ns = sl.nodes, phs = sl.phases, base = sl.base;
+        for (var i = 0; i < ns.length; i++) {
+          var tw = 0.55 + 0.45 * Math.sin(ph + phs[i]);
+          ns[i].setAttribute("fill-opacity", (base * tw).toFixed(2));
+        }
+      }
+    }
+
     // --- animation loop --------------------------------------------------
     var perf = (root.performance && root.performance.now) ? root.performance : Date;
     var last = perf.now();
@@ -359,6 +384,7 @@
       if (viewDirty) { updateView(); viewDirty = false; }
       updateBelts();   // every frame: rotation advances + zoom/pan reflected
       updateBodies();
+      updateShimmer(now);   // gentle Oort twinkle (throttled; static shell, alive)
 
       readout.textContent = "scale " + scaleAU().toFixed(scaleAU() < 10 ? 2 : 0) +
         " AU · t " + t.toFixed(1) + " yr · play-speed " + spd.toFixed(2) + " yr/s";

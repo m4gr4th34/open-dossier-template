@@ -13,6 +13,7 @@ stays untouched).
 | `figures.js` | The runtime **floor** — shared primitives every figure leans on. Exposes `window.DossierFigures`. Pinned by `FIGURES_RUNTIME_VERSION`. |
 | `figures.test.js` | Author-local Node test for the primitives (`node figures/figures.test.js`). Never run by CI. |
 | `orrery.js` | A render module that **composes** the primitives into a Keplerian zoom-orrery. Extends `DossierFigures` with `renderOrrery(container, spec)`. |
+| `galaxy.js` | A render module that **composes** the primitives into a procedural spiral galaxy (statistical structure, ~10-order zoom, per-scale cull). Extends `DossierFigures` with `renderGalaxy(container, spec)`. |
 
 ## Versioning (how we pin our own code)
 
@@ -65,6 +66,38 @@ the element with committed static SVG so readers need no JavaScript.)
   "regions":[ { "name": "Giants", "scale": 34 } ]   // zoom-to targets (AU half-window)
 }
 ```
+
+### Spec schema — galaxy (`renderGalaxy`)
+
+A parallel spec: the same `version/title/zoom/time/regions` envelope, with galaxy
+domain blocks (`disk` / `bulge` / `halo` / `sun`) instead of `bodies` / `belts` /
+`oort`. Structure is GENERATED from seeds (`seededScatter`), never stored.
+
+```jsonc
+{
+  "title": "…",
+  "zoom":  { "lo": 0.00001, "hi": 200000, "start": 60000 }, // light-year half-window (lo,hi > 0); ~10 orders of magnitude
+  "time":  { "baseSpeed": 0.05, "playing": true },          // rigid-spin rate at scale 1; autoplay
+  "disk":  { "seed": 80021, "count": 9000, "arms": 4,       // log-spiral star field
+             "rMin": 1500, "rMax": 48000, "pitch": 4.3, "spread": 0.55, "color": "#cdd8ff" },
+             // per star: arm = i % arms; R = rMin + (rMax-rMin)*u*u (center-dense);
+             // theta = arm*2PI/arms + pitch*ln(R) + spread*(u-0.5)
+  "bulge": { "seed": 4407, "count": 1200, "radius": 9000, "color": "#ffe6b0" },          // dense core (uniform-shell fn)
+  "halo":  { "seed": 2231, "count": 800, "rMin": 20000, "rMax": 85000, "color": "#8a93a8" }, // sparse outer shell
+  "sun":   { "r": 26000, "theta": 2.3, "label": "You are here" },  // galactic position of the Solar System (one point)
+  "regions":[ { "name": "Solar neighborhood", "scale": 400, "center": "sun" } ] // zoom-to (ly); center "sun" pans to the Sun
+}
+```
+
+Rendering notes (all in `galaxy.js`, not the runtime): a per-scale **cull** caps
+stars drawn at `MAX_STAR_NODES` (4000) — wide zoom shows a representative sample,
+a zoomed region draws only its local stars. The spin is **rigid** (one angle in
+projection, scale-coupled via `scaleAwareTime`). The Sun marker is a
+constant-size point — **honest sub-pixel scaling**: the whole Solar System is one
+dot at galaxy scale, and stays a single point when zoomed in (no fabricated
+sub-structure). `Math.log`/`cos`/`sin` are geometry on `seededScatter` output;
+the density gradient uses `u*u` (no `Math.pow`), keeping composition unambiguous.
+
 
 ## The composition law (the whole point of the scaffold)
 
