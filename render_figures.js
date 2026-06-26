@@ -34,13 +34,18 @@ global.window = global.window || {};
 require("./figures/figures.js");   // -> window.DossierFigures (runtime primitives)
 require("./figures/orrery.js");    // -> renderOrrery + renderOrreryPosterSVG
 require("./figures/galaxy.js");    // -> renderGalaxy + renderGalaxyPosterSVG (DOM-free poster path)
+require("./figures/cosmiczoom.js");// -> renderCosmicZoom + renderCosmicZoomPosterSVG (delegates to galaxy poster)
 const DossierFigures = global.window.DossierFigures;
 
-// Pick the poster emitter by the spec's TOP-LEVEL discriminator key. A galaxy
-// spec has `disk`; an orrery spec has `bodies`. (The cosmic-zoom spec nests its
-// orrery/galaxy under `orrery`/`galaxy` blocks, so neither top-level key matches
-// — it is deliberately not sealed in this slab.)
+// Pick the poster emitter by the spec's TOP-LEVEL discriminator key:
+//   `seam`   -> cosmic-zoom (composes orrery/galaxy under nested blocks)
+//   `disk`   -> galaxy
+//   `bodies` -> orrery
+// The cosmic check is FIRST and keyed on `seam` (present only in the cosmic
+// spec); a cosmic spec has NO top-level `disk`/`bodies`, so this never misfires
+// on figure-demo (bodies) or galaxy-demo (disk).
 function posterFor(spec) {
+  if (spec && spec.seam) return DossierFigures.renderCosmicZoomPosterSVG(spec);
   if (spec && spec.disk) return DossierFigures.renderGalaxyPosterSVG(spec);
   if (spec && spec.bodies) return DossierFigures.renderOrreryPosterSVG(spec);
   return "";

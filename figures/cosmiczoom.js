@@ -93,6 +93,16 @@
     }
     if (!spec || !spec.orrery || !spec.galaxy) return fail(container, "spec needs both orrery and galaxy blocks");
 
+    // A build-time sealed poster (data-poster) may already sit in the container
+    // as the JS-off floor. Remove it before mounting the live stack so a JS-on
+    // reader ends with exactly ONE live figure — the floor upgrades to the
+    // ceiling. (Same additive dedup as renderOrrery/renderGalaxy; no-op when
+    // no poster is present.)
+    if (container.querySelector) {
+      var baked = container.querySelector("[data-poster]");
+      if (baked && baked.parentNode) baked.parentNode.removeChild(baked);
+    }
+
     var W = 800, H = 480, cx = W / 2, cy = H / 2, RAD = Math.min(W, H) * 0.46;
     var seam = spec.seam || {};
 
@@ -282,5 +292,22 @@
     };
   }
 
+  // -------------------------------------------------------------------------
+  // renderCosmicZoomPosterSVG(spec) -> the SEALED FLOOR: a DETERMINISTIC <svg>
+  // STRING for the galaxy-scale "you are here" frame. PURE DELEGATION — at the
+  // galaxy-scale frame the live orrery opacity is 0 and the void opacity is 0,
+  // so the floor frame IS the galaxy layer alone. So we COMPOSE the existing
+  // galaxy poster path (one level up), exactly as live renderCosmicZoom composes
+  // live renderGalaxy at galaxy scale. No compositing, no reimplementation.
+  // The poster carries the galaxy's own title ("Milky Way") — correct, because
+  // the floor IS the Milky Way view; no aria rewrite needed.
+  // -------------------------------------------------------------------------
+  function renderCosmicZoomPosterSVG(spec) {
+    if (typeof spec === "string") { try { spec = JSON.parse(spec); } catch (e) { return ""; } }
+    if (!spec || !spec.galaxy) return "";
+    return DossierFigures.renderGalaxyPosterSVG(spec.galaxy);
+  }
+
   DossierFigures.renderCosmicZoom = renderCosmicZoom;
+  DossierFigures.renderCosmicZoomPosterSVG = renderCosmicZoomPosterSVG;
 })(typeof window !== "undefined" ? window : null);
