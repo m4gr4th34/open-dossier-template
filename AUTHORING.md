@@ -258,6 +258,59 @@ never auto-applied by a template sync.
 
 **Publish CTA — keep it canonical.** The publish-like-this CTA band (before the footer on index.html, paper.html, and dossier.html) intentionally points at the canonical open-dossier-template's GETTING-STARTED.md — the instructions-first front door — not at this dossier's own repo and not at the template's repo root. Every dossier funnels new authors straight into the step-by-step guide. Leave these URLs as the canonical GETTING-STARTED.md.
 
+## Lineage — chapters across releases
+
+A dossier can be a single chapter or a **lineage** of chapters. Each chapter is a
+**release tag in this one repo** — `v1.0.0` is Chapter 1, `v2.0.0` is Chapter 2, and
+so on — not a separate repository. GitHub Pages only ever serves the latest commit,
+so without intervention an older chapter would vanish from the live URL the moment
+the next one shipped. The lineage feature **freezes** each chapter at release, at its
+own stable path, so every one stays readable forever.
+
+`lineage.json` is the single source of truth: an ordered list of chapters, each
+`{n, tag, title, summary, released, concept_doi, path}`. It ships **rootless**
+(`{"chapters": []}`) — a standalone dossier has no lineage and shows none. Do **not**
+hand-edit `lineage.json`; the freeze step appends to it, so the page and the archive
+can never disagree about what exists.
+
+`lineage.html` is the persistent **series index** — the reader's map of the whole arc.
+Each edition also carries a compact **lineage strip** ("Chapter K of N · ← previous ·
+view all chapters →") that appears only when chapters exist. Both read `lineage.json`
+live, so they update the moment a new chapter is frozen.
+
+**Ancestors-only — this is doctrine, not preference.** A chapter records and links only
+what came *before* it: the previous chapter and the view-all index. **Never forward.** A
+sealed, DOI'd chapter must not be edited to point at successors that did not exist when
+it was sealed — backward lineage is permanently true, while a forward link would require
+mutating a frozen artifact. The strip and the index are built this way on purpose; do
+not add a "next chapter" anywhere.
+
+**As-published — do not retro-theme.** A frozen chapter preserves its appearance *at
+release*: the theme, the asset set, whatever shipped that day. The lineage is a
+historical record, not a reskin — watching the design and the argument mature across
+chapters is a feature, not a defect. Never restyle an old chapter to match a newer one.
+
+**Frozen = immutable.** `chapters/<tag>/` is write-once, exactly like `timestamps/` —
+never modify a frozen chapter. The one thing freezing *does* adjust is navigation: a
+frozen chapter's nav links point back to the **live root**, so a reader who deep-links a
+sealed chapter can still return to the series. Its lineage strip stays hidden there —
+the nav escapes upward, but the sealed chapter asserts nothing about a lineage it cannot
+know.
+
+**Asset discipline.** Freezing duplicates only the chapter's HTML (cheap). Shared assets
+(`katex/`, fonts, CSS) are referenced at the live root from the frozen copies, never
+re-copied; per-chapter heavy assets (the PDF, figures) are stored write-once. A lineage
+is one research **arc** — when an arc grows very long (dozens of chapters), that is the
+signal to begin a *new* arc in a new repo, not a limit to engineer around.
+
+**How chapters get frozen — two paths.** *Forward (automatic):* on each release,
+`.github/workflows/freeze-chapter.yml` waits for provenance to settle, runs the
+placeholder-honesty gate, then freezes the chapter and appends to `lineage.json` —
+nothing to do by hand, just tag the release. *Backfill (one-time):* a repo that already
+had releases before adopting lineage runs the **"Backfilling chapters from past
+releases"** ritual (README Rituals) *once* to reconstruct its existing chapters; after
+that, the forward workflow takes over.
+
 ## The Project constitution (`CLAUDE.md`)
 
 For authors who run a dossier as a Claude Project (the optional power-path in

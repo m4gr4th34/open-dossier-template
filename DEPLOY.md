@@ -47,6 +47,13 @@ TODO-AFTER-FIRST-RELEASE, NNN, PLACEHOLDER, …) on a publication surface fails 
 build — so you can't release with placeholders still showing. Releases are for
 milestones; plain commits for everything else. Never modify timestamps/.
 
+Tagging a release now **also freezes that chapter into the permanent lineage**: a
+separate workflow (`freeze-chapter.yml`, kept apart from the timestamp/DOI machinery so
+provenance stays untouched) snapshots the editions into `chapters/<tag>/` and registers
+the chapter in `lineage.json`. It runs the honesty gate first — a chapter with surviving
+placeholders is NOT frozen, so fix and re-release. Frozen chapters are immutable, like
+timestamps/. (Full convention: AUTHORING.md, "Lineage — chapters across releases".)
+
 After your first release, set the DOI by hand in three places — release
 automation never writes DOI fields: provenance.json (version_doi, and concept_doi
 once, permanently), the manuscript.tex footer, and CITATION.cff. The

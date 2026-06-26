@@ -169,6 +169,22 @@
   button#run:hover{ transform:translateY(-1px); }
   .publish-cta{border-radius:var(--r-lg)}
   h1{font-weight:500; letter-spacing:-.014em}
+
+  /* ===== lineage strip (hidden until lineage.json has chapters) ===== */
+  .lineage-strip{
+    display:none;                      /* revealed by script when chapters>0 */
+    align-items:center; flex-wrap:wrap; gap:8px 16px;
+    margin:14px 0 0; padding:11px 16px;
+    background:linear-gradient(180deg,#ffffff,#f4f8f7);
+    border:1px solid var(--line); border-radius:var(--r-lg);
+    box-shadow:var(--shadow-soft);
+    font-family:var(--mono); font-size:12.5px; color:var(--ink2);
+  }
+  .lineage-strip.show{display:flex}
+  .lineage-strip b{color:var(--ink); font-weight:600}
+  .lineage-strip a{color:var(--teal)}
+  .lineage-strip .sep{color:var(--line); }
+  .lineage-strip .ls-all{margin-left:auto; font-weight:500}
 </style>
 </head>
 <body>
@@ -185,11 +201,13 @@
     <a class="pv-item" href="paper/manuscript.pdf" target="_blank" rel="noopener"><span class="pv-k">Archived PDF</span><span class="pv-v">read PDF ↗</span></a>
     <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
   </div>
+  <div class="lineage-strip" id="lineageStrip" aria-label="Lineage"></div>
   <p class="abstract">YOUR SURVEY ABSTRACT. This dossier surveys [field]: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
   <div class="cta">
     <a class="btn primary" href="index.html">The landscape</a>
     <a class="btn" href="paper.html">Self-explaining edition</a>
     <a class="btn" href="dossier.html">Audit trail</a>
+    <a class="btn" href="lineage.html">Chapters</a>
     <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source &amp; issues</a>
   </div>
 </header>
@@ -402,6 +420,47 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
   document.getElementById('pv-state').textContent='release '+p.release_tag+' (+ live edits)';
 }).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository \u2197';
   document.getElementById('pv-doi').href='https://github.com/YOURUSER/YOURREPO';});
+</script>
+<script>
+// Lineage strip — mirrors the provenance fetch shape against lineage.json.
+// ANCESTORS-ONLY / OUTWARD: links the PREVIOUS chapter + "view all", never a
+// forward/next chapter (a sealed chapter cannot know its successors). Hidden
+// unless chapters exist; built via createElement/textContent (no innerHTML).
+fetch('lineage.json').then(function(r){return r.json();}).then(function(d){
+  var chs = (d.chapters||[]).slice().sort(function(a,b){return a.n-b.n;});
+  if(chs.length < 1) return;                 // standalone -> strip stays hidden
+  var strip = document.getElementById('lineageStrip');
+  if(!strip) return;
+  var currentN = Math.max.apply(null, chs.map(function(c){return c.n;}));
+  var current = chs.filter(function(c){return c.n===currentN;})[0];
+  var prev = chs.filter(function(c){return c.n===currentN-1;})[0];
+
+  function sep(){ var s=document.createElement('span'); s.className='sep'; s.textContent='·'; return s; }
+
+  var lead=document.createElement('span');
+  lead.appendChild(document.createTextNode('Part of an '));
+  var n=document.createElement('b'); n.textContent=String(chs.length); lead.appendChild(n);
+  lead.appendChild(document.createTextNode('-chapter lineage'));
+  strip.appendChild(lead);
+
+  strip.appendChild(sep());
+  var cur=document.createElement('span'); cur.textContent='Chapter '+current.n; strip.appendChild(cur);
+
+  if(prev){
+    strip.appendChild(sep());
+    var pl=document.createElement('a');
+    pl.href=(prev.path||'')+'paper.html';
+    pl.textContent='← Chapter '+prev.n;   // backward only — never forward
+    strip.appendChild(pl);
+  }
+
+  var all=document.createElement('a');
+  all.className='ls-all'; all.href='lineage.html';
+  all.textContent='View all chapters →';
+  strip.appendChild(all);
+
+  strip.classList.add('show');
+}).catch(function(){ /* hide: strip stays display:none (standalone or load failure) */ });
 </script>
 </body>
 </html>
