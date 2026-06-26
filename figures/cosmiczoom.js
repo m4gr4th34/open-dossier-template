@@ -102,9 +102,16 @@
     var sliderM = clamp01(logZoom.scaleToSlider(num(seam.start, 5), MLO, MHI)); // open on the inner solar system
     function scaleAU() { return logZoom.sliderToScale(sliderM, MLO, MHI); }      // RUNTIME
 
-    // crossfade band (AU) and void band (ly)
-    var fadeLo = num(seam.fadeLoAU, 0.63);    // ~1e-5 ly (galaxy inner edge)
-    var fadeHi = num(seam.fadeHiAU, 6000);    // orrery outer edge
+    // crossfade band (AU) — MUST hand off in the EMPTY VOID BEYOND the Oort, not
+    // on top of it. The Oort (orrery.oort.rMax) only FITS IN FRAME once the view
+    // scale reaches its outer radius, so the orrery has to stay opaque until then;
+    // a fade that completes inside the Oort radius renders it invisibly. Default
+    // the band to start well past the framed Oort and finish out in the void.
+    var oortMax = (spec.orrery.oort && num(spec.orrery.oort.rMax, 0)) ||
+                  (num((spec.orrery.zoom || {}).hi, 6000) * 0.8);
+    var fadeLo = num(seam.fadeLoAU, oortMax * 2.5);   // start fade past the framed Oort
+    var fadeHi = num(seam.fadeHiAU, oortMax * 18);    // finish in the empty void beyond
+    // void band (ly)
     var vInLo = num(seam.voidInLoLy, 4), vInHi = num(seam.voidInHiLy, 12);
     var vOutLo = num(seam.voidOutLoLy, 300), vOutHi = num(seam.voidOutHiLy, 1500);
 
