@@ -4,3 +4,6 @@ node_modules/
 
 # Author-local figure demo output (regenerated on demand).
 verification/figure_style_demo.png
+
+# macOS Finder artifact
+.DS_Store
