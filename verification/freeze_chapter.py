@@ -140,6 +140,14 @@ def rewire(html):
     html, nimg = rewire_img_src(html)
     if nimg:
         counts["<img> relative src"] = nimg
+
+    # P5: same generalization for the living-figures RUNTIME. A sealed figure
+    # loads it via <script src="figures/figures.js"> (+ orrery/galaxy/cosmiczoom);
+    # from chapters/<tag>/ that relative path 404s, so repoint every relative
+    # <script src> to the shared live root, exactly as <img> is handled.
+    html, nscript = rewire_script_src(html)
+    if nscript:
+        counts["<script> relative src"] = nscript
     return html, counts
 
 
@@ -169,6 +177,36 @@ def rewire_img_src(html):
         return head + quote + "../../" + val + quote
 
     pat = re.compile(r'(<img\b[^>]*?\ssrc=)(["\'])(.*?)\2', re.IGNORECASE)
+    return pat.sub(repl, html), changed[0]
+
+
+def rewire_script_src(html):
+    """Repoint RELATIVE <script src> values to the live root (../../X).
+
+    P5: the living-figures runtime is loaded as <script src="figures/figures.js">
+    (+ orrery.js / galaxy.js / cosmiczoom.js). From a frozen chapters/<tag>/ subdir
+    that relative path 404s, so — exactly as rewire_img_src does for figures —
+    rewrite EVERY <script> whose src is relative to resolve from the single shared
+    runtime at the live root.
+
+    Left untouched (so it is safe and idempotent), via the SAME SKIP set as the
+    <img> rule: absolute URLs (http://, https://), protocol-relative (//) and
+    root-absolute (/) paths, in-page #anchors, data: URIs, and already-../-prefixed
+    values. Inline <script> blocks (the provenance/lineage JS, the ?embed toggle)
+    carry NO src=, so the pattern never matches them. Only the plain `src`
+    attribute is touched (the boundary requires whitespace before src). Handles
+    both quote styles. Returns (new_html, count)."""
+    SKIP = ("http://", "https://", "//", "/", "#", "data:", "../")
+    changed = [0]  # count ACTUAL rewrites, not bare pattern matches
+
+    def repl(m):
+        head, quote, val = m.group(1), m.group(2), m.group(3)
+        if (not val) or val.startswith(SKIP):
+            return m.group(0)
+        changed[0] += 1
+        return head + quote + "../../" + val + quote
+
+    pat = re.compile(r'(<script\b[^>]*?\ssrc=)(["\'])(.*?)\2', re.IGNORECASE)
     return pat.sub(repl, html), changed[0]
 
 
