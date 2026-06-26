@@ -54,6 +54,9 @@
   var scaleAwareTime = DossierFigures.scaleAwareTime;
   var ease           = DossierFigures.ease;
   var el             = DossierFigures.el;
+  var r2             = DossierFigures.r2;       // string-emit helpers (poster path)
+  var escAttr        = DossierFigures.escAttr;
+  var escTxt         = DossierFigures.escTxt;
 
   var TAU = Math.PI * 2;
   function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
@@ -72,6 +75,132 @@
 
   var MAX_STAR_NODES = 4000;   // hard cap on stars drawn per frame (the cull bound)
 
+  // ===== SHARED GEOMETRY ====================================================
+  // Computed ONCE here, consumed by BOTH emitters — the live el() path AND the
+  // poster string path — so the sealed floor can never drift from the live
+  // ceiling. seededScatter / logZoom are STILL the runtime primitives; only the
+  // final emit (DOM node vs SVG string) differs. Canvas constants are fixed.
+  var GW = 800, GH = 480, GRAD = Math.min(800, 480) * 0.46, GPAD = 36;
+
+  // GENERATE structure (PURE — seededScatter; structure lives in the fn). Same
+  // rng() call order as the original inline build => byte-identical point sets.
+  function computeGalaxyStars(spec) {
+    var disk = spec.disk;
+    var arms = Math.max(1, disk.arms | 0 || 4);
+    var rMinD = num(disk.rMin, 1500), rMaxD = num(disk.rMax, 48000);
+    var pitch = num(disk.pitch, 4.3), spread = num(disk.spread, 0.5);
+    return seededScatter(disk.seed | 0, disk.count | 0, function (rng, i) {
+      var arm = i % arms;
+      var u = rng();
+      var R = rMinD + (rMaxD - rMinD) * u * u;                 // denser toward center
+      var theta = (arm * TAU / arms) + pitch * Math.log(R) + spread * (rng() - 0.5);
+      var b = 0.35 + 0.65 * rng();
+      return [R * Math.cos(theta), R * Math.sin(theta), b];
+    });
+  }
+  function computeGalaxyBulge(spec) {
+    var bsp = spec.bulge || { seed: 7, count: 1200, radius: 9000 };
+    return seededScatter(bsp.seed | 0, bsp.count | 0, function (rng) {
+      var u = rng();
+      var R = num(bsp.radius, 9000) * u * u;                   // dense core
+      var th = rng() * TAU;
+      return [R * Math.cos(th), R * Math.sin(th), 0.5 + 0.5 * rng()];
+    });
+  }
+  function computeGalaxyHalo(spec) {
+    var hsp = spec.halo || { seed: 9, count: 800, rMin: 20000, rMax: 85000 };
+    return seededScatter(hsp.seed | 0, hsp.count | 0, function (rng) {
+      var R = num(hsp.rMin, 20000) + rng() * (num(hsp.rMax, 85000) - num(hsp.rMin, 20000));
+      var th = rng() * TAU;
+      return [R * Math.cos(th), R * Math.sin(th), 0.2 + 0.4 * rng()];
+    });
+  }
+
+  // The PURE per-scale cull: rotate (ca,sa), project, drop off-screen (GPAD),
+  // cap at `cap` (MAX_STAR_NODES for stars; 0 = uncapped), in generation order.
+  // Returns the drawn points [[sx,sy,brightness], …]. The live path sets node
+  // attrs from this; the poster emits <circle> strings from it — SAME set.
+  function cullLayer(worldArr, cap, ca, sa, kk, cx, cy, panX, panY) {
+    var out = [], j = 0;
+    for (var i = 0; i < worldArr.length; i++) {
+      if (cap && j >= cap) break;
+      var p = worldArr[i];
+      var wx = p[0] * ca - p[1] * sa, wy = p[0] * sa + p[1] * ca;   // rigid rotation
+      var sx = cx + (wx + panX) * kk, sy = cy - (wy + panY) * kk;
+      if (sx < -GPAD || sx > GW + GPAD || sy < -GPAD || sy > GH + GPAD) continue;
+      out.push([sx, sy, p[2]]); j++;
+    }
+    return out;
+  }
+
+  // The DEFAULT (start) frame as plain data: slider=scaleToSlider(zoom.start),
+  // pan=0 (auto-focus frac=0 at the start slider -> galactic-centre framed, the
+  // Sun marked OFF-centre in its spur), galaxyAngle=0 (ca=1,sa=0). The whole-
+  // galaxy "you are here" view — what the poster freezes.
+  function computeGalaxyFrame(spec) {
+    var cx = GW / 2, cy = GH / 2;
+    var zoom = spec.zoom || {};
+    var LO = Math.max(1e-9, num(zoom.lo, 1e-5));
+    var HI = Math.max(LO * 1.0001, num(zoom.hi, 200000));
+    var slider = clamp01(logZoom.scaleToSlider(num(zoom.start, HI * 0.4), LO, HI)); // RUNTIME
+    var scaleLY = logZoom.sliderToScale(slider, LO, HI);                            // RUNTIME
+    var kk = GRAD / scaleLY, panX = 0, panY = 0, ca = 1, sa = 0;                    // start frame
+
+    var disk = spec.disk, bsp = spec.bulge || {}, hsp = spec.halo || {};
+    var stars = cullLayer(computeGalaxyStars(spec), MAX_STAR_NODES, ca, sa, kk, cx, cy, panX, panY);
+    var bulge = cullLayer(computeGalaxyBulge(spec), 0, ca, sa, kk, cx, cy, panX, panY);
+    var halo  = cullLayer(computeGalaxyHalo(spec), 0, ca, sa, kk, cx, cy, panX, panY);
+
+    var sun = spec.sun || { r: 26000, theta: 2.1, label: "You are here" };
+    var sbx = num(sun.r, 26000) * Math.cos(num(sun.theta, 2.1));
+    var sby = num(sun.r, 26000) * Math.sin(num(sun.theta, 2.1));
+
+    return {
+      W: GW, H: GH, scaleLY: scaleLY, ariaLabel: spec.title || "Spiral galaxy",
+      coreGlow: { cx: cx + panX * kk, cy: cy - panY * kk },
+      stars: stars, starColor: disk.color || "#cdd8ff", starOpacity: 0.85,
+      bulge: bulge, bulgeColor: bsp.color || "#ffe6b0", bulgeOpacity: 0.8,
+      halo: halo, haloColor: hsp.color || "#8a93a8", haloOpacity: 0.5,
+      marker: { x: cx + (sbx + panX) * kk, y: cy - (sby + panY) * kk, label: sun.label || "You are here" }
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // renderGalaxyPosterSVG(spec) -> the SEALED FLOOR: a DETERMINISTIC <svg> STRING
+  // for the whole-galaxy start frame. PURE (no DOM, no browser, no sampling) —
+  // generated from the spec via the SAME computeGalaxyFrame the live path uses,
+  // so floor == ceiling by construction. The galaxy has no shimmer, so there is
+  // NO expected difference. Mirrors render_math.js's pure-string discipline.
+  // -------------------------------------------------------------------------
+  function emitLayer(cls, pts, color, opacity) {
+    var s = '<g class="' + cls + '">';
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      s += '<circle cx="' + r2(p[0]) + '" cy="' + r2(p[1]) + '" r="' + r2(0.5 + p[2] * 1.1) + '" fill="' + escAttr(color) + '" fill-opacity="' + opacity + '"></circle>';
+    }
+    return s + '</g>';
+  }
+  function renderGalaxyPosterSVG(spec) {
+    if (typeof spec === "string") { try { spec = JSON.parse(spec); } catch (e) { return ""; } }
+    if (!spec || !spec.disk) return "";
+    var f = computeGalaxyFrame(spec);
+    var s = '<svg viewBox="0 0 ' + f.W + ' ' + f.H + '" width="100%" class="lf-svg" role="img" aria-label="' + escAttr(f.ariaLabel) + '">';
+    s += '<defs><radialGradient id="lf-core-glow" cx="50%" cy="50%" r="50%">';
+    s += '<stop offset="0%" stop-color="#fff2cc" stop-opacity="0.9"></stop>';
+    s += '<stop offset="100%" stop-color="#ffcf7a" stop-opacity="0"></stop>';
+    s += '</radialGradient></defs>';
+    s += '<g class="lf-core"><circle r="34" fill="url(#lf-core-glow)" cx="' + r2(f.coreGlow.cx) + '" cy="' + r2(f.coreGlow.cy) + '"></circle></g>';
+    s += emitLayer("lf-halo", f.halo, f.haloColor, f.haloOpacity);
+    s += emitLayer("lf-stars", f.stars, f.starColor, f.starOpacity);
+    s += emitLayer("lf-bulge", f.bulge, f.bulgeColor, f.bulgeOpacity);
+    s += '<g class="lf-youarehere">';
+    s += '<circle r="9" fill="none" stroke="#ff7a59" stroke-width="1.4" stroke-opacity="0.9" cx="' + r2(f.marker.x) + '" cy="' + r2(f.marker.y) + '"></circle>';
+    s += '<circle r="2.2" fill="#ffd2c4" cx="' + r2(f.marker.x) + '" cy="' + r2(f.marker.y) + '"></circle>';
+    s += '<text class="lf-label" font-size="11" fill="#ffb9a6" dx="13" dy="4" x="' + r2(f.marker.x) + '" y="' + r2(f.marker.y) + '">' + escTxt(f.marker.label) + '</text>';
+    s += '</g></svg>';
+    return s;
+  }
+
   // -------------------------------------------------------------------------
   // renderGalaxy(container, spec)
   //   container : <figure class="living-figure"> (or any host node)
@@ -88,6 +217,15 @@
       catch (e) { return fail(container, "data-figure is not valid JSON"); }
     }
     if (!spec || !spec.disk) return fail(container, "spec has no disk");
+
+    // A build-time sealed poster (data-poster) may already sit in the container
+    // as the JS-off floor. Remove it before rendering live so a JS-on reader ends
+    // with exactly ONE (live) <svg> — the floor upgrades to the ceiling. (Same
+    // additive dedup as renderOrrery; a no-op when no poster is present.)
+    if (container.querySelector) {
+      var baked = container.querySelector("[data-poster]");
+      if (baked && baked.parentNode) baked.parentNode.removeChild(baked);
+    }
 
     var W = 800, H = 480, cx = W / 2, cy = H / 2, RAD = Math.min(W, H) * 0.46;
     var zoom = spec.zoom || {};
@@ -128,38 +266,14 @@
     var coreGlow = el("circle", { r: 34, fill: "url(#lf-core-glow)" });
     gCore.appendChild(coreGlow);
 
-    // --- GENERATE structure (seededScatter; structure lives in fn) --------
+    // --- GENERATE structure via the SHARED compute (same point sets the poster
+    //     path uses; only the emit below — el() — differs). ------------------
     var disk = spec.disk;
-    var arms = Math.max(1, disk.arms | 0 || 4);
-    var rMinD = num(disk.rMin, 1500), rMaxD = num(disk.rMax, 48000);
-    var pitch = num(disk.pitch, 4.3), spread = num(disk.spread, 0.5);
-    // Log-spiral arms with a center-dense radial gradient. Math.log/cos/sin are
-    // GEOMETRY on seededScatter's uniform output — not a reimplemented primitive.
-    // The density gradient is quadratic (u*u), deliberately avoiding Math.pow so
-    // the composition grep stays unambiguous.
-    var worldStars = seededScatter(disk.seed | 0, disk.count | 0, function (rng, i) {
-      var arm = i % arms;
-      var u = rng();
-      var R = rMinD + (rMaxD - rMinD) * u * u;                 // denser toward center
-      var theta = (arm * TAU / arms) + pitch * Math.log(R) + spread * (rng() - 0.5);
-      var b = 0.35 + 0.65 * rng();                             // brightness for texture
-      return [R * Math.cos(theta), R * Math.sin(theta), b];
-    });
-
     var bsp = spec.bulge || { seed: 7, count: 1200, radius: 9000 };
-    var worldBulge = seededScatter(bsp.seed | 0, bsp.count | 0, function (rng) {
-      var u = rng();
-      var R = num(bsp.radius, 9000) * u * u;                   // dense core (Oort-shell pattern)
-      var th = rng() * TAU;
-      return [R * Math.cos(th), R * Math.sin(th), 0.5 + 0.5 * rng()];
-    });
-
     var hsp = spec.halo || { seed: 9, count: 800, rMin: 20000, rMax: 85000 };
-    var worldHalo = seededScatter(hsp.seed | 0, hsp.count | 0, function (rng) {
-      var R = num(hsp.rMin, 20000) + rng() * (num(hsp.rMax, 85000) - num(hsp.rMin, 20000));
-      var th = rng() * TAU;
-      return [R * Math.cos(th), R * Math.sin(th), 0.2 + 0.4 * rng()];
-    });
+    var worldStars = computeGalaxyStars(spec);
+    var worldBulge = computeGalaxyBulge(spec);
+    var worldHalo  = computeGalaxyHalo(spec);
 
     // --- node pools ------------------------------------------------------
     function makeNodes(parent, n, color, opacity) {
@@ -222,24 +336,18 @@
       panX = -f[0] * frac; panY = -f[1] * frac;
     }
 
-    // --- the CULL: project a world layer into its node pool --------------
-    var PAD = 36;
+    // --- the CULL: SHARED math (cullLayer) -> set node attrs from the result --
     function projectLayer(worldArr, nodes, cap, ca, sa, kk) {
+      var pts = cullLayer(worldArr, cap, ca, sa, kk, cx, cy, panX, panY);
       var j = 0;
-      for (var i = 0; i < worldArr.length; i++) {
-        if (cap && j >= cap) break;
-        var p = worldArr[i];
-        var wx = p[0] * ca - p[1] * sa, wy = p[0] * sa + p[1] * ca;   // rigid rotation
-        var sx = cx + (wx + panX) * kk, sy = cy - (wy + panY) * kk;
-        if (sx < -PAD || sx > W + PAD || sy < -PAD || sy > H + PAD) continue;   // CULL off-screen
-        var n = nodes[j++];
-        n.setAttribute("cx", sx.toFixed(1)); n.setAttribute("cy", sy.toFixed(1));
+      for (; j < pts.length; j++) {
+        var n = nodes[j], p = pts[j];
+        n.setAttribute("cx", p[0].toFixed(1)); n.setAttribute("cy", p[1].toFixed(1));
         if (n.__b !== p[2]) { n.setAttribute("r", (0.5 + p[2] * 1.1).toFixed(2)); n.__b = p[2]; }
         if (n.__hidden) { n.style.display = ""; n.__hidden = false; }
       }
-      var drawn = j;
       for (; j < nodes.length; j++) { var m = nodes[j]; if (!m.__hidden) { m.style.display = "none"; m.__hidden = true; } }
-      return drawn;
+      return pts.length;
     }
 
     function updateMarker(ca, sa, kk) {
@@ -393,4 +501,5 @@
   }
 
   DossierFigures.renderGalaxy = renderGalaxy;
+  DossierFigures.renderGalaxyPosterSVG = renderGalaxyPosterSVG;
 })(typeof window !== "undefined" ? window : null);

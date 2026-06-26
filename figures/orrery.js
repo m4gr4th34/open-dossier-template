@@ -65,6 +65,9 @@
   var scaleAwareTime = DossierFigures.scaleAwareTime;
   var ease           = DossierFigures.ease;
   var el             = DossierFigures.el;
+  var r2             = DossierFigures.r2;       // string-emit helpers (poster path)
+  var escAttr        = DossierFigures.escAttr;
+  var escTxt         = DossierFigures.escTxt;
 
   var TAU = Math.PI * 2;
   var ORBIT_SAMPLES = 96;   // single source for BOTH the live path and the poster
@@ -179,11 +182,6 @@
     return { W: W, H: H, scaleAU: scaleAU, ariaLabel: spec.title || "Zoom-orrery",
       orbits: orbits, planets: planets, beltLayers: beltLayers, sun: { cx: sun[0], cy: sun[1] } };
   }
-
-  // tiny string helpers for the poster emitter (string building, not primitives)
-  function r2(n) { return Math.round(n * 100) / 100; }
-  function escAttr(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-  function escTxt(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
   function fail(container, msg) {
     if (root && root.console) root.console.error("[orrery] " + msg);

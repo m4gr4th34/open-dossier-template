@@ -150,6 +150,17 @@
   }
 
   // -------------------------------------------------------------------------
+  // 7) String-emit helpers — the siblings of el(): where el() emits a live DOM
+  //    node, these emit safe SVG-string pieces for the build-time POSTER path
+  //    (renderXPosterSVG). DOM-free, so they run in pure Node too.
+  //      r2(n)     -> round a coordinate to 2 dp (compact poster output)
+  //      escAttr/escTxt -> escape a value for an attribute / text node
+  // -------------------------------------------------------------------------
+  function r2(n) { return Math.round(n * 100) / 100; }
+  function escAttr(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function escTxt(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  // -------------------------------------------------------------------------
   // Public namespace. Attached to window in the browser; also exposed for the
   // author-local Node test (no third-party loader, just a plain object).
   // -------------------------------------------------------------------------
@@ -161,7 +172,10 @@
     logZoom: logZoom,
     scaleAwareTime: scaleAwareTime,
     ease: ease,
-    el: el
+    el: el,
+    r2: r2,
+    escAttr: escAttr,
+    escTxt: escTxt
   };
 
   if (typeof module !== "undefined" && module.exports) {

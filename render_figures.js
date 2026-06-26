@@ -33,7 +33,18 @@ const path = require("path");
 global.window = global.window || {};
 require("./figures/figures.js");   // -> window.DossierFigures (runtime primitives)
 require("./figures/orrery.js");    // -> renderOrrery + renderOrreryPosterSVG
+require("./figures/galaxy.js");    // -> renderGalaxy + renderGalaxyPosterSVG (DOM-free poster path)
 const DossierFigures = global.window.DossierFigures;
+
+// Pick the poster emitter by the spec's TOP-LEVEL discriminator key. A galaxy
+// spec has `disk`; an orrery spec has `bodies`. (The cosmic-zoom spec nests its
+// orrery/galaxy under `orrery`/`galaxy` blocks, so neither top-level key matches
+// — it is deliberately not sealed in this slab.)
+function posterFor(spec) {
+  if (spec && spec.disk) return DossierFigures.renderGalaxyPosterSVG(spec);
+  if (spec && spec.bodies) return DossierFigures.renderOrreryPosterSVG(spec);
+  return "";
+}
 
 // Decode the predefined entities so a data-figure value becomes raw JSON
 // (e.g. Barnard&#39;s -> Barnard's). &amp; last. (mirrors render_math.)
@@ -98,28 +109,32 @@ function renderHtml(html) {
     var close = findMatchingClose(html, "figure", gt + 1);
     if (!close) { out += html.slice(i); i = html.length; break; }  // unbalanced; bail safely
 
-    // Generate the sealed poster from the SAME spec (pure, deterministic).
+    // Generate the sealed poster from the SAME spec (pure, deterministic),
+    // dispatched by figure type. A figure whose spec matches no emitter (e.g.
+    // the not-yet-supported cosmic-zoom) is an error AND is LEFT UNCHANGED —
+    // never rewritten with an empty poster.
     var poster = "", ok = false;
     try {
       var spec = JSON.parse(decodeEntities(df));
-      poster = DossierFigures.renderOrreryPosterSVG(spec);
+      poster = posterFor(spec);
       ok = !!poster;
     } catch (e) { ok = false; }
-    if (!ok) errors++;
 
-    // Mark the poster <svg> so the live runtime removes it before appending.
-    var tagged = ok ? poster.replace(/^<svg /, '<svg data-poster="1" ') : "";
-
-    // New inner = the sealed poster + the existing inner MINUS any prior poster
-    // (idempotent: regenerating discards the old <svg data-poster>). The figure's
-    // OPEN TAG is preserved verbatim, so data-figure stays byte-identical.
-    var inner = html.slice(gt + 1, close.start);
-    var rest = inner.replace(/\s*<svg\b[^>]*\bdata-poster\b[\s\S]*?<\/svg>/i, "");
-    var newInner = "\n    " + tagged + rest;
-
-    out += html.slice(i, lt) + openTag + newInner + html.slice(close.start, close.end);
+    if (ok) {
+      // Mark the poster <svg> so the live runtime removes it before appending.
+      var tagged = poster.replace(/^<svg /, '<svg data-poster="1" ');
+      // New inner = the sealed poster + the existing inner MINUS any prior poster
+      // (idempotent: regenerating discards the old <svg data-poster>). The figure's
+      // OPEN TAG is preserved verbatim, so data-figure stays byte-identical.
+      var inner = html.slice(gt + 1, close.start);
+      var rest = inner.replace(/\s*<svg\b[^>]*\bdata-poster\b[\s\S]*?<\/svg>/i, "");
+      out += html.slice(i, lt) + openTag + "\n    " + tagged + rest + html.slice(close.start, close.end);
+      count++;
+    } else {
+      errors++;
+      out += html.slice(i, close.end);   // unrecognized/failed -> figure copied through UNCHANGED
+    }
     i = close.end;
-    count++;
   }
 
   return { html: out, count: count, errors: errors };
