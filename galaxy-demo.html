@@ -83,7 +83,21 @@
 
   footer{margin-top:40px;padding:20px 0 56px;border-top:3px solid var(--ink);font-size:13.5px;color:var(--ink2)}
   .mono{font-family:var(--mono)}
+
+  /* ===== embed bare-mode (?embed=1): show ONLY the figure (for iframing into the
+     living-figures showcase). Opt-in; the default (no query param) is unchanged. */
+  .embed header, .embed footer { display: none; }
+  .embed main > :not(.living-figure) { display: none; }   /* hide the intro/note copy */
+  .embed .wrap { max-width: none; margin: 0; padding: 0; }
+  .embed main { padding: 0; }
+  .embed .living-figure { margin: 0; padding: 0; border: none; box-shadow: none; border-radius: 0; }
 </style>
+<script>
+  // Opt-in bare-mode for iframing just the figure: ?embed (or ?embed=1) hides the
+  // page chrome via an .embed class set on <html> here in <head> (no flash of chrome
+  // before paint). Default (no query param) is untouched — pure chrome visibility.
+  try { if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed"); } catch (e) {}
+</script>
 </head>
 <body>
 <header>
