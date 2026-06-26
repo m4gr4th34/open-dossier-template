@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Living Figures — a capability of the Open Dossier format</title>
+<meta name="description" content="A showcase of living figures: figures you can fall through, that are ALSO sealed, static, archival SVGs. Floor / source / ceiling — alive and permanent.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== canonical theme tokens — copied verbatim from the demo heads so the
+     showcase feels native to the format (the elevated-light theme). ===== */
+  :root{
+    --ink:#17262c;--ink2:#586a6f;--paper:#f3f6f5;--card:#ffffff;
+    --teal:#0c8f86;--teal-soft:#e2efed;--coral:#cf5d36;--coral-soft:#fbe9e3;--violet:#6b4e9b;--violet-soft:#efe9f6;
+    --pass:#1d9b62;--open:#bd861d;--line:rgba(23,38,44,.085);
+    --serif:'Spectral',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --r-lg:16px; --r-sm:10px; --r-pill:999px;
+    --shadow-soft:0 2px 12px rgba(23,38,44,.05);
+    --shadow-lift:0 16px 44px rgba(23,38,44,.09);
+    --teal-glow:rgba(12,143,134,.30);
+    --lf-label:#5a6b70;
+  }
+  @supports (color: oklch(0 0 0)){
+    @media (color-gamut: p3){
+      :root{
+        --teal: oklch(0.585 0.15 187);
+        --coral: oklch(0.685 0.205 41);
+        --teal-glow: oklch(0.59 0.15 187 / .5);
+      }
+    }
+  }
+  ::selection{background:var(--teal-soft);color:var(--ink)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px}
+
+  /* a touch wider than the 880px reading column — this page holds figures */
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+  header{padding:48px 0 22px;border-bottom:3px solid var(--ink)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+  .eyebrow b{color:var(--coral)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,5vw,46px);line-height:1.1;margin:.35em 0 .25em;letter-spacing:-.016em}
+  .byline{font-family:var(--serif);font-style:italic;color:var(--ink2)}
+  main{padding:30px 0 8px}
+  p{max-width:68ch}
+  p.lede{color:var(--ink2);font-size:17px}
+
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(21px,3vw,27px);line-height:1.2;
+     letter-spacing:-.01em;margin:0 0 .3em}
+  section{margin:52px 0}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+     color:var(--teal);margin:0 0 10px}
+  strong{color:var(--ink)}
+  code{font-family:var(--mono);font-size:.92em;background:var(--card);border:1px solid var(--line);
+     border-radius:6px;padding:1px 5px}
+  a{color:var(--teal);text-decoration-thickness:1.5px;text-underline-offset:2px}
+  a:hover{color:var(--coral)}
+
+  /* ===== figure card — reuses the demos' .living-figure tokens (themed border,
+     soft shadow, --r-lg) so the iframed figure reads as a first-class figure. ===== */
+  .figcard{
+    margin:22px 0; padding:14px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--r-lg); box-shadow:var(--shadow-soft);
+    overflow:hidden;
+  }
+  .figcard.hero{ box-shadow:var(--shadow-lift); padding:16px; }
+  .figcard iframe{
+    display:block; width:100%; border:0; border-radius:var(--r-sm);
+    background:radial-gradient(120% 120% at 50% 42%, #0c151b 0%, #0a1117 60%, #070d12 100%);
+  }
+  .figcard.hero iframe{ height:680px; }
+  .figcard.depth iframe{ height:660px; }   /* tuned: inner content ~630-644px, no scrollbar */
+  .cap{font-family:var(--mono);font-size:12.5px;color:var(--ink2);
+     margin:11px 4px 2px;line-height:1.5;max-width:78ch}
+  .cap b{color:var(--ink)}
+
+  /* honesty callout — the format's soul; uses the open/caveat accent, made prominent */
+  .honesty{
+    background:var(--card); border:1px solid var(--line); border-left:4px solid var(--open);
+    border-radius:var(--r-lg); box-shadow:var(--shadow-soft);
+    padding:22px 24px; margin:52px 0;
+  }
+  .honesty h2{margin-top:0}
+  .honesty .kicker{color:var(--open)}
+
+  /* the three-layer model, laid out as labeled lines */
+  .model{margin:18px 0 4px;padding:0;list-style:none;max-width:72ch}
+  .model li{margin:0 0 12px;padding-left:0}
+  .model .tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+     color:var(--teal);display:inline-block;min-width:84px}
+  .model li.floor .tag{color:var(--coral)}
+  .model li.ceiling .tag{color:var(--violet)}
+
+  footer{margin-top:40px;padding:24px 0 64px;border-top:3px solid var(--ink);
+     font-size:13.5px;color:var(--ink2)}
+  footer a{color:var(--ink2)}
+  .mono{font-family:var(--mono)}
+
+  @media (max-width:680px){
+    .figcard.hero iframe{ height:560px; }
+    .figcard.depth iframe{ height:560px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Open Dossier · <b>living figures</b> · a capability of the format</div>
+    <h1>A figure you can fall through.</h1>
+    <div class="byline">A standalone showcase — not one of the frozen editions. Everything below
+      is rendered by the dossier's own vendored, zero-dependency runtime.</div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+  <!-- 1) THE HOOK — wow on arrival, before any explanation -->
+  <section>
+    <p class="lede">Most figures are pictures of a result. A few are the result itself — runnable,
+      inspectable, and built to survive. Here is one. Drag it.</p>
+
+    <div class="figcard hero">
+      <iframe src="cosmic-demo.html?embed=1" loading="eager"
+              title="Cosmic Zoom — one continuous zoom from Mercury to the Milky Way"></iframe>
+    </div>
+    <p class="cap"><b>Drag the zoom — fall from Mercury to the Milky Way.</b> Real orbital mechanics
+      below, a procedural galaxy above, stitched into one continuous gesture. The same runtime draws
+      both, and the zoom <em>composes</em> them rather than cross-fading two pictures.</p>
+  </section>
+
+  <!-- 2) THE TURN — the substance that separates it from a toy -->
+  <section>
+    <p class="kicker">the turn</p>
+    <h2>Now turn JavaScript off. It's still here.</h2>
+    <p>That is the part a toy can't do. The figure you just dragged is <strong>also</strong> a sealed,
+      static SVG baked into the page — it renders with no JavaScript at all, it is byte-stable, and it
+      is exactly what gets archived and timestamped. The interaction is an enhancement layered on top of
+      a permanent picture, not a replacement for one. Three honest layers:</p>
+
+    <ul class="model">
+      <li class="floor"><span class="tag">floor</span> a sealed, static, archival <strong>SVG poster</strong>
+        — no JavaScript, hash-stable, the thing that gets sealed and timestamped. It is what a reader with
+        scripts off, a screen reader, or an archive crawler sees.</li>
+      <li class="source"><span class="tag">source</span> the figure's <strong>generator</strong>, carried in
+        plain sight as a <code>data-figure</code> JSON spec — the few hundred bytes a person <em>or</em> an
+        AI can read, diff, and edit to change the figure.</li>
+      <li class="ceiling"><span class="tag">ceiling</span> the <strong>live interaction</strong> — drag, zoom,
+        play — progressive enhancement that the runtime upgrades the floor into when scripts are available.</li>
+    </ul>
+
+    <p>So a living figure is alive <strong>and</strong> permanent: it moves when a reader is present to move
+      it, and it freezes into a citable, archival artifact when no one is. Nothing here is a widget that
+      breaks in an archive five years from now.</p>
+  </section>
+
+  <!-- 3) THE DEPTH — and it generalizes -->
+  <section>
+    <p class="kicker">the depth</p>
+    <h2>And it generalizes.</h2>
+    <p>The cosmic zoom isn't a one-off. It is two ordinary living figures, composed. Each stands on its own:</p>
+
+    <div class="figcard depth">
+      <iframe src="figure-demo.html?embed=1" loading="lazy"
+              title="Zoom-orrery — a Keplerian model of the solar system"></iframe>
+    </div>
+    <p class="cap"><b>Deterministic physics.</b> Kepler's equation is solved per body, per frame — no
+      pre-baked path. The eight planets are about 1.4&nbsp;KB of orbital elements; the asteroid and Kuiper
+      belts are a 203-byte pair of seeds that scatter two thousand bodies at view time, and the Oort cloud is
+      another 68 bytes for nine hundred more.</p>
+
+    <div class="figcard depth">
+      <iframe src="galaxy-demo.html?embed=1" loading="lazy"
+              title="Spiral galaxy — a statistical model generated from a seed"></iframe>
+    </div>
+    <p class="cap"><b>A galaxy from a seed.</b> A four-arm spiral of nine thousand stars, plus a bulge and a
+      halo, unfolded from a single 760-byte spec — not a stored point cloud, a generator. Change the seed and
+      you get a different, equally lawful galaxy.</p>
+
+    <p>The thread through all three: <strong>figures store generators, not output.</strong> The runtime is
+      vendored, pinned, and zero-dependency, and the render modules <em>compose</em> a small set of shared
+      primitives — the Kepler solve, the seeded scatter, the logarithmic zoom — rather than reimplementing
+      them. The cosmic zoom reuses the orrery and the galaxy the very same way. Small inputs, lawful math,
+      one runtime: that is what keeps a figure both light enough to archive and faithful enough to trust.</p>
+  </section>
+
+  <!-- 4) THE HONESTY NOTE — the format's soul, explicit and prominent -->
+  <aside class="honesty">
+    <p class="kicker">the honesty note</p>
+    <h2>A capability that invites — not a bar that excludes.</h2>
+    <p>None of this means a result has to be beautiful to be worthy. A null result, a flat line, a
+      boring-but-correct table gets the <strong>same</strong> sealed, first-class frame as a galaxy you can
+      drag. The living figure is an offer, not a requirement: when the truth happens to be a slider you pull,
+      pull it; when the truth is a number you simply have to sit with, the format sits with it just as
+      honestly.</p>
+    <p>The point of the medium is to make <strong>truth</strong> magnetic, never to dress up a finding it
+      hasn't earned. Spectacle never outranks honesty here — every label stays true, whether the figure
+      soars or sits still. A showcase that forgot this would be selling animation; this one is showing a way
+      to tell the truth and keep it.</p>
+  </aside>
+
+  <!-- 5) THE INVITATION — recruiting close, "here's a better way, running" -->
+  <section>
+    <p class="kicker">the invitation</p>
+    <h2>Fork it and publish.</h2>
+    <p>There's no plug-in to install and no platform to join. The whole capability is a vendored runtime and a
+      handful of plain-text specs sitting in a public repository — and this page is just three sealed demos in
+      <code>&lt;iframe&gt;</code>s. If you have a result worth reading, you can have figures like these under
+      it by the end of the afternoon.</p>
+    <p>The work makes the argument. Start from the template:
+      <a href="https://github.com/m4gr4th34/open-dossier-template">github.com/m4gr4th34/open-dossier-template</a>
+      — the README's <em>Rituals</em> walk you from "Use this template" to a live, sealed, timestamped
+      dossier. Then publish, and let the figures do the talking.</p>
+  </section>
+
+</main>
+<footer>
+  <div class="mono">Open Dossier · living figures showcase. Floor / source / ceiling — alive and
+    permanent. Built by the dossier's own runtime; sealed posters render with JavaScript off.</div>
+</footer>
+</div>
+</body>
+</html>
