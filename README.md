@@ -3,6 +3,8 @@
 **The starting point for every Open Dossier publication.**
 Click "Use this template" to create your Dossier NNN in one step.
 
+### ▶ [See a living figure — fall from a planet to the galaxy, live](https://m4gr4th34.github.io/open-dossier-template/showcase.html)
+
 <!-- AGENT: after the author's GitHub Pages site is live, replace this comment with a quick-links line placed HERE (immediately after the title/tagline, above the GETTING-STARTED line and the badge) so visitors can open the live result in one click. Use the author's real Pages URL:
 ### ▶ [Read the living paper](https://USER.github.io/REPO/) · [Self-explaining edition](https://USER.github.io/REPO/paper.html) · [Run the checks](https://USER.github.io/REPO/#verify) · [Audit trail](https://USER.github.io/REPO/dossier.html) · [Living figures showcase](https://USER.github.io/REPO/showcase.html)
 Rationale: lead with the live result for the skeptic, then GETTING-STARTED for the would-be author, then the explanatory sections. Do not leave these as live links until the Pages site actually resolves, or they 404. -->
