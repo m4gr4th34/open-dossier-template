@@ -125,43 +125,81 @@
     var vInLo = num(seam.voidInLoLy, 4), vInHi = num(seam.voidInHiLy, 12);
     var vOutLo = num(seam.voidOutLoLy, 300), vOutHi = num(seam.voidOutHiLy, 1500);
 
-    // --- the two composed layers + a void overlay + a stage --------------
-    var stage = doc.createElement("div");
-    stage.style.cssText = "position:relative;";
-    var layB = doc.createElement("div");   // galaxy — IN FLOW (gives the stage its height)
-    layB.style.cssText = "position:relative;z-index:1;pointer-events:none;";
-    var layA = doc.createElement("div");   // orrery — absolute on top (fades out)
-    layA.style.cssText = "position:absolute;inset:0;z-index:2;pointer-events:none;";
-    var voidSvg = el("svg", { viewBox: "0 0 " + W + " " + H, width: "100%", height: "100%",
-      "class": "lf-void", preserveAspectRatio: "xMidYMid meet" });
-    voidSvg.style.cssText = "position:absolute;inset:0;z-index:3;pointer-events:none;";
-    stage.appendChild(layB);
-    stage.appendChild(layA);
-    stage.appendChild(voidSvg);
-
-    // COMPOSE: call the existing modules, controls off (the master bar drives them)
-    var orrerySpec = merge(spec.orrery, { controls: false });
-    var galaxySpec = merge(spec.galaxy, { controls: false });
-    var hOrr = DossierFigures.renderOrrery(layA, orrerySpec);   // <-- composition
-    var hGal = DossierFigures.renderGalaxy(layB, galaxySpec);   // <-- composition
-    if (!hOrr || !hGal) return fail(container, "a composed module failed to render");
-
-    // child zoom ranges (to convert the master scale into each module's slider)
+    // child zoom ranges (to convert the master scale into each regime's slider)
     var oz = spec.orrery.zoom || {}, oLO = Math.max(1e-6, num(oz.lo, 0.3)), oHI = Math.max(oLO * 1.0001, num(oz.hi, 6000));
     var gz = spec.galaxy.zoom || {}, gLO = Math.max(1e-9, num(gz.lo, 1e-5)), gHI = Math.max(gLO * 1.0001, num(gz.hi, 200000));
 
-    function driveChildren() {
+    // --- the REGIME STACK (ordered INNER -> OUTER) + the boundary bands between
+    //     adjacent regimes. Generalizes the old hardwired 2-layer crossfade: every
+    //     regime is a pixel-identical 800x480 child, and each ADJACENT PAIR shares
+    //     ONE [fadeLo,fadeHi] band (identical in shape to the single band before).
+    //     A regime fades IN across its inner boundary and OUT across its outer one;
+    //     the innermost has no inner boundary, the outermost no outer one -> with
+    //     N=2 this reduces byte-for-byte to orrery(1->0)/galaxy(0->1). Adding an
+    //     outer regime later is "append a regime + a boundary," not a crossfade
+    //     rewrite. `unit` converts the master AU scale into the regime's own unit
+    //     (the AU_PER_LY bridge for the galaxy). The void overlay stays a
+    //     per-boundary overlay (orrery->galaxy for now), NOT a regime.
+    var regimes = [
+      { name: "orrery", childSpec: spec.orrery, render: DossierFigures.renderOrrery, unit: 1,         lo: oLO, hi: oHI },
+      { name: "galaxy", childSpec: spec.galaxy, render: DossierFigures.renderGalaxy, unit: AU_PER_LY, lo: gLO, hi: gHI }
+    ];
+    var boundaries = [
+      { fadeLo: fadeLo, fadeHi: fadeHi }   // orrery -> galaxy (the existing band; hands off in the void beyond the Oort)
+    ];
+    var N = regimes.length;
+
+    // --- mount: OUTERMOST regime IN FLOW (gives the stage its height), inner
+    //     regimes absolute on top, inner = HIGHER z (fades out to reveal the next
+    //     regime out); the void overlay sits above all. DOM-identical to the old
+    //     layB/layA/voidSvg stack when N=2. -----------------------------------
+    var stage = doc.createElement("div");
+    stage.style.cssText = "position:relative;";
+    for (var mi = N - 1; mi >= 0; mi--) {            // append OUTER -> INNER (in-flow base first)
+      var lay = doc.createElement("div");
+      lay.style.cssText = (mi === N - 1)
+        ? "position:relative;z-index:" + (N - mi) + ";pointer-events:none;"           // outermost: in flow
+        : "position:absolute;inset:0;z-index:" + (N - mi) + ";pointer-events:none;";  // inner: absolute on top
+      stage.appendChild(lay);
+      regimes[mi].layer = lay;
+    }
+    var voidSvg = el("svg", { viewBox: "0 0 " + W + " " + H, width: "100%", height: "100%",
+      "class": "lf-void", preserveAspectRatio: "xMidYMid meet" });
+    voidSvg.style.cssText = "position:absolute;inset:0;z-index:" + (N + 1) + ";pointer-events:none;";
+    stage.appendChild(voidSvg);
+
+    // COMPOSE: call each regime's existing render module, controls off (the master
+    // bar drives them). Still renderOrrery/renderGalaxy — composition, not rewrite.
+    for (var ci = 0; ci < N; ci++) {
+      var rg = regimes[ci];
+      rg.handle = rg.render(rg.layer, merge(rg.childSpec, { controls: false }));   // <-- composition
+      if (!rg.handle) return fail(container, "a composed module failed to render");
+    }
+    var hOrr = regimes[0].handle, hGal = regimes[1].handle;   // named handles (anchor proof + return)
+    var layA = regimes[0].layer,  layB = regimes[1].layer;    // aliases keep getState/return unchanged
+
+    function driveChildren() {                          // master AU -> each regime's own slider
       var aAU = scaleAU();
-      hOrr.setSlider(clamp01(logZoom.scaleToSlider(aAU, oLO, oHI)));               // orrery in AU
-      hGal.setSlider(clamp01(logZoom.scaleToSlider(aAU / AU_PER_LY, gLO, gHI)));   // galaxy in ly (bridge)
+      for (var i = 0; i < N; i++) {
+        var r = regimes[i];
+        r.handle.setSlider(clamp01(logZoom.scaleToSlider(aAU / r.unit, r.lo, r.hi)));
+      }
+    }
+    // INNER regime's REMAINING opacity across a boundary: 1 below the band, eased
+    // 1->0 across it, 0 above (exactly the old `fa`). The OUTER regime's fade-IN is
+    // the complement (1 - this) — exactly the old `1 - fa`.
+    function bandOut(aAU, b) {
+      if (aAU <= b.fadeLo) return 1;
+      if (aAU >= b.fadeHi) return 0;
+      return 1 - ease(clamp01(logZoom.scaleToSlider(aAU, b.fadeLo, b.fadeHi)));
     }
     function crossfade() {
-      var aAU = scaleAU(), fa;
-      if (aAU <= fadeLo) fa = 1;
-      else if (aAU >= fadeHi) fa = 0;
-      else fa = 1 - ease(clamp01(logZoom.scaleToSlider(aAU, fadeLo, fadeHi)));     // eased blend across the band
-      layA.style.opacity = fa.toFixed(3);
-      layB.style.opacity = (1 - fa).toFixed(3);
+      var aAU = scaleAU();
+      for (var i = 0; i < N; i++) {
+        var inner = (i === 0)     ? 1 : (1 - bandOut(aAU, boundaries[i - 1]));   // faded IN across inner boundary
+        var outer = (i === N - 1) ? 1 : bandOut(aAU, boundaries[i]);             // not yet OUT across outer boundary
+        regimes[i].layer.style.opacity = Math.min(inner, outer).toFixed(3);
+      }
     }
 
     // --- the honest void: nearest-star waypoints (radial from the Sun) ----
