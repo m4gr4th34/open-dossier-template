@@ -42,10 +42,11 @@
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
   a{color:var(--teal)}
   .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  .chrome{max-width:880px;margin:0 auto;padding:0 20px}
   header{padding:54px 0 26px;border-bottom:3px solid var(--ink)}
   .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
   .eyebrow b{color:var(--coral)}
-  h1{font-family:var(--serif);font-weight:800;font-size:clamp(27px,4.6vw,44px);line-height:1.12;margin:.4em 0 .25em;letter-spacing:-.01em}
+  h1{font-family:var(--serif);font-weight:800;font-size:clamp(27px,4.6vw,44px);line-height:1.12;margin:.4em 0 .25em;letter-spacing:-.014em}
   .byline{font-family:var(--serif);font-style:italic;color:var(--ink2)}
   .abstract{font-family:var(--serif);font-size:17.5px;max-width:70ch;margin-top:18px}
   .abstract b{color:var(--teal)}
@@ -188,29 +189,30 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-
 <header>
-  <div class="eyebrow">An Open Dossier · <b>NNN</b> · survey · v1.0 · MONTH YEAR</div>
-  <h1>YOUR TITLE HERE</h1>
-  <div class="byline">YOUR NAME — YOUR AFFILIATION</div>
-  <div class="provenance" role="contentinfo" aria-label="Provenance and verification">
-    <span class="pv-item"><span class="pv-k">Reading</span><span class="pv-v" id="pv-state">live tip</span></span>
-    <a class="pv-item" id="pv-doi" href="#" target="_blank" rel="noopener"><span class="pv-k">Archived DOI</span><span class="pv-v" id="pv-doi-v">loading… ↗</span></a>
-    <a class="pv-item" href="verify.html" target="_blank" rel="noopener"><span class="pv-k">Bitcoin timestamp</span><span class="pv-v">verify proof ↗</span></a>
-    <a class="pv-item" href="paper/manuscript.pdf" target="_blank" rel="noopener"><span class="pv-k">Archived PDF</span><span class="pv-v">read PDF ↗</span></a>
-    <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
-  </div>
-  <div class="lineage-strip" id="lineageStrip" aria-label="Lineage"></div>
-  <p class="abstract">YOUR SURVEY ABSTRACT. This dossier surveys [field]: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
-  <div class="cta">
-    <a class="btn primary" href="index.html">The landscape</a>
-    <a class="btn" href="paper.html">Self-explaining edition</a>
-    <a class="btn" href="dossier.html">Audit trail</a>
-    <a class="btn" href="lineage.html">Chapters</a>
-    <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source &amp; issues</a>
+  <div class="chrome">
+    <div class="eyebrow">An Open Dossier · <b>NNN</b> · survey · v1.0 · MONTH YEAR</div>
+    <div class="cta">
+      <a class="btn primary" href="index.html">The landscape</a>
+      <a class="btn" href="paper.html">Self-explaining edition</a>
+      <a class="btn" href="dossier.html">Audit trail</a>
+      <a class="btn" href="lineage.html">Chapters</a>
+      <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source &amp; issues</a>
+    </div>
+    <div class="provenance" role="contentinfo" aria-label="Provenance and verification">
+      <span class="pv-item"><span class="pv-k">Reading</span><span class="pv-v" id="pv-state">live tip</span></span>
+      <a class="pv-item" id="pv-doi" href="#" target="_blank" rel="noopener"><span class="pv-k">Archived DOI</span><span class="pv-v" id="pv-doi-v">loading… ↗</span></a>
+      <a class="pv-item" href="verify.html" target="_blank" rel="noopener"><span class="pv-k">Bitcoin timestamp</span><span class="pv-v">verify proof ↗</span></a>
+      <a class="pv-item" href="paper/manuscript.pdf" target="_blank" rel="noopener"><span class="pv-k">Archived PDF</span><span class="pv-v">read PDF ↗</span></a>
+      <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
+    </div>
+    <div class="lineage-strip" id="lineageStrip" aria-label="Lineage"></div>
+    <h1>YOUR TITLE HERE</h1>
+    <div class="byline">YOUR NAME — YOUR AFFILIATION</div>
   </div>
 </header>
+<div class="wrap">
+  <p class="abstract">YOUR SURVEY ABSTRACT. This dossier surveys [field]: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
 
 <!-- ============================================================
      SURVEY LANDSCAPE — the survey-shaped scaffold's centrepiece.

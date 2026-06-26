@@ -41,10 +41,11 @@
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
   a{color:var(--teal)}
   .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  .chrome{max-width:880px;margin:0 auto;padding:0 20px}
   header{padding:54px 0 26px;border-bottom:3px solid var(--ink)}
   .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
   .eyebrow b{color:var(--coral)}
-  h1{font-family:var(--serif);font-weight:800;font-size:clamp(24px,4vw,38px);line-height:1.14;margin:.4em 0 .25em}
+  h1{font-family:var(--serif);font-weight:800;font-size:clamp(27px,4.6vw,44px);line-height:1.12;margin:.4em 0 .25em;letter-spacing:-.014em}
   .byline{font-family:var(--serif);font-style:italic;color:var(--ink2)}
   .statusbar{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
   .chip{font-family:var(--mono);font-size:12.5px;padding:7px 12px;border:1.5px solid var(--ink);background:var(--card);display:flex;gap:8px;align-items:center}
@@ -165,34 +166,35 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-
 <header>
-  <div class="eyebrow">An Open Dossier · <b>NNN</b> · audit trail · MONTH YEAR</div>
-  <h1>Audit Trail — YOUR TITLE</h1>
-  <div class="byline">YOUR NAME · companion verification record</div>
-  <div class="provenance" role="contentinfo" aria-label="Provenance and verification">
-    <span class="pv-item"><span class="pv-k">Reading</span><span class="pv-v" id="pv-state">live tip</span></span>
-    <a class="pv-item" id="pv-doi" href="#" target="_blank" rel="noopener"><span class="pv-k">Archived DOI</span><span class="pv-v" id="pv-doi-v">loading… ↗</span></a>
-    <a class="pv-item" href="verify.html" target="_blank" rel="noopener"><span class="pv-k">Bitcoin timestamp</span><span class="pv-v">verify proof ↗</span></a>
-    <a class="pv-item" href="paper/manuscript.pdf" target="_blank" rel="noopener"><span class="pv-k">Archived PDF</span><span class="pv-v">read PDF ↗</span></a>
-    <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
+  <div class="chrome">
+    <div class="eyebrow">An Open Dossier · <b>NNN</b> · audit trail · MONTH YEAR</div>
+    <div class="cta">
+      <a class="btn" href="index.html">The landscape</a>
+      <a class="btn" href="paper.html">Self-explaining edition</a>
+      <a class="btn primary" href="dossier.html">Audit trail</a>
+      <a class="btn" href="lineage.html">Chapters</a>
+      <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source &amp; issues</a>
+    </div>
+    <div class="provenance" role="contentinfo" aria-label="Provenance and verification">
+      <span class="pv-item"><span class="pv-k">Reading</span><span class="pv-v" id="pv-state">live tip</span></span>
+      <a class="pv-item" id="pv-doi" href="#" target="_blank" rel="noopener"><span class="pv-k">Archived DOI</span><span class="pv-v" id="pv-doi-v">loading… ↗</span></a>
+      <a class="pv-item" href="verify.html" target="_blank" rel="noopener"><span class="pv-k">Bitcoin timestamp</span><span class="pv-v">verify proof ↗</span></a>
+      <a class="pv-item" href="paper/manuscript.pdf" target="_blank" rel="noopener"><span class="pv-k">Archived PDF</span><span class="pv-v">read PDF ↗</span></a>
+      <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
+    </div>
+    <div class="lineage-strip" id="lineageStrip" aria-label="Lineage"></div>
+    <h1>Audit Trail — YOUR TITLE</h1>
+    <div class="byline">YOUR NAME · companion verification record</div>
   </div>
-  <div class="lineage-strip" id="lineageStrip" aria-label="Lineage"></div>
+</header>
+<div class="wrap">
   <div class="statusbar">
     <span class="chip"><span class="dot t"></span>avenues&nbsp;<b>N surveyed</b></span>
     <span class="chip"><span class="dot v"></span>forecasts&nbsp;<b>N (all signposted)</b></span>
     <span class="chip"><span class="dot g"></span>citations&nbsp;<b>N verified · N flagged</b></span>
     <span class="chip"><span class="dot o"></span>red team&nbsp;<b>N resolved · N open</b></span>
   </div>
-  <div class="cta">
-    <a class="btn" href="index.html">The landscape</a>
-    <a class="btn" href="paper.html">Self-explaining edition</a>
-    <a class="btn primary" href="dossier.html">Audit trail</a>
-    <a class="btn" href="lineage.html">Chapters</a>
-    <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source &amp; issues</a>
-  </div>
-</header>
 
 <!-- ============================================================
      SURVEY-shaped audit trail. For a survey the citation audit is
