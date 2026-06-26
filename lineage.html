@@ -69,25 +69,6 @@
   }
   h1{font-weight:500; letter-spacing:-.014em}
 
-  /* ===== provenance bar — cloned verbatim from index.html (chrome standardization) ===== */
-.provenance{display:flex;flex-wrap:wrap;gap:0;margin:18px 0 4px;border:1.5px solid var(--ink);background:var(--card);font-family:var(--mono);font-size:12px;overflow:hidden}
-.provenance .pv-item{display:flex;flex-direction:column;gap:2px;padding:9px 14px;border-right:1px solid var(--line);text-decoration:none;color:var(--ink);min-width:0}
-.provenance .pv-item:last-child{border-right:none}
-.provenance a.pv-item:hover{background:var(--teal-soft,#e3f0f0)}
-.provenance .pv-k{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
-.provenance .pv-v{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.provenance a.pv-item .pv-v{color:var(--teal)}
-#pv-state{color:var(--open,#b07d1f)}
-@media(max-width:560px){.provenance .pv-item{flex:1 1 45%;border-bottom:1px solid var(--line)}}
-
-  /* .provenance surface treatment (rounded + lit) — same as the editions' bar */
-  .provenance{
-    border-radius:var(--r-lg); overflow:hidden;
-    background:linear-gradient(180deg,#ffffff,#f4f8f7);
-    box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.85);
-    transition:box-shadow .2s ease, transform .2s ease;
-  }
-
   /* ===== lineage list — reuses the ol.phases numbered-card idiom ===== */
   .intro{color:var(--ink2); max-width:64ch; margin:22px 0 0; font-size:15px}
   ol.lineage{list-style:none;counter-reset:ch;margin:30px 0 10px;padding:0}
@@ -103,27 +84,29 @@
     font-family:var(--serif); font-size:30px; font-weight:500;
     color:var(--violet); line-height:1;
   }
-  ol.lineage li.current{ border-color:var(--teal);
-    box-shadow:var(--shadow-soft), 0 0 0 1px var(--teal-soft) inset; }
   .ch-title{font-family:var(--serif); font-weight:600; font-size:21px;
     margin:0 0 6px; color:var(--ink);}
   .ch-title .tag{font-family:var(--mono); font-size:12px; font-weight:500;
     color:var(--ink2); margin-left:8px;}
-  .ch-current-badge{display:inline-block; font-family:var(--mono); font-size:11px;
-    color:var(--teal); border:1px solid var(--teal-soft); border-radius:var(--r-pill);
-    padding:2px 9px; margin-left:8px; vertical-align:middle;}
   .ch-summary{color:var(--ink2); margin:0 0 12px; line-height:1.55;}
   .ch-meta{font-family:var(--mono); font-size:12.5px; color:var(--ink2);
     display:flex; gap:18px; flex-wrap:wrap; align-items:center;}
   .ch-meta a{color:var(--teal);}
   .ch-read{font-family:var(--mono); font-size:13px; font-weight:500;}
-  .lineage-empty{background:var(--card); border:1px solid var(--line);
-    border-radius:var(--r-lg); box-shadow:var(--shadow-soft);
-    padding:28px; color:var(--ink2); line-height:1.6;}
-  /* visible keyboard focus for in-card links (the cloned .btn:focus-visible
-     only covers nav buttons) */
-  ol.lineage a:focus-visible,.lineage-empty a:focus-visible{
+  /* visible keyboard focus for non-nav links — the in-card chapter links and
+     the load-failure note (the cloned .btn:focus-visible only covers nav buttons) */
+  ol.lineage a:focus-visible,.lineage-loaderr a:focus-visible{
     outline:3px solid var(--coral); outline-offset:2px; border-radius:2px;}
+  /* working-draft head — the live, unreleased tip (not a sealed chapter) */
+  ol.lineage li.draft-head{ counter-increment:none;           /* claims no chapter number */
+    border-style:dashed; border-color:var(--coral); }
+  ol.lineage li.draft-head::before{ content:'\25CB'; color:var(--coral);
+    font-family:var(--serif); font-size:26px; }
+  .ch-draft-badge{ display:inline-block; font-family:var(--mono); font-size:11px;
+    color:var(--coral); border:1px solid var(--coral-soft); border-radius:var(--r-pill);
+    padding:2px 9px; margin-left:8px; vertical-align:middle; }
+  .lineage-loaderr{ font-family:var(--mono); font-size:12.5px; color:var(--ink2); margin:4px 0 0; }
+  .lineage-loaderr a{ color:var(--teal); }
 </style>
 </head>
 <body>
@@ -137,13 +120,6 @@
       <a class="btn primary" href="lineage.html">Chapters</a>
       <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source &amp; issues</a>
     </div>
-    <div class="provenance" role="contentinfo" aria-label="Provenance and verification">
-      <span class="pv-item"><span class="pv-k">Reading</span><span class="pv-v">series index</span></span>
-      <span class="pv-item"><span class="pv-k">Archived DOI</span><span class="pv-v">—</span></span>
-      <span class="pv-item"><span class="pv-k">Bitcoin timestamp</span><span class="pv-v">—</span></span>
-      <span class="pv-item"><span class="pv-k">Archived PDF</span><span class="pv-v">—</span></span>
-      <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
-    </div>
     <h1>The lineage</h1>
     <div class="byline">Every chapter of this dossier — each a sealed, DOI'd release, readable in full. The work as it grew.</div>
   </div>
@@ -151,7 +127,7 @@
 <div class="wrap">
 
 <main>
-  <p class="intro">Chapters are listed oldest to newest; the most recent is the current edition.</p>
+  <p class="intro">The working draft heads the list — the live editions, ahead of the latest sealed release. Sealed chapters follow below, oldest to newest, each a DOI-bearing release.</p>
   <ol class="lineage" id="lineage"></ol>
 </main>
 
@@ -163,107 +139,134 @@
 </div>
 
 <script>
-// Renders lineage.json into the chapter list. Mirrors the provenance.json
-// fetch().then().catch() shape; builds DOM with createElement/textContent so
-// chapter titles/summaries can never inject markup. Empty/standalone or a load
-// failure both fall back to a graceful .lineage-empty state (emptiness is an
-// invitation, not an error).
+// Renders lineage.json into the chapter list, newest-first: a synthetic
+// WORKING-DRAFT head entry (the live, unreleased tip — never stored in
+// lineage.json) sits above the sealed chapters, built with createElement/
+// textContent so titles/summaries can never inject markup. The working draft
+// ALWAYS shows (a brand-new dossier IS a working draft); a load failure still
+// shows it and appends a small note. No sealed chapter is marked "current" —
+// the working draft is the current, in-progress thing now.
 (function(){
   var ol = document.getElementById('lineage');
 
-  function renderEmpty(isError){
-    var box = document.createElement('div');
-    box.className = 'lineage-empty';
+  function draftHead(){
+    var li = document.createElement('li');
+    li.className = 'draft-head';
+
+    var title = document.createElement('div');
+    title.className = 'ch-title';
+    title.appendChild(document.createTextNode('Working draft'));
+    var badge = document.createElement('span');
+    badge.className = 'ch-draft-badge';
+    badge.textContent = 'in progress · unreleased';
+    title.appendChild(badge);
+    li.appendChild(title);
+
+    var sum = document.createElement('p');
+    sum.className = 'ch-summary';
+    sum.textContent = 'The next chapter, in progress — the live editions, ahead of the latest sealed release. No chapter number or DOI is claimed until it is sealed.';
+    li.appendChild(sum);
+
+    var meta = document.createElement('div');
+    meta.className = 'ch-meta';
+    var read = document.createElement('a');
+    read.className = 'ch-read';
+    read.href = 'paper.html';            // live self-explaining edition
+    read.textContent = 'Read the working draft →';
+    meta.appendChild(read);
+    var land = document.createElement('a');
+    land.href = 'index.html';            // live landscape
+    land.textContent = 'The landscape →';
+    meta.appendChild(land);
+    li.appendChild(meta);
+    return li;
+  }
+
+  function sealed(c){
+    var li = document.createElement('li');   // NOT marked 'current' — the draft head is current
+
+    var title = document.createElement('div');
+    title.className = 'ch-title';
+    title.appendChild(document.createTextNode(c.title || c.tag || ('Chapter ' + c.n)));
+    if (c.tag){
+      var tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = c.tag;
+      title.appendChild(tag);
+    }
+    li.appendChild(title);
+
+    if (c.summary){
+      var sum = document.createElement('p');
+      sum.className = 'ch-summary';
+      sum.textContent = c.summary;
+      li.appendChild(sum);
+    }
+
+    var meta = document.createElement('div');
+    meta.className = 'ch-meta';
+    if (c.released){
+      var rel = document.createElement('span');
+      rel.textContent = 'Released ' + c.released;
+      meta.appendChild(rel);
+    }
+    // DOI: cite the VERSION doi (pins this exact chapter); fall back to concept
+    // (all-versions); when both exist, add a small secondary concept pointer.
+    var vdoi = c.version_doi || '', cdoi = c.concept_doi || '';
+    if (vdoi){
+      var doi = document.createElement('a');
+      doi.href = 'https://doi.org/' + vdoi;
+      doi.target = '_blank'; doi.rel = 'noopener';
+      doi.textContent = 'DOI: ' + vdoi + ' ↗';
+      meta.appendChild(doi);
+      if (cdoi && cdoi !== vdoi){
+        var allv = document.createElement('a');
+        allv.href = 'https://doi.org/' + cdoi;
+        allv.target = '_blank'; allv.rel = 'noopener';
+        allv.textContent = 'all versions ↗';
+        meta.appendChild(allv);
+      }
+    } else if (cdoi){
+      var cdoiEl = document.createElement('a');
+      cdoiEl.href = 'https://doi.org/' + cdoi;
+      cdoiEl.target = '_blank'; cdoiEl.rel = 'noopener';
+      cdoiEl.textContent = 'DOI (all versions): ' + cdoi + ' ↗';
+      meta.appendChild(cdoiEl);
+    }
+    var read = document.createElement('a');
+    read.className = 'ch-read';
+    read.href = (c.path || '') + 'paper.html';   // self-explaining edition = reader entry
+    read.textContent = 'Read this chapter →';
+    meta.appendChild(read);
+
+    li.appendChild(meta);
+    return li;
+  }
+
+  function loadNote(){
     var p = document.createElement('p');
-    p.style.margin = '0 0 10px';
-    p.textContent = isError
-      ? 'The chapter list couldn’t be loaded here. View this dossier’s releases on the repository.'
-      : 'This dossier has no sealed chapters yet. A single-chapter dossier has no lineage to show — the first release will appear here as Chapter 1.';
-    box.appendChild(p);
+    p.className = 'lineage-loaderr';
+    p.appendChild(document.createTextNode('Sealed chapters couldn’t be loaded here — '));
     var a = document.createElement('a');
     a.href = 'https://github.com/YOURUSER/YOURREPO/releases';
     a.target = '_blank'; a.rel = 'noopener';
-    a.textContent = 'View releases on the repository →';
-    box.appendChild(a);
-    if (ol && ol.parentNode) ol.parentNode.replaceChild(box, ol);
+    a.textContent = 'view releases on the repository →';
+    p.appendChild(a);
+    return p;
+  }
+
+  function render(chs){
+    ol.appendChild(draftHead());                 // working draft is ALWAYS the head
+    chs.forEach(function(c){ ol.appendChild(sealed(c)); });
   }
 
   fetch('lineage.json').then(function(r){ return r.json(); }).then(function(d){
     var chs = (d && d.chapters ? d.chapters : []).slice().sort(function(a, b){ return a.n - b.n; });
-    if (!chs.length){ renderEmpty(false); return; }
-    var currentN = Math.max.apply(null, chs.map(function(c){ return c.n; }));
-
-    chs.forEach(function(c){
-      var li = document.createElement('li');
-      if (c.n === currentN) li.className = 'current';
-
-      var title = document.createElement('div');
-      title.className = 'ch-title';
-      title.appendChild(document.createTextNode(c.title || c.tag || ('Chapter ' + c.n)));
-      if (c.tag){
-        var tag = document.createElement('span');
-        tag.className = 'tag';
-        tag.textContent = c.tag;
-        title.appendChild(tag);
-      }
-      if (c.n === currentN){
-        var badge = document.createElement('span');
-        badge.className = 'ch-current-badge';
-        badge.textContent = 'current';
-        title.appendChild(badge);
-      }
-      li.appendChild(title);
-
-      if (c.summary){
-        var sum = document.createElement('p');
-        sum.className = 'ch-summary';
-        sum.textContent = c.summary;
-        li.appendChild(sum);
-      }
-
-      var meta = document.createElement('div');
-      meta.className = 'ch-meta';
-      if (c.released){
-        var rel = document.createElement('span');
-        rel.textContent = 'Released ' + c.released;
-        meta.appendChild(rel);
-      }
-      // DOI: cite the VERSION doi (pins this exact chapter). Fall back to the
-      // concept (all-versions) doi when no version doi exists; when both exist,
-      // add a small secondary "all versions" pointer to the concept doi. The
-      // 'https://doi.org/' prefix means a DOI string can never become a
-      // javascript: URL, and textContent keeps the label injection-safe.
-      var vdoi = c.version_doi || '', cdoi = c.concept_doi || '';
-      if (vdoi){
-        var doi = document.createElement('a');
-        doi.href = 'https://doi.org/' + vdoi;
-        doi.target = '_blank'; doi.rel = 'noopener';
-        doi.textContent = 'DOI: ' + vdoi + ' ↗';
-        meta.appendChild(doi);
-        if (cdoi && cdoi !== vdoi){
-          var allv = document.createElement('a');
-          allv.href = 'https://doi.org/' + cdoi;
-          allv.target = '_blank'; allv.rel = 'noopener';
-          allv.textContent = 'all versions ↗';
-          meta.appendChild(allv);
-        }
-      } else if (cdoi){
-        var cdoiEl = document.createElement('a');
-        cdoiEl.href = 'https://doi.org/' + cdoi;
-        cdoiEl.target = '_blank'; cdoiEl.rel = 'noopener';
-        cdoiEl.textContent = 'DOI (all versions): ' + cdoi + ' ↗';
-        meta.appendChild(cdoiEl);
-      }
-      var read = document.createElement('a');
-      read.className = 'ch-read';
-      read.href = (c.path || '') + 'paper.html';   // self-explaining edition = reader entry
-      read.textContent = 'Read this chapter →';
-      meta.appendChild(read);
-
-      li.appendChild(meta);
-      ol.appendChild(li);
-    });
-  }).catch(function(){ renderEmpty(true); });
+    render(chs);                                  // zero sealed -> draft head alone, no void
+  }).catch(function(){
+    render([]);                                   // load failure: still show the working draft
+    if (ol && ol.parentNode) ol.parentNode.insertBefore(loadNote(), ol.nextSibling);
+  });
 })();
 </script>
 </body>

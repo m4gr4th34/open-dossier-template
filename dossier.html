@@ -302,36 +302,33 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
 </script>
 <script>
 // Lineage strip — mirrors the provenance fetch shape against lineage.json.
-// ANCESTORS-ONLY / OUTWARD: links the PREVIOUS chapter + "view all", never a
+// ANCESTORS-ONLY / OUTWARD: links the latest SEALED chapter + "view all", never a
 // forward/next chapter (a sealed chapter cannot know its successors). Hidden
 // unless chapters exist; built via createElement/textContent (no innerHTML).
 fetch('lineage.json').then(function(r){return r.json();}).then(function(d){
   var chs = (d.chapters||[]).slice().sort(function(a,b){return a.n-b.n;});
-  if(chs.length < 1) return;                 // standalone -> strip stays hidden
+  if(chs.length < 1) return;                 // solo dossier (no releases) -> strip stays hidden
   var strip = document.getElementById('lineageStrip');
   if(!strip) return;
   var currentN = Math.max.apply(null, chs.map(function(c){return c.n;}));
-  var current = chs.filter(function(c){return c.n===currentN;})[0];
-  var prev = chs.filter(function(c){return c.n===currentN-1;})[0];
+  var latest = chs.filter(function(c){return c.n===currentN;})[0];
 
   function sep(){ var s=document.createElement('span'); s.className='sep'; s.textContent='·'; return s; }
 
+  // The reader is on the WORKING DRAFT (the live, unreleased tip) — NOT on a
+  // sealed chapter. Label it as such; never call the latest seal "current".
   var lead=document.createElement('span');
-  lead.appendChild(document.createTextNode('Part of an '));
-  var n=document.createElement('b'); n.textContent=String(chs.length); lead.appendChild(n);
-  lead.appendChild(document.createTextNode('-chapter lineage'));
+  var b=document.createElement('b'); b.textContent='Working draft';
+  lead.appendChild(b);
   strip.appendChild(lead);
 
+  // ANCESTOR back-link only: the latest SEALED release (Chapter currentN) is the
+  // working draft's immediate ancestor — never a forward/next claim.
   strip.appendChild(sep());
-  var cur=document.createElement('span'); cur.textContent='Chapter '+current.n; strip.appendChild(cur);
-
-  if(prev){
-    strip.appendChild(sep());
-    var pl=document.createElement('a');
-    pl.href=(prev.path||'')+'paper.html';
-    pl.textContent='← Chapter '+prev.n;   // backward only — never forward
-    strip.appendChild(pl);
-  }
+  var rel=document.createElement('a');
+  rel.href=(latest.path||'')+'paper.html';
+  rel.textContent='latest release Chapter '+latest.n;
+  strip.appendChild(rel);
 
   var all=document.createElement('a');
   all.className='ls-all'; all.href='lineage.html';
