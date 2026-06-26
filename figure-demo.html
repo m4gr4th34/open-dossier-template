@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Living Figures — zoom-orrery demo (Open Dossier)</title>
+<meta name="description" content="Phase 2 scaffold demo: the zoom-orrery rendered live through the vendored figures runtime. Not a frozen edition.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#17262c;--ink2:#586a6f;--paper:#f3f6f5;--card:#ffffff;
+    --teal:#0c8f86;--teal-soft:#e2efed;--coral:#cf5d36;--coral-soft:#fbe9e3;--violet:#6b4e9b;--violet-soft:#efe9f6;
+    --pass:#1d9b62;--open:#bd861d;--line:rgba(23,38,44,.085);
+    --serif:'Spectral',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --r-lg:16px; --r-sm:10px; --r-pill:999px;
+    --shadow-soft:0 2px 12px rgba(23,38,44,.05);
+    --shadow-lift:0 16px 44px rgba(23,38,44,.09);
+    --teal-glow:rgba(12,143,134,.30);
+    --lf-label:#5a6b70;
+  }
+  @supports (color: oklch(0 0 0)){
+    @media (color-gamut: p3){
+      :root{
+        --teal: oklch(0.585 0.15 187);
+        --coral: oklch(0.685 0.205 41);
+        --teal-glow: oklch(0.59 0.15 187 / .5);
+      }
+    }
+  }
+  ::selection{background:var(--teal-soft);color:var(--ink)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  header{padding:48px 0 22px;border-bottom:3px solid var(--ink)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+  .eyebrow b{color:var(--coral)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.14;margin:.35em 0 .25em;letter-spacing:-.014em}
+  .byline{font-family:var(--serif);font-style:italic;color:var(--ink2)}
+  main{padding:30px 0 8px}
+  p{max-width:68ch}
+  p.lede{color:var(--ink2)}
+  .note{font-family:var(--mono);font-size:12.5px;color:var(--ink2);background:var(--card);
+    border:1px solid var(--line);border-left:4px solid var(--open);border-radius:var(--r-sm);
+    padding:10px 14px;margin:18px 0;max-width:70ch}
+
+  /* ===== living-figure container — parallel to paper.html's .eq ===== */
+  .living-figure{
+    margin:22px 0; padding:14px 14px 12px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--r-lg); box-shadow:var(--shadow-soft);
+    overflow:hidden;
+  }
+  .lf-svg{
+    display:block; width:100%; height:auto; cursor:grab;
+    background:radial-gradient(120% 120% at 50% 42%, #0c151b 0%, #0a1117 60%, #070d12 100%);
+    border-radius:var(--r-sm); touch-action:none;
+  }
+  .lf-svg:active{cursor:grabbing}
+  .lf-label{font-family:var(--mono)}
+  .lf-orbit{stroke-width:1; vector-effect:non-scaling-stroke}
+
+  /* controls — themed buttons + ranges */
+  .lf-controls{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+    margin-top:12px; font-family:var(--mono); font-size:12.5px; color:var(--ink2);
+  }
+  .lf-btn{
+    font-family:var(--mono); font-size:12.5px; font-weight:600;
+    padding:7px 12px; border:1.5px solid var(--ink); background:var(--card); color:var(--ink);
+    border-radius:var(--r-sm); cursor:pointer; transition:box-shadow .2s ease, transform .12s ease;
+  }
+  .lf-btn:hover{box-shadow:var(--shadow-soft); transform:translateY(-1px)}
+  .lf-btn:focus-visible{outline:3px solid var(--coral); outline-offset:2px}
+  .lf-region{border-color:var(--teal); color:var(--teal)}
+  .lf-play{border-color:var(--teal); background:var(--teal); color:#fff}
+  .lf-field{display:flex; align-items:center; gap:7px; letter-spacing:.06em; text-transform:uppercase; font-size:11px}
+  .lf-range{accent-color:var(--teal); cursor:pointer}
+  .lf-readout{margin-left:auto; font-size:11.5px; color:var(--ink2); white-space:nowrap}
+  .lf-fallback{font-family:var(--mono); color:var(--coral)}
+
+  footer{margin-top:40px;padding:20px 0 56px;border-top:3px solid var(--ink);font-size:13.5px;color:var(--ink2)}
+  .mono{font-family:var(--mono)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Open Dossier · <b>living figures</b> · Phase 2 scaffold demo</div>
+    <h1>The zoom-orrery, alive through the vendored runtime</h1>
+    <div class="byline">A standalone demo — not one of the frozen editions. The figure below is rendered by <span class="mono">figures/orrery.js</span>, which composes the Phase 1 primitives in <span class="mono">figures/figures.js</span>.</div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+  <p class="lede">Drag to pan, scroll to zoom, or jump to a region. The play-speed couples to the zoom scale (<span class="mono">scaleAwareTime</span>): zoomed in, time slows so the inner planets stay legible instead of blurring; zoomed out, time speeds up so the giants visibly move. The two belts and the Oort cloud are <em>generated</em> from integer seeds (<span class="mono">seededScatter</span>), not stored.</p>
+
+  <figure class="living-figure" data-figure='{"version":"0.1.0","title":"The Solar System — a Keplerian zoom-orrery","zoom":{"lo":0.3,"hi":6000,"start":34},"time":{"baseSpeed":0.12,"playing":true},"bodies":[{"name":"Mercury","a":0.387,"e":0.206,"period":0.241,"r":2.4,"color":"#b9a48f","M0":0.3,"omega":1.0},{"name":"Venus","a":0.723,"e":0.007,"period":0.615,"r":3.4,"color":"#d9b26a","M0":1.7,"omega":2.0},{"name":"Earth","a":1.0,"e":0.017,"period":1.0,"r":3.6,"color":"#3f7fb0","M0":2.9,"omega":0.5},{"name":"Mars","a":1.524,"e":0.093,"period":1.881,"r":2.8,"color":"#c1502e","M0":4.2,"omega":3.4},{"name":"Jupiter","a":5.203,"e":0.048,"period":11.86,"r":7,"color":"#c8a878","M0":0.8,"omega":5.2},{"name":"Saturn","a":9.537,"e":0.054,"period":29.45,"r":6,"color":"#cbb27a","M0":5.6,"omega":1.4},{"name":"Uranus","a":19.19,"e":0.047,"period":84.0,"r":4.6,"color":"#8fc7c9","M0":2.2,"omega":4.0},{"name":"Neptune","a":30.07,"e":0.009,"period":164.8,"r":4.6,"color":"#4a6fd0","M0":3.7,"omega":2.6}],"belts":[{"name":"Asteroid belt","seed":10543,"count":700,"aMin":2.05,"aMax":3.3,"eMax":0.18,"color":"#9a8f76"},{"name":"Kuiper belt","seed":77211,"count":1300,"aMin":30,"aMax":49,"eMax":0.22,"color":"#6f8ba0"}],"oort":{"seed":91237,"count":900,"rMin":1800,"rMax":4600,"color":"#5d6b7a"},"regions":[{"name":"Inner planets","scale":1.9},{"name":"Giants","scale":34},{"name":"Kuiper belt","scale":62},{"name":"Oort cloud","scale":4800}]}'>
+    <noscript>
+      This figure comes alive with JavaScript. A sealed, static SVG poster
+      (so it renders with no scripts at all) arrives in Phase 3 of the living-figures
+      scaffold; until then, enable JavaScript to explore the orrery.
+    </noscript>
+  </figure>
+
+  <p class="note">SCAFFOLD NOTE — Phase 2 of N. This page exists to prove the vendored runtime drives the real figure. It is deliberately <b>not</b> one of the four frozen editions, so the freeze script-src rewire gap (flagged in the Phase-1 audit) cannot bite here; that is handled in Phase 5 when figures land in freezable editions. The graceful static-poster floor (for JS-off readers) arrives in Phase 3.</p>
+</main>
+
+<footer>
+  <span class="mono">figures runtime — vendored, zero-dependency, reader-side, never run by CI.</span>
+</footer>
+</div>
+
+<!-- vendored runtime, root-relative (no CDN). figures.js MUST load before orrery.js. -->
+<script src="figures/figures.js"></script>
+<script src="figures/orrery.js"></script>
+<script>
+  (function () {
+    var fig = document.querySelector(".living-figure");
+    if (!fig) return;
+    if (window.DossierFigures && typeof window.DossierFigures.renderOrrery === "function") {
+      // reads data-figure, renders into the element, leaves the attribute in place
+      window.DossierFigures.renderOrrery(fig);
+    } else if (window.console) {
+      console.error("[figure-demo] DossierFigures.renderOrrery not available — check script order");
+    }
+  })();
+</script>
+</body>
+</html>
