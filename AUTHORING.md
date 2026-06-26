@@ -272,11 +272,15 @@ second copy to keep in lockstep: revise your working rules in `CLAUDE.md` alone.
 ## Design identity (do not reinvent)
 
 The palette and type ARE the format's brand across all dossiers:
-ink #101d26, paper #f6f8f9, teal #0e7c7b (verification/key), coral
-#e4572e (accents/security), violet #6b4e9b (sources/learning), pass
-#1e8e5a, open #b07d1f. Display: Spectral. Data/labels: IBM Plex Mono.
+ink #17262c, paper #f3f6f5, teal #0c8f86 (verification/key), coral
+#cf5d36 (accents/security), violet #6b4e9b (sources/learning), pass
+#1d9b62, open #bd861d. Display: Spectral. Data/labels: IBM Plex Mono.
 Body: system sans. Keep the machinery CSS from the scaffolds; spend your
 creativity on the content, not the chrome.
+
+Generate figures through `verification/figure_style.py`'s `apply_dossier_style()`
+so plots match the page (author-local; not run in CI). Usage:
+`from verification.figure_style import apply_dossier_style; plt = apply_dossier_style()`.
 
 ## What the agent must STOP and ask the human
 
