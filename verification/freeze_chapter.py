@@ -14,9 +14,15 @@ lineage.json. The live root pages stay mutable; chapters are the frozen lineage.
 
 Usage:
   python3 verification/freeze_chapter.py \
-      --tag v1.0.0 --title "..." --summary "..." \
-      --released 2026-01-01 --concept-doi "10.5281/zenodo.123" \
+      --tag v1.0.0 --title "..." --summary "..." --released 2026-01-01 \
+      --version-doi "10.5281/zenodo.124" --concept-doi "10.5281/zenodo.123" \
       [--source-dir <dir>]
+
+A chapter (= a release) has TWO DOIs in its provenance.json — version_doi (pinned
+to that exact release) and concept_doi (permanent, the whole work). The lineage
+entry carries BOTH under their true names; storing a version DOI in the concept
+slot (or vice versa) would be a false label in a write-once archive. Each defaults
+to "" when absent/sentinel.
 
   --source-dir defaults to the repo root (the current tree), which is what the
   release workflow uses. The backfill ritual passes a checked-out-tag worktree
@@ -160,6 +166,7 @@ def main():
     ap.add_argument("--title", required=True)
     ap.add_argument("--summary", required=True)
     ap.add_argument("--released", required=True, help="YYYY-MM-DD")
+    ap.add_argument("--version-doi", dest="version_doi", default="")
     ap.add_argument("--concept-doi", dest="concept_doi", default="")
     ap.add_argument("--source-dir", dest="source_dir", default=REPO_ROOT)
     args = ap.parse_args()
@@ -208,12 +215,16 @@ def main():
 
     # --- step 5: APPEND ---
     n = max((int(c.get("n", 0)) for c in lineage["chapters"]), default=0) + 1
+    # Both DOIs, each under its true name (mirrors provenance.json): version_doi
+    # pins this exact release; concept_doi is the permanent all-versions pointer.
+    # Both default "" when absent/sentinel — no placeholders in the archive.
     entry = {
         "n": n,
         "tag": tag,
         "title": args.title,
         "summary": args.summary,
         "released": args.released,
+        "version_doi": args.version_doi,
         "concept_doi": args.concept_doi,
         "path": "chapters/" + tag + "/",
     }

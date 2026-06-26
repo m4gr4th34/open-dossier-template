@@ -348,10 +348,12 @@ for TAG in $TAGS; do
   [ -n "$RELEASED" ] || RELEASED="$(git log -1 --format=%cs "$TAG")"        # fallback: tag commit date
   CONCEPT_DOI="$(git show "$TAG":provenance.json 2>/dev/null | jq -r '.concept_doi // ""' 2>/dev/null || echo "")"
   case "$CONCEPT_DOI" in TODO*|"") CONCEPT_DOI="" ;; esac                   # sentinel/absent -> empty
+  VERSION_DOI="$(git show "$TAG":provenance.json 2>/dev/null | jq -r '.version_doi // ""' 2>/dev/null || echo "")"
+  case "$VERSION_DOI" in TODO*|"") VERSION_DOI="" ;; esac                   # from that tag's own sealed provenance
 
   python3 verification/freeze_chapter.py \
     --tag "$TAG" --title "$TITLE" --summary "$SUMMARY" \
-    --released "$RELEASED" --concept-doi "$CONCEPT_DOI" \
+    --released "$RELEASED" --version-doi "$VERSION_DOI" --concept-doi "$CONCEPT_DOI" \
     --source-dir .backfill-tmp \
     || echo "  skipped $TAG (already frozen / gate failed / dup — see message above)"
 

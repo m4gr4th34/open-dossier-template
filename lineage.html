@@ -200,12 +200,31 @@
         rel.textContent = 'Released ' + c.released;
         meta.appendChild(rel);
       }
-      if (c.concept_doi){
+      // DOI: cite the VERSION doi (pins this exact chapter). Fall back to the
+      // concept (all-versions) doi when no version doi exists; when both exist,
+      // add a small secondary "all versions" pointer to the concept doi. The
+      // 'https://doi.org/' prefix means a DOI string can never become a
+      // javascript: URL, and textContent keeps the label injection-safe.
+      var vdoi = c.version_doi || '', cdoi = c.concept_doi || '';
+      if (vdoi){
         var doi = document.createElement('a');
-        doi.href = 'https://doi.org/' + c.concept_doi;
+        doi.href = 'https://doi.org/' + vdoi;
         doi.target = '_blank'; doi.rel = 'noopener';
-        doi.textContent = 'DOI: ' + c.concept_doi;
+        doi.textContent = 'DOI: ' + vdoi + ' ↗';
         meta.appendChild(doi);
+        if (cdoi && cdoi !== vdoi){
+          var allv = document.createElement('a');
+          allv.href = 'https://doi.org/' + cdoi;
+          allv.target = '_blank'; allv.rel = 'noopener';
+          allv.textContent = 'all versions ↗';
+          meta.appendChild(allv);
+        }
+      } else if (cdoi){
+        var cdoiEl = document.createElement('a');
+        cdoiEl.href = 'https://doi.org/' + cdoi;
+        cdoiEl.target = '_blank'; cdoiEl.rel = 'noopener';
+        cdoiEl.textContent = 'DOI (all versions): ' + cdoi + ' ↗';
+        meta.appendChild(cdoiEl);
       }
       var read = document.createElement('a');
       read.className = 'ch-read';

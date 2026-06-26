@@ -78,12 +78,14 @@ jobs:
           RELEASED="${REL_PUBLISHED%%T*}"               # YYYY-MM-DD from ISO8601
           CONCEPT_DOI="$(jq -r '.concept_doi // ""' provenance.json 2>/dev/null || echo "")"
           case "$CONCEPT_DOI" in TODO*) CONCEPT_DOI="" ;; esac   # placeholder -> empty
+          VERSION_DOI="$(jq -r '.version_doi // ""' provenance.json 2>/dev/null || echo "")"
+          case "$VERSION_DOI" in TODO*) VERSION_DOI="" ;; esac   # placeholder -> empty
 
           # --- run the shared freeze (gate / write-once / dup all enforced inside);
           #     a non-zero exit aborts the workflow before any push. ---
           python3 verification/freeze_chapter.py \
             --tag "$TAG" --title "$TITLE" --summary "$SUMMARY" \
-            --released "$RELEASED" --concept-doi "$CONCEPT_DOI"
+            --released "$RELEASED" --version-doi "$VERSION_DOI" --concept-doi "$CONCEPT_DOI"
 
           # --- commit & push ONLY the freeze outputs, by explicit path ---
           git add chapters/ lineage.json
