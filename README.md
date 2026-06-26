@@ -308,6 +308,71 @@ type to `FORECAST` and add its mandatory dated signpost; leave genuine non-
 forecast `EST` rows alone. *Safe to defer?* Yes — `EST` rows aren't false, just
 less precise. Do it as a deliberate authoring pass when you're ready.
 
+### Backfilling chapters from past releases
+
+Run this **once** in a dossier that already has releases predating the lineage
+feature, to reconstruct each past release as a frozen chapter. Afterward,
+`freeze-chapter.yml` archives every new release automatically — you never run this
+again. Frozen chapters preserve their **as-published** appearance (old theme, old
+asset set); the lineage is a historical record, **not a reskin** — do not
+retro-theme them.
+
+It is a thin caller of `verification/freeze_chapter.py` (the same shared freeze the
+release workflow uses): it reconstructs each tag in a detached worktree so `main`
+is never disturbed, runs the honesty gate against that old tree, then writes
+`chapters/<tag>/` and appends to `lineage.json` on `main`. `chapters/` is
+write-once/immutable like `timestamps/`, so re-running is safe — already-frozen
+tags are skipped, never overwritten. `gh` gives the richest metadata; without it
+the loop degrades to git-only (tag name + commit date).
+
+Paste into the Code tab:
+
+```bash
+# --- PRE-FLIGHT: repo root, clean tree, lineage.json present ---
+test -f verification/freeze_chapter.py && test -f lineage.json || { echo "Run from the dossier repo root (after the template sync that brings lineage)."; exit 1; }
+git diff --quiet && git diff --cached --quiet || { echo "Working tree is dirty — start the backfill from a clean tree."; exit 1; }
+
+# --- ENUMERATE release tags, ascending (this ordered set IS the lineage) ---
+TAGS="$(git tag --list 'v*' --sort=v:refname)"
+echo "Tags to backfill (ascending):"; printf '  %s\n' $TAGS
+[ -n "$TAGS" ] || { echo "No v* tags — nothing to backfill."; exit 0; }
+
+# --- FOR EACH TAG: reconstruct as-published in a detached worktree, freeze, clean up ---
+for TAG in $TAGS; do
+  echo "=== $TAG ==="
+  git worktree add --detach .backfill-tmp "$TAG" || { echo "  worktree add failed; skipping $TAG"; continue; }
+
+  TITLE="$(gh release view "$TAG" --json name -q .name 2>/dev/null)";  TITLE="${TITLE:-$TAG}"
+  SUMMARY="$(gh release view "$TAG" --json body -q .body 2>/dev/null | head -n1)"
+  RELEASED="$(gh release view "$TAG" --json publishedAt -q .publishedAt 2>/dev/null | cut -c1-10)"
+  [ -n "$RELEASED" ] || RELEASED="$(git log -1 --format=%cs "$TAG")"        # fallback: tag commit date
+  CONCEPT_DOI="$(git show "$TAG":provenance.json 2>/dev/null | jq -r '.concept_doi // ""' 2>/dev/null || echo "")"
+  case "$CONCEPT_DOI" in TODO*|"") CONCEPT_DOI="" ;; esac                   # sentinel/absent -> empty
+
+  python3 verification/freeze_chapter.py \
+    --tag "$TAG" --title "$TITLE" --summary "$SUMMARY" \
+    --released "$RELEASED" --concept-doi "$CONCEPT_DOI" \
+    --source-dir .backfill-tmp \
+    || echo "  skipped $TAG (already frozen / gate failed / dup — see message above)"
+
+  git worktree remove --force .backfill-tmp   # ALWAYS clean up, even on failure
+done
+
+# --- REVIEW, then commit explicitly (the ritual does NOT auto-commit) ---
+echo; echo "=== review before committing ==="
+git status
+echo "--- lineage.json ---"; cat lineage.json
+```
+
+Review the reconstructed `chapters/` tree and `lineage.json`. When they look right,
+commit explicitly — same diff-gated discipline as everywhere else:
+
+```bash
+git add chapters/ lineage.json
+git commit -m "freeze(lineage): backfill chapters from past releases"
+git push
+```
+
 ---
 
 ## Originates from

@@ -1,0 +1,96 @@
+name: freeze-chapter
+# A SEPARATE release workflow (kept out of the hardened auto-timestamp.yml so the
+# provenance/DOI machinery stays untouched). It is a THIN CALLER of the shared
+# verification/freeze_chapter.py — it reimplements no freeze logic.
+#
+# Disjoint-by-construction: this workflow writes ONLY chapters/ and lineage.json;
+# auto-timestamp.yml writes ONLY timestamps/ and provenance.json. The
+# pull --rebase before push therefore always replays cleanly onto a concurrent
+# provenance push. (True cross-workflow serialization would require the same
+# concurrency group on auto-timestamp.yml, which we must not modify — so the
+# rebase is the real conflict-avoidance; the group below serializes this
+# workflow's own runs.)
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-main-push
+  cancel-in-progress: false   # never cancel a half-done push — let it finish, then run
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0        # full history/tags so the tree + lineage.json are current
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Freeze released chapter into lineage
+        # Release-supplied fields are passed as ENV VARS (not inlined via ${{ }}),
+        # so titles/bodies containing spaces, quotes, or newlines can't break the
+        # shell or inject commands.
+        env:
+          REL_TAG: ${{ github.event.release.tag_name }}
+          REL_NAME: ${{ github.event.release.name }}
+          REL_BODY: ${{ github.event.release.body }}
+          REL_PUBLISHED: ${{ github.event.release.published_at }}
+        run: |
+          set -euo pipefail
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Provenance-settled guard: auto-timestamp.yml updates provenance.json's
+          # release_tag to the real tag on this SAME release event. Wait until that
+          # lands (pulling latest main each iteration) so freeze_chapter.py's gate
+          # judges the real RELEASED state — never freeze a stale pre-release
+          # (v0.0.0) snapshot. Bounded (~2 min ceiling); on timeout we FAIL rather
+          # than freeze stale. (jq is preinstalled on ubuntu-latest — auto-timestamp.yml
+          # relies on it too — so no setup step is needed.)
+          settled=""
+          for _ in $(seq 1 24); do
+            git pull --rebase --quiet origin main || true
+            CURRENT="$(jq -r '.release_tag // ""' provenance.json 2>/dev/null || echo "")"
+            if [ "$CURRENT" = "$REL_TAG" ]; then
+              echo "provenance settled at $REL_TAG"; settled=1; break
+            fi
+            echo "waiting for provenance.json release_tag ($CURRENT) to reach $REL_TAG…"
+            sleep 5
+          done
+          if [ -z "$settled" ]; then
+            echo "::error::provenance.json release_tag did not settle to $REL_TAG within ~2 min. Not freezing a stale-gated snapshot. Re-run this workflow once auto-timestamp.yml has updated provenance — the freeze is write-once/idempotent, so a re-run is safe."
+            exit 1
+          fi
+
+          # --- derive chapter metadata from the release event (injection-safe) ---
+          TAG="$REL_TAG"
+          TITLE="${REL_NAME:-$TAG}"                      # fallback to TAG if name empty
+          SUMMARY="$(printf '%s\n' "$REL_BODY" | head -n1)"   # first line of body, or empty
+          RELEASED="${REL_PUBLISHED%%T*}"               # YYYY-MM-DD from ISO8601
+          CONCEPT_DOI="$(jq -r '.concept_doi // ""' provenance.json 2>/dev/null || echo "")"
+          case "$CONCEPT_DOI" in TODO*) CONCEPT_DOI="" ;; esac   # placeholder -> empty
+
+          # --- run the shared freeze (gate / write-once / dup all enforced inside);
+          #     a non-zero exit aborts the workflow before any push. ---
+          python3 verification/freeze_chapter.py \
+            --tag "$TAG" --title "$TITLE" --summary "$SUMMARY" \
+            --released "$RELEASED" --concept-doi "$CONCEPT_DOI"
+
+          # --- commit & push ONLY the freeze outputs, by explicit path ---
+          git add chapters/ lineage.json
+          if git diff --cached --quiet; then
+            echo "Nothing to freeze."
+          else
+            git commit -m "freeze(lineage): archive chapter ${TAG} + register in lineage.json [skip ci]"
+            git pull --rebase origin main   # replay our disjoint commit on top of any concurrent provenance push
+            git push
+          fi
