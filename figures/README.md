@@ -158,3 +158,35 @@ Render modules **compose** the runtime primitives; they never re-roll them.
 Root-relative paths, no CDN. (Freezing a figure into `chapters/<tag>/` needs the
 freeze rewire extended to repoint `figures/` script-src — handled in Phase 5; the
 Phase-2 demo page is deliberately outside the freeze set.)
+
+## Sealing the floor (`render-figures`, author-local)
+
+A living figure has a **live ceiling** (JS-on: the interactive runtime renders
+into the `<figure>`) and a **sealed floor** (JS-off: a static `<svg>` baked into
+the figure). `render_figures.js` bakes the floor:
+
+```sh
+node render_figures.js                 # defaults to figure-demo.html
+node render_figures.js a.html b.html
+npm run render-figures
+```
+
+It is **author-local and pure Node — NO browser required** (the Phase-3a poster
+path, `DossierFigures.renderOrreryPosterSVG(spec)`, touches no DOM), mirroring how
+`render-math` needs only Node + vendored KaTeX. It reads each `<figure
+data-figure='…'>`, generates the sealed `<svg data-poster="1">` deterministically
+from the spec, and bakes it inside the figure — keeping the `data-figure` open tag
+**byte-identical** (the source of truth). Idempotent (a second run is a no-op);
+fail-loud (non-zero exit on any error). **NEVER run by CI** — the stdlib-only
+verify floor is untouched. On load, the runtime removes the `data-poster` `<svg>`
+before rendering, so a JS-on reader sees exactly one (live) figure: the floor
+upgrades to the ceiling.
+
+**The poster-weight lever (a knob, not yet built).** The poster's point density
+is an *independent* knob from the live figure's. The sealed floor only needs to
+**communicate the finding** — a recognisable orrery — not match the live
+point-count. So a future `poster.beltCount` (or `poster.maxPoints`) override could
+render a much lighter sealed `<svg>` (say a few hundred belt points instead of
+thousands) **without changing the live figure at all**, since the two densities
+are decoupled. Worth doing when sealed-SVG weight matters; documented here, not
+built.

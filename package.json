@@ -5,7 +5,8 @@
   "description": "Open Dossier template — author-local tooling (vendored KaTeX for build-time prerendered math). Readers need no JS; CI never renders math.",
   "license": "MIT",
   "scripts": {
-    "render-math": "node render_math.js"
+    "render-math": "node render_math.js",
+    "render-figures": "node render_figures.js"
   },
   "dependencies": {
     "katex": "0.16.47"

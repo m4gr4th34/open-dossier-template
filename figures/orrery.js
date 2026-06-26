@@ -213,6 +213,14 @@
     }
     if (!spec || !spec.bodies || !spec.bodies.length) return fail(container, "spec has no bodies");
 
+    // Phase 3b: a build-time sealed poster (data-poster) may already sit in the
+    // container as the JS-off floor. Remove it before rendering live so a JS-on
+    // reader ends with exactly ONE (live) <svg> — the floor upgrades to the ceiling.
+    if (container.querySelector) {
+      var baked = container.querySelector("[data-poster]");
+      if (baked && baked.parentNode) baked.parentNode.removeChild(baked);
+    }
+
     // --- view geometry ---------------------------------------------------
     var W = 800, H = 480, cx = W / 2, cy = H / 2, RAD = Math.min(W, H) * 0.46;
     var zoom = spec.zoom || {};
