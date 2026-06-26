@@ -1,0 +1,279 @@
+/*
+ * cosmiczoom.js — ONE continuous zoom from Mercury (~0.4 AU) to the Milky Way
+ * (~10^9 AU), built by COMPOSING the existing render modules: it CALLS
+ * DossierFigures.renderOrrery and DossierFigures.renderGalaxy (it does NOT
+ * refactor or reimplement them — they stay working standalone) and stitches
+ * their two pixel-identical SVG canvases into one seamless fall.
+ *
+ * COMPOSITION (one level up — render modules composing render modules)
+ *   - the inner regime  -> DossierFigures.renderOrrery(layerA, orrerySpec{controls:false})
+ *   - the outer regime  -> DossierFigures.renderGalaxy(layerB, galaxySpec{controls:false})
+ *   - zoom mapping      -> DossierFigures.logZoom (master AU range + per-module slider)
+ *   - soft crossfade    -> DossierFigures.ease
+ *   - SVG nodes         -> DossierFigures.el
+ *   NO Kepler, NO spiral, NO PRNG, NO scatter here — those live INSIDE the two
+ *   composed modules. The only "new" math is the UNIT BRIDGE (1 ly = 63,241 AU,
+ *   owned here) and the opacity crossfade/void blends.
+ *
+ * THE SEAM
+ *   Both modules render identical 800x480 canvases (cx,cy=400,240, RAD=220.8),
+ *   so the two layers stack absolutely and CROSS-FADE by opacity — no geometric
+ *   reconciliation. A master "cosmic scale" (AU) drives both: orrery via
+ *   setSlider(scaleToSlider(scaleAU,...)), galaxy via setSlider(scaleToSlider(
+ *   scaleAU/63241,...)). Inside the overlap band [~0.63 AU .. 6000 AU] the orrery
+ *   fades out as the galaxy fades in.
+ *
+ * THE ANCHOR (Sun-frame inversion held automatically)
+ *   The orrery is Sun-centred (its origin (0,0) IS the Sun, at screen centre).
+ *   The galaxy spec uses focus:"sun", so at the deep end of its range its
+ *   auto-focus centres on the Sun too — so through the whole crossfade BOTH Suns
+ *   sit at screen centre and stay registered. Only when the master zooms well
+ *   PAST the seam does the galaxy's auto-focus release the Sun toward the
+ *   galactic centre — the honest inversion from "Sun is the centre of everything"
+ *   to "Sun is one dot in a spur". We hold the anchor purely by composing the
+ *   galaxy's own focus machinery (driving setSlider only) — no pan injection.
+ *
+ * THE HONEST VOID
+ *   Between the Oort outer edge (~0.073 ly) and the nearest stars, a thin
+ *   waypoint layer renders a tiny REAL catalog (Proxima 4.2 ly, ... Sirius 8.6 ly)
+ *   as labelled points radiating from the Sun at their true distances — the
+ *   Powers-of-Ten payload: the vast emptiness, honestly labelled, not a blank gap.
+ *
+ * Vendored, zero-dependency, reader-side; never run by CI.
+ */
+(function (root) {
+  "use strict";
+
+  var NS = root && root.DossierFigures;
+  if (!NS) {
+    if (root && root.console) root.console.error("[cosmiczoom] figures.js runtime not found — load it (and orrery.js + galaxy.js) first");
+    return;
+  }
+  var DossierFigures = NS;
+  var logZoom = DossierFigures.logZoom;     // RUNTIME (zoom mapping)
+  var ease    = DossierFigures.ease;        // RUNTIME (crossfade easing)
+  var el      = DossierFigures.el;          // RUNTIME (SVG nodes)
+
+  var AU_PER_LY = 63241;                    // THE UNIT BRIDGE (owned here): 1 ly = 63,241 AU
+
+  function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function num(v, d) { return (typeof v === "number" && isFinite(v)) ? v : d; }
+  function merge(a, b) {
+    var o = {}, k;
+    for (k in a) if (Object.prototype.hasOwnProperty.call(a, k)) o[k] = a[k];
+    for (k in b) if (Object.prototype.hasOwnProperty.call(b, k)) o[k] = b[k];
+    return o;
+  }
+  function fail(container, msg) {
+    if (root && root.console) root.console.error("[cosmiczoom] " + msg);
+    if (container && container.appendChild) {
+      var p = root.document.createElement("p");
+      p.className = "lf-fallback"; p.textContent = "Figure unavailable: " + msg;
+      container.appendChild(p);
+    }
+    return null;
+  }
+
+  // Real values — the one bit of real DATA in the scaffold (overridable via spec).
+  var DEFAULT_NEAREST = [
+    { name: "Proxima Centauri", ly: 4.247, dir: 18 },
+    { name: "Alpha Centauri AB", ly: 4.37, dir: 26 },
+    { name: "Barnard's Star", ly: 5.96, dir: 142 },
+    { name: "Wolf 359", ly: 7.86, dir: 250 },
+    { name: "Sirius", ly: 8.6, dir: 318 }
+  ];
+
+  function renderCosmicZoom(container, spec) {
+    if (!container) return fail(null, "no container");
+    var doc = (root && root.document) || container.ownerDocument;
+
+    if (spec == null && container.getAttribute) spec = container.getAttribute("data-figure");
+    if (typeof spec === "string") {
+      try { spec = JSON.parse(spec); } catch (e) { return fail(container, "data-figure is not valid JSON"); }
+    }
+    if (!spec || !spec.orrery || !spec.galaxy) return fail(container, "spec needs both orrery and galaxy blocks");
+
+    var W = 800, H = 480, cx = W / 2, cy = H / 2, RAD = Math.min(W, H) * 0.46;
+    var seam = spec.seam || {};
+
+    // master cosmic scale range, in AU (Mercury inner -> Milky Way)
+    var MLO = Math.max(1e-3, num(seam.lo, 0.35));
+    var MHI = Math.max(MLO * 1.0001, num(seam.hi, 4e9));       // ~63,000 ly
+    var sliderM = clamp01(logZoom.scaleToSlider(num(seam.start, 5), MLO, MHI)); // open on the inner solar system
+    function scaleAU() { return logZoom.sliderToScale(sliderM, MLO, MHI); }      // RUNTIME
+
+    // crossfade band (AU) and void band (ly)
+    var fadeLo = num(seam.fadeLoAU, 0.63);    // ~1e-5 ly (galaxy inner edge)
+    var fadeHi = num(seam.fadeHiAU, 6000);    // orrery outer edge
+    var vInLo = num(seam.voidInLoLy, 4), vInHi = num(seam.voidInHiLy, 12);
+    var vOutLo = num(seam.voidOutLoLy, 300), vOutHi = num(seam.voidOutHiLy, 1500);
+
+    // --- the two composed layers + a void overlay + a stage --------------
+    var stage = doc.createElement("div");
+    stage.style.cssText = "position:relative;";
+    var layB = doc.createElement("div");   // galaxy — IN FLOW (gives the stage its height)
+    layB.style.cssText = "position:relative;z-index:1;pointer-events:none;";
+    var layA = doc.createElement("div");   // orrery — absolute on top (fades out)
+    layA.style.cssText = "position:absolute;inset:0;z-index:2;pointer-events:none;";
+    var voidSvg = el("svg", { viewBox: "0 0 " + W + " " + H, width: "100%", height: "100%",
+      "class": "lf-void", preserveAspectRatio: "xMidYMid meet" });
+    voidSvg.style.cssText = "position:absolute;inset:0;z-index:3;pointer-events:none;";
+    stage.appendChild(layB);
+    stage.appendChild(layA);
+    stage.appendChild(voidSvg);
+
+    // COMPOSE: call the existing modules, controls off (the master bar drives them)
+    var orrerySpec = merge(spec.orrery, { controls: false });
+    var galaxySpec = merge(spec.galaxy, { controls: false });
+    var hOrr = DossierFigures.renderOrrery(layA, orrerySpec);   // <-- composition
+    var hGal = DossierFigures.renderGalaxy(layB, galaxySpec);   // <-- composition
+    if (!hOrr || !hGal) return fail(container, "a composed module failed to render");
+
+    // child zoom ranges (to convert the master scale into each module's slider)
+    var oz = spec.orrery.zoom || {}, oLO = Math.max(1e-6, num(oz.lo, 0.3)), oHI = Math.max(oLO * 1.0001, num(oz.hi, 6000));
+    var gz = spec.galaxy.zoom || {}, gLO = Math.max(1e-9, num(gz.lo, 1e-5)), gHI = Math.max(gLO * 1.0001, num(gz.hi, 200000));
+
+    function driveChildren() {
+      var aAU = scaleAU();
+      hOrr.setSlider(clamp01(logZoom.scaleToSlider(aAU, oLO, oHI)));               // orrery in AU
+      hGal.setSlider(clamp01(logZoom.scaleToSlider(aAU / AU_PER_LY, gLO, gHI)));   // galaxy in ly (bridge)
+    }
+    function crossfade() {
+      var aAU = scaleAU(), fa;
+      if (aAU <= fadeLo) fa = 1;
+      else if (aAU >= fadeHi) fa = 0;
+      else fa = 1 - ease(clamp01(logZoom.scaleToSlider(aAU, fadeLo, fadeHi)));     // eased blend across the band
+      layA.style.opacity = fa.toFixed(3);
+      layB.style.opacity = (1 - fa).toFixed(3);
+    }
+
+    // --- the honest void: nearest-star waypoints (radial from the Sun) ----
+    var catalog = (seam.nearestStars && seam.nearestStars.length) ? seam.nearestStars : DEFAULT_NEAREST;
+    var voidNodes = catalog.map(function (st, i) {
+      var g = el("g", {});
+      var dot = el("circle", { r: 2.6, fill: "#ffe6b0", "fill-opacity": 0.95 });
+      var lbl = el("text", { "class": "lf-label", "font-size": 10.5, fill: "#cfe0ff", dx: 7, dy: 3.5 });
+      lbl.appendChild(doc.createTextNode((st.name || "star") + " · " + num(st.ly, 5) + " ly"));
+      g.appendChild(dot); g.appendChild(lbl);
+      voidSvg.appendChild(g);
+      return { dot: dot, lbl: lbl, ly: num(st.ly, 5), dir: num(st.dir, i * 72) * Math.PI / 180 };
+    });
+    function voidBump(ly) {                                   // 0 outside the void band, 1 across it (log ramps)
+      if (ly <= vInLo || ly >= vOutHi) return 0;
+      if (ly < vInHi) return clamp01(logZoom.scaleToSlider(ly, vInLo, vInHi));
+      if (ly <= vOutLo) return 1;
+      return clamp01(1 - logZoom.scaleToSlider(ly, vOutLo, vOutHi));
+    }
+    function updateVoid() {
+      var ly = scaleAU() / AU_PER_LY, op = voidBump(ly);
+      voidSvg.style.opacity = op.toFixed(3);
+      if (op < 0.01) return;
+      var kly = RAD / ly;                                    // px per ly (Sun at screen centre)
+      for (var i = 0; i < voidNodes.length; i++) {
+        var v = voidNodes[i], off = v.ly * kly;              // px from centre at the star's true distance
+        var sx = cx + off * Math.cos(v.dir), sy = cy - off * Math.sin(v.dir);
+        v.dot.setAttribute("cx", sx.toFixed(1)); v.dot.setAttribute("cy", sy.toFixed(1));
+        v.lbl.setAttribute("x", sx.toFixed(1)); v.lbl.setAttribute("y", sy.toFixed(1));
+      }
+    }
+
+    // --- ONE master control bar (the only visible controls) --------------
+    var bar = doc.createElement("div");
+    bar.className = "lf-controls lf-cosmic";
+
+    var journeyPlaying = seam.playing === true;   // default paused (calm open)
+    var jdir = 1, masterJump = null;
+    var playBtn = doc.createElement("button");
+    playBtn.type = "button"; playBtn.className = "lf-btn lf-play";
+    function playLabel() { return journeyPlaying ? "❚❚ Pause" : "▶ Journey"; }
+    playBtn.textContent = playLabel();
+    playBtn.addEventListener("click", function () { journeyPlaying = !journeyPlaying; masterJump = null; playBtn.textContent = playLabel(); });
+    bar.appendChild(playBtn);
+
+    var zWrap = doc.createElement("label"); zWrap.className = "lf-field";
+    zWrap.appendChild(doc.createTextNode("Cosmic zoom"));
+    var zIn = doc.createElement("input");
+    zIn.type = "range"; zIn.min = "0"; zIn.max = "1"; zIn.step = "0.0005";
+    zIn.value = String(sliderM); zIn.className = "lf-range";
+    zIn.addEventListener("input", function () { masterJump = null; journeyPlaying = false; playBtn.textContent = playLabel(); sliderM = clamp01(parseFloat(zIn.value)); });
+    zWrap.appendChild(zIn); bar.appendChild(zWrap);
+
+    function jumpTo(scaleAUtarget) { masterJump = { from: sliderM, to: clamp01(logZoom.scaleToSlider(scaleAUtarget, MLO, MHI)), p: 0, dur: 1.4 }; journeyPlaying = false; playBtn.textContent = playLabel(); }
+    (seam.regions || []).forEach(function (rg) {
+      var btn = doc.createElement("button");
+      btn.type = "button"; btn.className = "lf-btn lf-region";
+      btn.textContent = rg.name;
+      btn.addEventListener("click", function () { jumpTo(num(rg.scale, scaleAU())); });
+      bar.appendChild(btn);
+    });
+
+    var readout = doc.createElement("span"); readout.className = "lf-readout";
+    bar.appendChild(readout);
+
+    function syncMaster() { zIn.value = String(sliderM); }
+    function fmtScale(aAU) {
+      if (aAU < AU_PER_LY) {
+        if (aAU < 1) return aAU.toFixed(3) + " AU";
+        if (aAU < 1000) return aAU.toFixed(1) + " AU";
+        return Math.round(aAU).toLocaleString() + " AU";
+      }
+      var ly = aAU / AU_PER_LY;
+      return (ly < 1000 ? (ly < 10 ? ly.toFixed(2) : Math.round(ly)) : Math.round(ly).toLocaleString()) + " ly";
+    }
+    function regime(aAU) {
+      if (aAU <= fadeLo) return "solar system";
+      if (aAU < fadeHi) return "seam (orrery ↔ galaxy)";
+      return (aAU / AU_PER_LY) < vOutLo ? "interstellar void" : "the galaxy";
+    }
+    function updateReadout() { var a = scaleAU(); readout.textContent = "cosmic scale " + fmtScale(a) + " · " + regime(a); }
+
+    // master scroll-to-zoom (children are pointer-events:none, so this owns it)
+    stage.addEventListener("wheel", function (ev) {
+      ev.preventDefault(); masterJump = null; journeyPlaying = false; playBtn.textContent = playLabel();
+      sliderM = clamp01(sliderM + (ev.deltaY < 0 ? -0.03 : 0.03)); syncMaster();
+    }, { passive: false });
+
+    // --- mount (data-figure left untouched) ------------------------------
+    container.style.position = container.style.position || "relative";
+    container.appendChild(stage);
+    container.appendChild(bar);
+
+    // --- master loop: only act when the cosmic scale changes (children run
+    //     their own loops; we just steer their zoom + the crossfade + the void) -
+    var JR = num(seam.journeyRate, 0.05);   // slider units / second (Powers-of-Ten travel)
+    var perf = (root.performance && root.performance.now) ? root.performance : Date;
+    var last = perf.now(), lastDriven = null;
+    function tick(now) {
+      var dt = Math.min(0.05, (now - last) / 1000); last = now;
+      if (masterJump) {
+        masterJump.p += dt / masterJump.dur;
+        sliderM = masterJump.from + (masterJump.to - masterJump.from) * ease(clamp01(masterJump.p));
+        if (masterJump.p >= 1) masterJump = null;
+        syncMaster();
+      } else if (journeyPlaying) {
+        sliderM += jdir * JR * dt;            // ping-pong the cosmic journey
+        if (sliderM >= 1) { sliderM = 1; jdir = -1; } else if (sliderM <= 0) { sliderM = 0; jdir = 1; }
+        syncMaster();
+      }
+      if (sliderM !== lastDriven) { driveChildren(); crossfade(); updateVoid(); updateReadout(); lastDriven = sliderM; }
+      root.requestAnimationFrame(tick);
+    }
+    root.requestAnimationFrame(tick);
+
+    return {
+      runtimeVersion: DossierFigures.FIGURES_RUNTIME_VERSION,
+      orrery: hOrr, galaxy: hGal,
+      getState: function () {
+        var a = scaleAU();
+        return { sliderM: sliderM, scaleAU: a, scaleLY: a / AU_PER_LY,
+          orreryOpacity: parseFloat(layA.style.opacity || "1"),
+          galaxyOpacity: parseFloat(layB.style.opacity || "1"),
+          voidOpacity: parseFloat(voidSvg.style.opacity || "0"),
+          journeyPlaying: journeyPlaying, regime: regime(a) };
+      },
+      setMaster: function (v) { masterJump = null; sliderM = clamp01(v); syncMaster(); }
+    };
+  }
+
+  DossierFigures.renderCosmicZoom = renderCosmicZoom;
+})(typeof window !== "undefined" ? window : null);

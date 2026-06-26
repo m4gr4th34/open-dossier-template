@@ -260,65 +260,67 @@
       updateMarker(ca, sa, kk);
     }
 
-    // --- controls (HTML, themed by the host page) ------------------------
-    var controls = doc.createElement("div");
-    controls.className = "lf-controls";
+    // --- controls (HTML) — skipped when spec.controls === false so a composer
+    //     (e.g. cosmiczoom.js) can drive this instance from one master bar.
+    //     ADDITIVE + default-preserving: default builds controls as before.
+    var controls = null, zoomInput = null, readout = null;
+    if (spec.controls !== false) {
+      controls = doc.createElement("div");
+      controls.className = "lf-controls";
 
-    var playBtn = doc.createElement("button");
-    playBtn.type = "button"; playBtn.className = "lf-btn lf-play";
-    playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play";
-    playBtn.addEventListener("click", function () { playing = !playing; playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play"; });
-    controls.appendChild(playBtn);
+      var playBtn = doc.createElement("button");
+      playBtn.type = "button"; playBtn.className = "lf-btn lf-play";
+      playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play";
+      playBtn.addEventListener("click", function () { playing = !playing; playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play"; });
+      controls.appendChild(playBtn);
 
-    var zoomWrap = doc.createElement("label"); zoomWrap.className = "lf-field";
-    zoomWrap.appendChild(doc.createTextNode("Zoom"));
-    var zoomInput = doc.createElement("input");
-    zoomInput.type = "range"; zoomInput.min = "0"; zoomInput.max = "1"; zoomInput.step = "0.0005";
-    zoomInput.value = String(slider); zoomInput.className = "lf-range";
-    zoomInput.addEventListener("input", function () { jump = null; slider = clamp01(parseFloat(zoomInput.value)); viewDirty = true; });
-    zoomWrap.appendChild(zoomInput); controls.appendChild(zoomWrap);
+      var zoomWrap = doc.createElement("label"); zoomWrap.className = "lf-field";
+      zoomWrap.appendChild(doc.createTextNode("Zoom"));
+      zoomInput = doc.createElement("input");
+      zoomInput.type = "range"; zoomInput.min = "0"; zoomInput.max = "1"; zoomInput.step = "0.0005";
+      zoomInput.value = String(slider); zoomInput.className = "lf-range";
+      zoomInput.addEventListener("input", function () { jump = null; slider = clamp01(parseFloat(zoomInput.value)); viewDirty = true; });
+      zoomWrap.appendChild(zoomInput); controls.appendChild(zoomWrap);
 
-    var spdWrap = doc.createElement("label"); spdWrap.className = "lf-field";
-    spdWrap.appendChild(doc.createTextNode("Spin"));
-    var spdInput = doc.createElement("input");
-    spdInput.type = "range"; spdInput.min = "0"; spdInput.max = "0.3"; spdInput.step = "0.005";
-    spdInput.value = String(baseSpeed); spdInput.className = "lf-range";
-    spdInput.addEventListener("input", function () { baseSpeed = parseFloat(spdInput.value); });
-    spdWrap.appendChild(spdInput); controls.appendChild(spdWrap);
+      var spdWrap = doc.createElement("label"); spdWrap.className = "lf-field";
+      spdWrap.appendChild(doc.createTextNode("Spin"));
+      var spdInput = doc.createElement("input");
+      spdInput.type = "range"; spdInput.min = "0"; spdInput.max = "0.3"; spdInput.step = "0.005";
+      spdInput.value = String(baseSpeed); spdInput.className = "lf-range";
+      spdInput.addEventListener("input", function () { baseSpeed = parseFloat(spdInput.value); });
+      spdWrap.appendChild(spdInput); controls.appendChild(spdWrap);
 
-    function syncZoom() { zoomInput.value = String(slider); }
-    function resolveCenter(rg, ca, sa) {
-      if (rg.center === "sun") {
-        return [sunBase[0] * ca - sunBase[1] * sa, sunBase[0] * sa + sunBase[1] * ca];
-      }
-      if (rg.center && rg.center.length === 2) return rg.center;
-      return null;
-    }
-    function startJump(rg) {
-      var ca = Math.cos(galaxyAngle), sa = Math.sin(galaxyAngle);
-      var c = resolveCenter(rg, ca, sa);
-      // Explicit-centre region -> manual focus (autoFocus off). A region with NO
-      // centre hands control back to the "fall toward home" auto-focus (pan is
-      // then driven by applyAutoFocus from the zoom level), so e.g. "Whole galaxy"
-      // returns to the default origin-at-wide / Sun-on-zoom-in behaviour.
-      autoFocus = !c;
-      jump = {
-        fromS: slider, toS: clamp01(logZoom.scaleToSlider(num(rg.scale, scaleLY()), LO, HI)),
-        fromPX: panX, toPX: c ? -c[0] : panX,   // pan so the target centers (project(c)=center)
-        fromPY: panY, toPY: c ? -c[1] : panY,
-        p: 0, dur: 1.1
+      var resolveCenter = function (rg, ca, sa) {
+        if (rg.center === "sun") {
+          return [sunBase[0] * ca - sunBase[1] * sa, sunBase[0] * sa + sunBase[1] * ca];
+        }
+        if (rg.center && rg.center.length === 2) return rg.center;
+        return null;
       };
-    }
-    (spec.regions || []).forEach(function (rg) {
-      var btn = doc.createElement("button");
-      btn.type = "button"; btn.className = "lf-btn lf-region";
-      btn.textContent = rg.name;
-      btn.addEventListener("click", function () { startJump(rg); });
-      controls.appendChild(btn);
-    });
+      var startJump = function (rg) {
+        var ca = Math.cos(galaxyAngle), sa = Math.sin(galaxyAngle);
+        var c = resolveCenter(rg, ca, sa);
+        // Explicit-centre region -> manual focus (autoFocus off); no centre -> auto "fall home".
+        autoFocus = !c;
+        jump = {
+          fromS: slider, toS: clamp01(logZoom.scaleToSlider(num(rg.scale, scaleLY()), LO, HI)),
+          fromPX: panX, toPX: c ? -c[0] : panX,   // pan so the target centers (project(c)=center)
+          fromPY: panY, toPY: c ? -c[1] : panY,
+          p: 0, dur: 1.1
+        };
+      };
+      (spec.regions || []).forEach(function (rg) {
+        var btn = doc.createElement("button");
+        btn.type = "button"; btn.className = "lf-btn lf-region";
+        btn.textContent = rg.name;
+        btn.addEventListener("click", function () { startJump(rg); });
+        controls.appendChild(btn);
+      });
 
-    var readout = doc.createElement("span"); readout.className = "lf-readout";
-    controls.appendChild(readout);
+      readout = doc.createElement("span"); readout.className = "lf-readout";
+      controls.appendChild(readout);
+    }
+    function syncZoom() { if (zoomInput) zoomInput.value = String(slider); }
 
     // --- interaction: scroll-to-zoom + drag-to-pan ----------------------
     svg.addEventListener("wheel", function (ev) {
@@ -339,7 +341,7 @@
 
     // --- mount (data-figure left untouched) ------------------------------
     container.appendChild(svg);
-    container.appendChild(controls);
+    if (controls) container.appendChild(controls);
 
     // --- animation loop --------------------------------------------------
     // RIGID slow spin (one galaxyAngle applied to all layers in projection),
@@ -370,7 +372,7 @@
       var scaleTxt = s >= 1000 ? Math.round(s).toLocaleString() + " ly"
         : s >= 0.1 ? s.toFixed(2) + " ly"
         : "~" + (s * 63241).toFixed(2) + " AU";   // 1 ly = 63,241 AU
-      readout.textContent = "scale " + scaleTxt + " · stars " + drawnStars + "/" + worldStars.length +
+      if (readout) readout.textContent = "scale " + scaleTxt + " · stars " + drawnStars + "/" + worldStars.length +
         " (cap " + MAX_STAR_NODES + ") · spin " + spin.toFixed(2);
 
       root.requestAnimationFrame(frame);

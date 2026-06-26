@@ -273,54 +273,59 @@
       });
     }
 
-    // --- controls (HTML, themed by the host page) ------------------------
-    var controls = doc.createElement("div");
-    controls.className = "lf-controls";
+    // --- controls (HTML) — skipped when spec.controls === false so a composer
+    //     (e.g. cosmiczoom.js) can drive this instance from one master bar.
+    //     ADDITIVE + default-preserving: default builds controls as before.
+    var controls = null, zoomInput = null, readout = null;
+    if (spec.controls !== false) {
+      controls = doc.createElement("div");
+      controls.className = "lf-controls";
 
-    var playBtn = doc.createElement("button");
-    playBtn.type = "button"; playBtn.className = "lf-btn lf-play";
-    playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play";
-    playBtn.addEventListener("click", function () {
-      playing = !playing; playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play";
-    });
-    controls.appendChild(playBtn);
+      var playBtn = doc.createElement("button");
+      playBtn.type = "button"; playBtn.className = "lf-btn lf-play";
+      playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play";
+      playBtn.addEventListener("click", function () {
+        playing = !playing; playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play";
+      });
+      controls.appendChild(playBtn);
 
-    var zoomWrap = doc.createElement("label");
-    zoomWrap.className = "lf-field";
-    zoomWrap.appendChild(doc.createTextNode("Zoom"));
-    var zoomInput = doc.createElement("input");
-    zoomInput.type = "range"; zoomInput.min = "0"; zoomInput.max = "1"; zoomInput.step = "0.001";
-    zoomInput.value = String(slider); zoomInput.className = "lf-range";
-    zoomInput.addEventListener("input", function () { jump = null; slider = clamp01(parseFloat(zoomInput.value)); viewDirty = true; });
-    zoomWrap.appendChild(zoomInput);
-    controls.appendChild(zoomWrap);
+      var zoomWrap = doc.createElement("label");
+      zoomWrap.className = "lf-field";
+      zoomWrap.appendChild(doc.createTextNode("Zoom"));
+      zoomInput = doc.createElement("input");
+      zoomInput.type = "range"; zoomInput.min = "0"; zoomInput.max = "1"; zoomInput.step = "0.001";
+      zoomInput.value = String(slider); zoomInput.className = "lf-range";
+      zoomInput.addEventListener("input", function () { jump = null; slider = clamp01(parseFloat(zoomInput.value)); viewDirty = true; });
+      zoomWrap.appendChild(zoomInput);
+      controls.appendChild(zoomWrap);
 
-    var spdWrap = doc.createElement("label");
-    spdWrap.className = "lf-field";
-    spdWrap.appendChild(doc.createTextNode("Speed"));
-    var spdInput = doc.createElement("input");
-    spdInput.type = "range"; spdInput.min = "0"; spdInput.max = "2"; spdInput.step = "0.01";
-    spdInput.value = String(baseSpeed); spdInput.className = "lf-range";
-    spdInput.addEventListener("input", function () { baseSpeed = parseFloat(spdInput.value); });
-    spdWrap.appendChild(spdInput);
-    controls.appendChild(spdWrap);
+      var spdWrap = doc.createElement("label");
+      spdWrap.className = "lf-field";
+      spdWrap.appendChild(doc.createTextNode("Speed"));
+      var spdInput = doc.createElement("input");
+      spdInput.type = "range"; spdInput.min = "0"; spdInput.max = "2"; spdInput.step = "0.01";
+      spdInput.value = String(baseSpeed); spdInput.className = "lf-range";
+      spdInput.addEventListener("input", function () { baseSpeed = parseFloat(spdInput.value); });
+      spdWrap.appendChild(spdInput);
+      controls.appendChild(spdWrap);
 
-    function startJump(targetScale) {
-      jump = { from: slider, to: clamp01(logZoom.scaleToSlider(targetScale, LO, HI)), p: 0, dur: 0.7 };
+      var startJump = function (targetScale) {
+        jump = { from: slider, to: clamp01(logZoom.scaleToSlider(targetScale, LO, HI)), p: 0, dur: 0.7 };
+      };
+      (spec.regions || []).forEach(function (rg) {
+        var btn = doc.createElement("button");
+        btn.type = "button"; btn.className = "lf-btn lf-region";
+        btn.textContent = rg.name;
+        btn.addEventListener("click", function () { startJump(num(rg.scale, scaleAU())); });
+        controls.appendChild(btn);
+      });
+
+      readout = doc.createElement("span");
+      readout.className = "lf-readout";
+      controls.appendChild(readout);
     }
-    (spec.regions || []).forEach(function (rg) {
-      var btn = doc.createElement("button");
-      btn.type = "button"; btn.className = "lf-btn lf-region";
-      btn.textContent = rg.name;
-      btn.addEventListener("click", function () { startJump(num(rg.scale, scaleAU())); });
-      controls.appendChild(btn);
-    });
 
-    var readout = doc.createElement("span");
-    readout.className = "lf-readout";
-    controls.appendChild(readout);
-
-    function syncZoomInput() { zoomInput.value = String(slider); }
+    function syncZoomInput() { if (zoomInput) zoomInput.value = String(slider); }
 
     // --- interaction: scroll-to-zoom + drag-to-pan ----------------------
     svg.addEventListener("wheel", function (ev) {
@@ -343,7 +348,7 @@
 
     // --- mount (leaves data-figure attribute untouched) -----------------
     container.appendChild(svg);
-    container.appendChild(controls);
+    if (controls) container.appendChild(controls);
 
     // Oort shimmer: a gentle per-point opacity twinkle (throttled ~12 Hz). The
     // shell is physically static, so this conveys "alive" WITHOUT faking a spin.
@@ -386,7 +391,7 @@
       updateBodies();
       updateShimmer(now);   // gentle Oort twinkle (throttled; static shell, alive)
 
-      readout.textContent = "scale " + scaleAU().toFixed(scaleAU() < 10 ? 2 : 0) +
+      if (readout) readout.textContent = "scale " + scaleAU().toFixed(scaleAU() < 10 ? 2 : 0) +
         " AU · t " + t.toFixed(1) + " yr · play-speed " + spd.toFixed(2) + " yr/s";
 
       root.requestAnimationFrame(frame);

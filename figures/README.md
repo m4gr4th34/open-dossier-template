@@ -14,6 +14,7 @@ stays untouched).
 | `figures.test.js` | Author-local Node test for the primitives (`node figures/figures.test.js`). Never run by CI. |
 | `orrery.js` | A render module that **composes** the primitives into a Keplerian zoom-orrery. Extends `DossierFigures` with `renderOrrery(container, spec)`. |
 | `galaxy.js` | A render module that **composes** the primitives into a procedural spiral galaxy (statistical structure, ~10-order zoom, per-scale cull). Extends `DossierFigures` with `renderGalaxy(container, spec)`. |
+| `cosmiczoom.js` | A composer **one level up**: calls `renderOrrery` + `renderGalaxy` and crossfades them into one continuous Mercury→Milky-Way zoom (the unit bridge + seam). Extends `DossierFigures` with `renderCosmicZoom(container, spec)`. |
 
 ## Versioning (how we pin our own code)
 
@@ -97,6 +98,37 @@ constant-size point — **honest sub-pixel scaling**: the whole Solar System is 
 dot at galaxy scale, and stays a single point when zoomed in (no fabricated
 sub-structure). `Math.log`/`cos`/`sin` are geometry on `seededScatter` output;
 the density gradient uses `u*u` (no `Math.pow`), keeping composition unambiguous.
+
+
+### Spec schema — cosmic-zoom (`renderCosmicZoom`)
+
+A COMPOSITION figure: it references a full `orrery` spec and a full `galaxy`
+spec (the schemas above) plus a `seam` block, and stitches them into one
+continuous Mercury→Milky-Way zoom by CALLING `renderOrrery` + `renderGalaxy`
+(it does not reimplement them). The composer sets `controls:false` on each child
+so one master bar drives both.
+
+```jsonc
+{
+  "orrery": { /* a full zoom-orrery spec — see above */ },
+  "galaxy": { /* a full galaxy spec — use focus:"sun" so the seam anchors on the Sun */ },
+  "seam": {
+    "lo": 0.35, "hi": 4e9, "start": 5,         // master cosmic scale range, in AU (Mercury -> Milky Way)
+    "fadeLoAU": 0.63, "fadeHiAU": 6000,         // crossfade band: orrery fades out / galaxy fades in
+    "voidInLoLy": 4, "voidInHiLy": 12,          // nearest-star waypoints fade IN across this ly band
+    "voidOutLoLy": 300, "voidOutHiLy": 1500,    // ... and fade OUT as the galaxy populates
+    "journeyRate": 0.05, "playing": false,      // Powers-of-Ten auto-journey (ping-pong); default paused
+    "regions": [ { "name": "Oort cloud", "scale": 5000 } ],   // master zoom-to targets, scale in AU
+    "nearestStars": [ { "name": "Proxima Centauri", "ly": 4.247, "dir": 18 } ] // the one bit of real DATA
+  }
+}
+```
+
+The UNIT BRIDGE (`1 ly = 63,241 AU`) lives ONLY in `cosmiczoom.js`. The two SVG
+canvases are pixel-identical (`viewBox 0 0 800 480`), so the layers stack and
+crossfade by opacity — no geometric reconciliation. The ANCHOR (Sun at screen
+centre through the seam) is held by composing the galaxy's own `focus:"sun"`
+auto-focus + the orrery's origin=Sun; the composer drives only `setSlider`.
 
 
 ## The composition law (the whole point of the scaffold)
