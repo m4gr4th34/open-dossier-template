@@ -150,6 +150,42 @@ never hand-write the rendered math:
   matplotlib (`verification/figure_style.py`); readers need nothing, and **CI does
   not render math** — the stdlib-only verify floor stays untouched.
 
+**Living figures — author as `data-figure`, seal with `render-figures` (agent-primary;
+hand-edit is the fallback).** A *living figure* is an interactive SVG: a tiny JSON
+spec in a `data-figure` attribute, rendered live by the vendored `figures/` runtime,
+with a sealed static poster baked in for JS-off readers. This is a DIFFERENT path
+from a **static plot** (Python/matplotlib → PNG via `verification/figure_style.py`,
+see Design identity) — both are first-class; do not conflate them. Reach for a
+living figure only when the result has dynamics worth exploring.
+
+- Author the figure as `<figure class="living-figure" data-figure='{ …spec… }'>`,
+  then load the runtime first, then the render module(s) it needs:
+  `<script src="figures/figures.js"></script>` then `<script src="figures/orrery.js"></script>`
+  (`galaxy.js` / `cosmiczoom.js` for the others). The full spec schemas — zoom-orrery,
+  galaxy, cosmic-zoom — live in **`figures/README.md`**; author against them there and
+  do not restate them in the page.
+- After writing or editing any `data-figure`, run `npm run render-figures` (or
+  `node render_figures.js <page.html>`). It bakes a deterministic static `<svg>`
+  poster INTO the figure so **readers need zero JavaScript**; `data-figure` stays the
+  editable source of truth — change it and re-run (idempotent). On load the runtime
+  removes the poster and renders the live figure (the floor upgrades to the ceiling).
+- This is an author-local Node step, exactly like `render-math`; readers need
+  nothing, and **CI never renders figures** — the stdlib-only verify floor stays
+  untouched.
+- **A capability that invites, not a bar that excludes.** Author a living figure only
+  when the result genuinely has dynamics worth exploring. A null result, a flat line,
+  a boring-but-correct table gets the SAME sealed, first-class frame — the medium
+  never implies a finding must animate to be worthy. If your result isn't "sexy,"
+  that is not a defect to paper over with motion: honesty outranks spectacle, and a
+  still figure that tells the truth beats a moving one that oversells. Seal it plainly
+  and let the honest label carry it.
+- **In a fork:** a dossier made from the template already vendors `figures/`, so
+  living figures work out of the box, and both sealing and freeze-survival are
+  automatic (`render-figures` bakes the poster; a frozen chapter repoints its
+  `figures/` script-src to the shared root). Enabling Pages on the fork and filling
+  the `USER/REPO` placeholders is the ordinary fork story — see the README "Use this
+  template" steps and DEPLOY.md; there is nothing figure-specific to redo.
+
 **Honest labels inline.** Any OPEN-UNVERIFIED claim gets an `.openclaim`
 amber box AT THE EXACT POINT the claim is made — naming its ledger id and
 posting it as an open challenge with named credit for whoever closes it.

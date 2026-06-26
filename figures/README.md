@@ -37,14 +37,14 @@ as `data-tex` carries LaTeX:
 
 ```html
 <figure class="living-figure" data-figure='{ ...spec json... }'>
-  <!-- Phase 3 prerenders a sealed <svg> poster here; for now JS renders into it -->
+  <!-- render-figures bakes the sealed <svg> poster here; the runtime removes it and renders live on JS load -->
 </figure>
 ```
 
 The renderer **reads** the attribute, renders **into** the element, and **leaves
-`data-figure` in place** — it never destroys the source. (Phase 3 adds a
-build-time prerender, `render_figures.js`, mirroring `render_math.js`: it fills
-the element with committed static SVG so readers need no JavaScript.)
+`data-figure` in place** — it never destroys the source. A build-time prerender,
+`render_figures.js` (mirroring `render_math.js`), bakes committed static SVG into
+the element so readers need no JavaScript — see **Sealing the floor** below.
 
 ### Spec schema — zoom-orrery (`renderOrrery`)
 
@@ -155,9 +155,10 @@ Render modules **compose** the runtime primitives; they never re-roll them.
 <script src="figures/orrery.js"></script>    <!-- then render modules -->
 ```
 
-Root-relative paths, no CDN. (Freezing a figure into `chapters/<tag>/` needs the
-freeze rewire extended to repoint `figures/` script-src — handled in Phase 5; the
-Phase-2 demo page is deliberately outside the freeze set.)
+Root-relative paths, no CDN. (Freezing a figure into `chapters/<tag>/` repoints
+these `figures/` script-srcs to the shared root `../../figures/` automatically —
+`rewire_script_src` in `freeze_chapter.py`; the standalone demo pages are
+deliberately outside the freeze set.)
 
 ## Sealing the floor (`render-figures`, author-local)
 
@@ -171,8 +172,8 @@ node render_figures.js a.html b.html
 npm run render-figures
 ```
 
-It is **author-local and pure Node — NO browser required** (the Phase-3a poster
-path, `DossierFigures.renderOrreryPosterSVG(spec)`, touches no DOM), mirroring how
+It is **author-local and pure Node — NO browser required** (the poster path,
+`DossierFigures.renderOrreryPosterSVG(spec)`, touches no DOM), mirroring how
 `render-math` needs only Node + vendored KaTeX. It reads each `<figure
 data-figure='…'>`, generates the sealed `<svg data-poster="1">` deterministically
 from the spec, and bakes it inside the figure — keeping the `data-figure` open tag

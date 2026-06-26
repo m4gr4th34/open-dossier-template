@@ -144,7 +144,15 @@ verification script, and its claim ledger all live here.
   - dossier.html      — audit trail (red team, citation audit)
   - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)
   - verification/     — verify script, audits, red-team report, format spec
+  - figures/          — vendored living-figures runtime (interactive SVG via data-figure)
   - claim_ledger.csv  — every claim, typed, with honest status
+- Living figures (interactive SVG): authored as a `data-figure` JSON spec, rendered
+  by the vendored `figures/` runtime, sealed into a static JS-off poster by
+  `render-figures` (mirrors `render-math`). See `figures/README.md` for the reference
+  and `AUTHORING.md` for the walkthrough. Two standing rules: **compose, don't
+  reimplement** (render modules call the shared primitives, never re-roll Kepler /
+  PRNG / log-zoom), and **seal after editing** (run `render-figures` after any
+  `data-figure` change so the floor matches the source).
 
 ### If you are the strategy-room project chat (you CANNOT push)
 **You CANNOT push to the repo. You decide here and hand Code paste-ready
