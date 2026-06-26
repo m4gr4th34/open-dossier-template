@@ -40,6 +40,7 @@ Aborts loudly (no partial writes) on:
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -90,9 +91,10 @@ def rewire(html):
     """Repoint a frozen chapter's outward-local paths to the live root (../../).
 
     Two kinds of rewrite:
-      - shared ASSETS (katex/, + forward-compat assets/ and paper/ images)
-        -> ../../ so the frozen copy uses the single shared root copy rather
-        than a missing per-chapter one.
+      - shared ASSETS: katex/ and forward-compat assets/ links, plus EVERY
+        relative <img> src (figures at ANY path, via rewire_img_src) -> ../../
+        so the frozen copy uses the single shared root copy rather than a
+        missing per-chapter one.
       - cross-edition + lineage NAV links (index/paper/dossier/verify/lineage.html)
         -> ../../ so a sealed chapter is not a navigational dead-end: its nav
         returns the reader to the LIVE series, NOT to its frozen siblings in the
@@ -114,8 +116,6 @@ def rewire(html):
         reps.append(("href=" + q + "katex/", "href=" + q + "../../katex/"))
         # forward-compat (only rewritten if present in a future figure-bearing chapter)
         reps.append(("href=" + q + "assets/", "href=" + q + "../../assets/"))
-        reps.append(("src=" + q + "assets/", "src=" + q + "../../assets/"))
-        reps.append(("src=" + q + "paper/", "src=" + q + "../../paper/"))
 
     # cross-edition + lineage NAV -> live root. DOUBLE-QUOTE ONLY on purpose: the
     # editions write every HTML attribute with double quotes, whereas the lineage
@@ -133,7 +133,60 @@ def rewire(html):
         if n:
             html = html.replace(old, new)
             counts[old] = counts.get(old, 0) + n
+
+    # BUG-2 fix: generalize figure-image rewiring beyond the old assets//paper/
+    # src prefixes. A figure can live at ANY relative path; rewrite every <img>
+    # whose src is relative so it resolves from chapters/<tag>/ at the live root.
+    html, nimg = rewire_img_src(html)
+    if nimg:
+        counts["<img> relative src"] = nimg
     return html, counts
+
+
+def rewire_img_src(html):
+    """Repoint RELATIVE <img> src values to the live root (../../X).
+
+    BUG-2 fix: the old rewire only repathed the src="assets/" and src="paper/"
+    PREFIXES, so a figure at any other relative path (src="figures/x.png",
+    src="verification/a/b.png", a bare src="x.png", ...) 404'd from the
+    chapters/<tag>/ subdir. This rewrites EVERY <img> whose src is relative.
+
+    Left untouched (so it is safe and idempotent): absolute URLs (http://,
+    https://), protocol-relative (//) and root-absolute (/) paths, in-page
+    #anchors, data: URIs, and already-../-prefixed values. The lightbox
+    <img id="lbx-img"> ships with NO src (filled at runtime), so the pattern
+    never matches it. Only the plain `src` attribute is touched — `srcset`,
+    `data-src`, etc. are ignored (the boundary requires whitespace before src).
+    Handles both quote styles. Returns (new_html, count)."""
+    SKIP = ("http://", "https://", "//", "/", "#", "data:", "../")
+    changed = [0]  # count ACTUAL rewrites, not bare pattern matches
+
+    def repl(m):
+        head, quote, val = m.group(1), m.group(2), m.group(3)
+        if (not val) or val.startswith(SKIP):
+            return m.group(0)
+        changed[0] += 1
+        return head + quote + "../../" + val + quote
+
+    pat = re.compile(r'(<img\b[^>]*?\ssrc=)(["\'])(.*?)\2', re.IGNORECASE)
+    return pat.sub(repl, html), changed[0]
+
+
+def bake_release_label(html, tag):
+    """BUG-1 fix: bake the sealed release label into the #pv-state element.
+
+    A frozen chapters/<tag>/ page has no adjacent provenance.json, so its
+    provenance fetch 404s; the .catch resets the DOI item but NEVER pv-state,
+    leaving the baked-in "live tip" default — a sealed chapter wrongly reading
+    "live". Rewriting the element's inner text at freeze time makes the label
+    correct ("release <TAG>") with NO script and NO fetch.
+
+    Targets the element by its double-quoted id="pv-state" attribute (the live
+    fetch script's getElementById('pv-state') uses single quotes and is never
+    matched). Replaces only the inner content, leaving the rest of the bar
+    intact. Returns (new_html, count)."""
+    pat = re.compile(r'(id="pv-state"[^>]*>).*?(</span>)')
+    return pat.subn(lambda m: m.group(1) + "release " + tag + m.group(2), html, count=1)
 
 
 # --- step 5: lineage.json ----------------------------------------------------
@@ -202,11 +255,15 @@ def main():
 
     os.makedirs(chapter_dir, exist_ok=False)
     rewired_summary = {}
+    baked_labels = []
     for f in present:
         with open(os.path.join(source_dir, f), encoding="utf-8") as fh:
             html = fh.read()
-        # --- step 4: REWIRE ---
+        # --- step 4: REWIRE paths + BAKE the sealed release label ---
         html, counts = rewire(html)
+        html, nlabel = bake_release_label(html, tag)
+        if nlabel:
+            baked_labels.append(f)
         with open(os.path.join(chapter_dir, f), "w", encoding="utf-8") as fh:
             fh.write(html)
         if counts:
@@ -242,6 +299,8 @@ def main():
             print("  rewired " + f + ": " + bits)
     else:
         print("  rewired: (no outward-local asset paths found to rewire)")
+    if baked_labels:
+        print("  pv-state baked 'release " + tag + "' in: " + ", ".join(baked_labels))
     print("  lineage.json: appended " + json.dumps(entry, ensure_ascii=False))
     return 0
 
