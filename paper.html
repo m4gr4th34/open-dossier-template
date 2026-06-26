@@ -155,6 +155,38 @@
   }
   .publish-cta{border-radius:var(--r-lg)}
   h1{font-weight:500; letter-spacing:-.014em}
+
+  /* ===== figures + dependency-free lightbox (inert with no figures) ===== */
+  figure{
+    margin:28px 0; padding:0;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--r-lg); overflow:hidden;
+    box-shadow:var(--shadow-soft);
+  }
+  figure img{
+    display:block; width:100%; height:auto; cursor:zoom-in;
+  }
+  figcaption{
+    font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:var(--ink2); text-align:center;
+    padding:11px 16px 13px; border-top:1px solid var(--line);
+  }
+  /* lightbox — overlay must clear the grain overlay at z-index:9999 */
+  .lbx{
+    position:fixed; inset:0; z-index:10000;
+    display:none; align-items:center; justify-content:center;
+    background:rgba(23,38,44,.78); padding:24px; cursor:zoom-out;
+    -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+  }
+  .lbx.open{display:flex}
+  .lbx img{
+    max-width:min(1100px,94vw); max-height:92vh; width:auto; height:auto;
+    border-radius:var(--r-lg); box-shadow:var(--shadow-lift);
+    background:var(--card);
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .lbx img{transition:transform .2s ease}
+  }
 </style>
 </head>
 <body>
@@ -334,6 +366,44 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
   document.getElementById('pv-state').textContent='release '+p.release_tag+' (+ live edits)';
 }).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository \u2197';
   document.getElementById('pv-doi').href='https://github.com/YOURUSER/YOURREPO';});
+</script>
+<div class="lbx" id="lbx" role="dialog" aria-modal="true" aria-label="Figure, full size" aria-hidden="true">
+  <img id="lbx-img" alt="">
+</div>
+<script>
+(function(){
+  var lbx = document.getElementById('lbx');
+  var lbxImg = document.getElementById('lbx-img');
+  if(!lbx || !lbxImg) return;
+  var imgs = document.querySelectorAll('figure img');
+  if(!imgs.length) return;            // INERT when there are no figures
+  var lastFocus = null;
+  function open(src, alt){
+    lastFocus = document.activeElement;
+    lbxImg.src = src; lbxImg.alt = alt || '';
+    lbx.classList.add('open'); lbx.setAttribute('aria-hidden','false');
+    lbx.tabIndex = -1; lbx.focus();
+  }
+  function close(){
+    lbx.classList.remove('open'); lbx.setAttribute('aria-hidden','true');
+    lbxImg.src = '';
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  imgs.forEach(function(img){
+    img.setAttribute('role','button');
+    img.setAttribute('tabindex','0');
+    if(!img.getAttribute('aria-label'))
+      img.setAttribute('aria-label','View figure full size');
+    img.addEventListener('click', function(){ open(img.currentSrc||img.src, img.alt); });
+    img.addEventListener('keydown', function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(img.currentSrc||img.src, img.alt); }
+    });
+  });
+  lbx.addEventListener('click', close);   // backdrop OR image click closes (cursor:zoom-out)
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' && lbx.classList.contains('open')) close();
+  });
+})();
 </script>
 </body>
 </html>
