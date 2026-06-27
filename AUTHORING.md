@@ -158,17 +158,25 @@ from a **static plot** (Python/matplotlib → PNG via `verification/figure_style
 see Design identity) — both are first-class; do not conflate them. Reach for a
 living figure only when the result has dynamics worth exploring.
 
-- Author the figure as `<figure class="living-figure" data-figure='{ …spec… }'>`,
-  then load the runtime first, then the render module(s) it needs:
-  `<script src="figures/figures.js"></script>` then `<script src="figures/orrery.js"></script>`
-  (`galaxy.js` / `cosmiczoom.js` for the others). The full spec schemas — zoom-orrery,
-  galaxy, cosmic-zoom — live in **`figures/README.md`**; author against them there and
-  do not restate them in the page.
+- Author the figure as `<figure class="living-figure" data-figure='{ "type":"…", …spec… }'>`,
+  with a top-level **`"type"`** declaring the figure type (`"orrery"` / `"galaxy"` /
+  `"cosmic"` for the built-ins), then load the runtime first, then the render module(s)
+  it needs: `<script src="figures/figures.js"></script>` then
+  `<script src="figures/orrery.js"></script>` (`galaxy.js` / `cosmiczoom.js` for the
+  others). The full spec schemas — zoom-orrery, galaxy, cosmic-zoom — live in
+  **`figures/README.md`**; author against them there and do not restate them in the
+  page. (The engine is domain-agnostic: a non-astronomy project registers its OWN
+  type without touching the sealer — see *Adopting the engine for a new figure type*
+  in `figures/README.md`.)
 - After writing or editing any `data-figure`, run `npm run render-figures` (or
-  `node render_figures.js <page.html>`). It bakes a deterministic static `<svg>`
-  poster INTO the figure so **readers need zero JavaScript**; `data-figure` stays the
-  editable source of truth — change it and re-run (idempotent). On load the runtime
-  removes the poster and renders the live figure (the floor upgrades to the ceiling).
+  `node render_figures.js <page.html>`). It auto-loads the runtime + every figure
+  module and **dispatches by `type`** through the poster registry, baking a
+  deterministic static `<svg>` poster INTO the figure so **readers need zero
+  JavaScript**; `data-figure` stays the editable source of truth — change it and
+  re-run (idempotent). A figure type that registers no poster emitter is
+  live-ceiling-only and is copied through unsealed; a figure with no `type` fails
+  loud. On load the runtime removes the poster and renders the live figure (the floor
+  upgrades to the ceiling).
 - This is an author-local Node step, exactly like `render-math`; readers need
   nothing, and **CI never renders figures** — the stdlib-only verify floor stays
   untouched.
