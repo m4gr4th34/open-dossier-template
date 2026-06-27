@@ -21,7 +21,7 @@ plain English and tell when an answer smells wrong, you're qualified.
 
 > **The deal.** The AI does the literature search, the drafting, the math
 > typesetting, the citation formatting, the figures, the verification
-> script, and all three web editions. You do four things: bring the idea,
+> script, and both web editions. You do four things: bring the idea,
 > sanity-check the results, decide what's established versus still an open
 > question, and press the buttons that publish. That's it. That's the job.
 
@@ -141,10 +141,10 @@ ten exclamation points.
 
 ### Step 5 — Build the readable editions (the agent leads)
 
-> "Build all three web surfaces per AUTHORING.md: the interactive edition
-> with the verification console, the self-explaining edition where every
-> term and citation expands in place so a smart outsider needs no
-> prerequisites, and the audit trail."
+> "Build the web surfaces per AUTHORING.md: the self-explaining front door
+> — where every term and citation expands in place so a smart outsider needs
+> no prerequisites, with the avenue landscape and verification console up top
+> — and the audit trail."
 
 Out comes a publication a curious 17-year-old can read end to end, and a
 skeptical professor can read without a single eye-roll — because every

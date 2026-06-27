@@ -20,8 +20,8 @@
  * no-op (the file is not rewritten).
  *
  * Usage:
- *   node render_math.js                 # defaults to paper.html
- *   node render_math.js paper.html a.html b.html
+ *   node render_math.js                 # defaults to index.html
+ *   node render_math.js index.html a.html b.html
  *   npm run render-math
  */
 
@@ -163,7 +163,7 @@ function renderHtml(html) {
 
 function main() {
   const args = process.argv.slice(2);
-  const files = args.length ? args : ["paper.html"];
+  const files = args.length ? args : ["index.html"];
   let grandEq = 0, grandErr = 0, changed = 0;
 
   for (const f of files) {

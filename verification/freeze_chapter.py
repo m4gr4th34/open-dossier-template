@@ -50,8 +50,8 @@ REPO_ROOT = os.path.dirname(HERE)
 LINEAGE = os.path.join(REPO_ROOT, "lineage.json")
 CHAPTERS = os.path.join(REPO_ROOT, "chapters")
 
-# The four editions frozen together so their intra-set relative links keep working.
-EDITIONS = ["index.html", "paper.html", "dossier.html", "verify.html"]
+# The three editions (index.html, dossier.html, verify.html) frozen together so their intra-set relative links keep working.
+EDITIONS = ["index.html", "dossier.html", "verify.html"]
 
 
 def abort(msg):

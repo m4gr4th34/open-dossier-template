@@ -43,7 +43,6 @@ SENTINELS = [
 # Author-facing publication surfaces (what a reader/citer actually sees).
 SURFACES = [
     "index.html",
-    "paper.html",
     "dossier.html",
     "verify.html",
     "CITATION.cff",

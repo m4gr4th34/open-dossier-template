@@ -6,14 +6,14 @@ Click "Use this template" to create your Dossier NNN in one step.
 ### ▶ [See a living figure — fall from a planet to the galaxy, live](https://m4gr4th34.github.io/open-dossier-template/showcase.html)
 
 <!-- AGENT: after the author's GitHub Pages site is live, replace this comment with a quick-links line placed HERE (immediately after the title/tagline, above the GETTING-STARTED line and the badge) so visitors can open the live result in one click. Use the author's real Pages URL:
-### ▶ [Read the living paper](https://USER.github.io/REPO/) · [Self-explaining edition](https://USER.github.io/REPO/paper.html) · [Run the checks](https://USER.github.io/REPO/#verify) · [Audit trail](https://USER.github.io/REPO/dossier.html) · [Living figures showcase](https://USER.github.io/REPO/showcase.html)
+### ▶ [Read the living paper](https://USER.github.io/REPO/) · [Run the checks](https://USER.github.io/REPO/#verify) · [Audit trail](https://USER.github.io/REPO/dossier.html) · [Living figures showcase](https://USER.github.io/REPO/showcase.html)
 Rationale: lead with the live result for the skeptic, then GETTING-STARTED for the would-be author, then the explanatory sections. Do not leave these as live links until the Pages site actually resolves, or they 404. -->
 
 <!-- DRAFT BANNER: present during pre-release. At first release, the "Spawning"/release ritual replaces this block with the standard live-document links (no "work in progress" caveat). See DEPLOY.md and the Rituals section. AGENT: replace YOURUSER/YOURREPO in these links with the real repo path during the spawn rename pass, so the author's draft preview works immediately. -->
 ### 📖 Live preview (work in progress)
 > **This dossier is an active draft — not yet released.** Sections, claims, and checks may be incomplete. Shared early so the ideas can be read and discussed as they develop.
 
-▶ **[Read the self-explaining edition](https://YOURUSER.github.io/YOURREPO/paper.html)** · [Interactive edition](https://YOURUSER.github.io/YOURREPO/) · [Audit trail](https://YOURUSER.github.io/YOURREPO/dossier.html)
+▶ **[Read the self-explaining edition](https://YOURUSER.github.io/YOURREPO/)** · [Audit trail](https://YOURUSER.github.io/YOURREPO/dossier.html)
 
 ## How this works (the pre-release operating model)
 
@@ -25,7 +25,7 @@ honestly: a claim's label tells the reader exactly how finished it is.
 
 Fill the editions early with clearly-labeled draft content and refine it in
 place. **Do not quarantine draft material into side pages** — put it in the
-interactive, self-explaining, and audit-trail editions where it belongs, wearing
+self-explaining front door and the audit-trail edition where it belongs, wearing
 an honest label, and sharpen it as you go.
 
 The one rule that makes this safe: **loose content must carry its honest label
@@ -43,7 +43,7 @@ You bring the idea and the judgment. An AI agent does the rest — drafting, typ
 2. **Map the idea** — the agent does a prior-art search and sorts claims into established / adjacent / open. You correct it with what you know.
 3. **Draft** — the agent writes the paper, sets the math, formats every citation. No LaTeX tantrums.
 4. **Self-check** — a verification script recomputes every number; an AI red-team attacks the paper; findings get published, not hidden.
-5. **Readable editions** — a verification-console edition and a self-explaining edition any curious outsider can follow.
+5. **Readable editions** — a self-explaining edition, with a built-in verification console, that any curious outsider can follow.
 6. **Publish** — one release mints your DOI at CERN and anchors the hash in the Bitcoin blockchain. Priority is yours, timestamped.
 7. **Live review** — readers file issues against specific claims; corrections become dated amendments. The paper stays alive.
 
@@ -85,8 +85,8 @@ GETTING-STARTED-GENERIC.md ← platform-agnostic version
 AUTHORING.md        ← production playbook — hand to your AI agent (read, don't edit)
 CLAUDE.md           ← the single constitution (read by Claude Code AND the optional Project chat) — fill in [TOPIC] + standing context
 PROJECT-INSTRUCTIONS.md ← back-compat redirect to CLAUDE.md (nothing to fill in)
-index.html          ← replace title, abstract, concept cards, JS checks
-paper.html          ← self-explaining edition: replace placeholder sections, terms, and citation chips
+index.html          ← the paper: replace title, abstract, avenue cards, JS checks, and the self-explaining sections, terms & citation chips
+paper.html          ← redirect stub → index.html (nothing to edit)
 dossier.html        ← replace red-team findings and citation table
 verification/
   verify_numbers.py ← replace placeholder check with real ones
@@ -132,14 +132,14 @@ Two repeatable workflows run this template. Each is a single instruction block y
 Birth a new dossier from the template. Paste into the Code tab, editing the number and title:
 
 ```
-Create a new public GitHub repo named dossier-NNN from my template repo m4gr4th34/open-dossier-template, and clone it into this folder. Use the gh CLI (gh repo create m4gr4th34/dossier-NNN --template m4gr4th34/open-dossier-template --public --clone); if gh isn't installed or authenticated, walk me through installing and logging in first. Then do the rename pass: in README.md, index.html, paper.html, dossier.html, CITATION.cff, and .zenodo.json, replace every "open-dossier-template" and "DOSSIER NNN"/"dossier-NNN" placeholder with dossier-NNN and the working title "[YOUR TITLE]", replace the YOURUSER/YOURREPO links in the README draft-preview banner with the new repo's real GitHub Pages path so the draft preview resolves once Pages is enabled, and set my name and affiliation (Irfan Ali-Khan, Independent Researcher, Saratoga, California) where the author placeholders are. Then enable GitHub Pages on the new repo from branch main, root folder, using gh api. Show me what changed, commit as "Initialize Dossier NNN from template", and push. Then write template-sync.json at the repo root with the template repo URL, the template commit you spawned from (the upstream HEAD sha at spawn time), and today's date, and commit and push it.
+Create a new public GitHub repo named dossier-NNN from my template repo m4gr4th34/open-dossier-template, and clone it into this folder. Use the gh CLI (gh repo create m4gr4th34/dossier-NNN --template m4gr4th34/open-dossier-template --public --clone); if gh isn't installed or authenticated, walk me through installing and logging in first. Then do the rename pass: in README.md, index.html, dossier.html, CITATION.cff, and .zenodo.json, replace every "open-dossier-template" and "DOSSIER NNN"/"dossier-NNN" placeholder with dossier-NNN and the working title "[YOUR TITLE]", replace the YOURUSER/YOURREPO links in the README draft-preview banner with the new repo's real GitHub Pages path so the draft preview resolves once Pages is enabled, and set my name and affiliation (Irfan Ali-Khan, Independent Researcher, Saratoga, California) where the author placeholders are. Then enable GitHub Pages on the new repo from branch main, root folder, using gh api. Show me what changed, commit as "Initialize Dossier NNN from template", and push. Then write template-sync.json at the repo root with the template repo URL, the template commit you spawned from (the upstream HEAD sha at spawn time), and today's date, and commit and push it.
 ```
 
 Two clicks remain that no tool can do for you, both one-time per dossier: the Zenodo toggle (zenodo.org → GitHub → flip the new repo on — do it at birth so the first release auto-DOIs) and, in Claude.ai, creating the matching Project with the repo synced into Files and the dispatcher instructions pasted. (Automating the Zenodo step via their API token is already on the tooling roadmap — a real v2 ticket.)
 
 ### Pre-release drafting & preview
 
-Enable **GitHub Pages from your first commit** (Settings → Pages → deploy from `main` / root). A dossier is meant to be read as it develops, not held back until it's "done" — Pages makes the live self-explaining edition, interactive edition, and audit trail readable and shareable the moment you push.
+Enable **GitHub Pages from your first commit** (Settings → Pages → deploy from `main` / root). A dossier is meant to be read as it develops, not held back until it's "done" — Pages makes the live self-explaining edition (with its verification console) and audit trail readable and shareable the moment you push.
 
 The **draft-preview banner** at the top of the README is present **by default** and signals honestly that the work is unresolved: sections, claims, and checks may be incomplete. This lets you read the self-explaining edition and share early ideas — with the right expectations set — before any release.
 
@@ -214,12 +214,12 @@ to machinery ONLY:
   - verify.html (entirely machinery)
   - the doctrine/operating sections of CLAUDE.md, PRESERVING its "## Standing
     context" section untouched
-  - CSS/JS *machinery* hunks in index.html, paper.html, dossier.html
+  - CSS/JS *machinery* hunks in index.html, dossier.html
   - IF SURVEY-shaped: also the survey console/verifier machinery and the
     structure of avenues.json. IF SINGLE-RESULT: SKIP all survey-specific
     machinery (avenues.json, the survey console, the survey verifier) — not
     applicable to this shape.
-NEVER touch (bucket 2): paper.html section text / terms / citation chips & CITES,
+NEVER touch (bucket 2): index.html's self-explaining section text / terms / citation chips & CITES,
 claim_ledger.csv rows, the real checks in verify_numbers.py, your avenue DATA if
 survey-shaped (the rows inside avenues.json are content), paper/ manuscript
 files, anything in timestamps/, and LICENSE.md.
@@ -243,7 +243,7 @@ me which is canonical — never silently drop a filled-in Standing context.
 STEP 5 — STAMP + VERIFY. After the machinery commit, write template-sync.json
 with the template repo URL, the upstream HEAD commit you synced from, and today's
 date (this makes the next sync's changelog a one-line range). Confirm authored
-content survived (paper.html sections and CITES intact, every ledger row present,
+content survived (index.html's self-explaining sections and CITES intact, every ledger row present,
 paper/ and timestamps/ untouched) and that `python3 verification/verify_numbers.py`
 exits 0. Report, then we're done.
 ```

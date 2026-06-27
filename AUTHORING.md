@@ -2,7 +2,7 @@
 ## A production playbook for AI agents (and the humans directing them)
 
 **Who this file is for:** any capable AI agent handed a research idea and
-this repository. Follow it and the output is a complete dossier: interactive edition, self-explaining edition, audit
+this repository. Follow it and the output is a complete dossier: a self-explaining front door, audit
 trail, lineage index, verified claims, honest labels. **The human's job is the ideas, the intuition, the
 reality checks, and the sign-offs. Everything else is yours.**
 
@@ -87,7 +87,15 @@ Start from `paper/manuscript-template.tex`. Conventions:
   sections, never silent edits: state what changed, what is and is not
   affected, the issue number, and that archived releases stay frozen.
 
-## Surface 2 — The interactive edition (`index.html`)
+## Surface 2 — The front door (`index.html`) — the self-explaining edition
+
+The front door **is** the self-explaining edition. It opens with the avenue
+landscape and the consistency console — the interactive instrument — then
+continues, on the same page, as the self-explaining narrative read top to
+bottom. One page, one edition. (`paper.html` is now just a redirect stub that
+forwards to `index.html`, kept so old links and frozen chapters resolve.)
+
+**The interactive instrument (top of the page).**
 
 - Port every Python check into the `buildChecks()` console verbatim
   (same model, same tolerances). The reader pressing "Run all checks"
@@ -99,10 +107,8 @@ Start from `paper/manuscript-template.tex`. Conventions:
 - The abstract ends with the format's tagline: **Don't trust this paper —
   run it.**
 
-## Surface 3 — The self-explaining edition (`paper.html`) — THE MAGIC
-
-This is the format's crown jewel and the most judgment-heavy artifact.
-Specs, learned from Dossier 001:
+**The self-explaining narrative — THE MAGIC.** This is the format's crown jewel
+and the most judgment-heavy artifact. Specs, learned from Dossier 001:
 
 **Structure.** One page, one column, numbered narrative sections (5–8 of
 them), readable top to bottom by a sharp high-school student with NO
@@ -255,10 +261,10 @@ assess it) stated alongside with equal prominence.
 `AMENDED · DD MMM YYYY` `.openclaim` blocks at the exact site of the
 amended claim, stating: what changed, what is NOT affected, the issue
 link, and that the archived release stays frozen. Mirror every amendment
-across all four surfaces (tex Note added, paper.html block, index.html
-qualifier, dossier.html finding update) in one commit.
+across all surfaces (tex Note added, the index.html self-explaining block +
+console qualifier, dossier.html finding update) in one commit.
 
-## Surface 4 — The audit trail (`dossier.html`)
+## Surface 3 — The audit trail (`dossier.html`)
 
 - Red-team findings from the Phase 4 adversarial pass, each RESOLVED
   (green) or OPEN (amber), ranked by severity, including author
@@ -274,7 +280,7 @@ qualifier, dossier.html finding update) in one commit.
 Three surfaces carry the publication's provenance, and every one must stay
 true after each release:
 
-- **The provenance bar** (top of `index.html` and `paper.html`) and
+- **The provenance bar** (top of `index.html`) and
   **`verify.html`** read `provenance.json` at load time — so once that file
   carries the real version DOI and release tag, both update automatically.
   The `auto-timestamp` workflow updates only `release_tag` and the release date
@@ -301,7 +307,7 @@ at first release (see DEPLOY.md's release step and the README Rituals section)
 deliberate content edit the author makes at release, not machinery, so it is
 never auto-applied by a template sync.
 
-**Publish CTA — keep it canonical.** The publish-like-this CTA band (before the footer on index.html, paper.html, and dossier.html) intentionally points at the canonical open-dossier-template's GETTING-STARTED.md — the instructions-first front door — not at this dossier's own repo and not at the template's repo root. Every dossier funnels new authors straight into the step-by-step guide. Leave these URLs as the canonical GETTING-STARTED.md.
+**Publish CTA — keep it canonical.** The publish-like-this CTA band (before the footer on index.html and dossier.html) intentionally points at the canonical open-dossier-template's GETTING-STARTED.md — the instructions-first front door — not at this dossier's own repo and not at the template's repo root. Every dossier funnels new authors straight into the step-by-step guide. Leave these URLs as the canonical GETTING-STARTED.md.
 
 ## Lineage — chapters across releases
 
@@ -410,7 +416,7 @@ so plots match the page (author-local; not run in CI). Usage:
 - [ ] Every ledger label true; unverified claims hedged in prose
 - [ ] Citation audit complete; flags resolved or stated
 - [ ] Red-team pass done; findings published
-- [ ] All four surfaces carry the funnel link to the template
+- [ ] All surfaces carry the funnel link to the template
 - [ ] `.github/workflows/` and `.zenodo.json` present ON THE REMOTE
       (web uploads drop dotfiles — see DEPLOY.md)
 - [ ] Acknowledgments state the actual review basis
