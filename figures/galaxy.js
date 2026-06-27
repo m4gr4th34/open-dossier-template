@@ -510,5 +510,6 @@
   }
 
   DossierFigures.renderGalaxy = renderGalaxy;
-  DossierFigures.renderGalaxyPosterSVG = renderGalaxyPosterSVG;
+  DossierFigures.renderGalaxyPosterSVG = renderGalaxyPosterSVG;   // back-compat (direct callers)
+  DossierFigures.registerPoster("galaxy", renderGalaxyPosterSVG); // registry (the sealer dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);

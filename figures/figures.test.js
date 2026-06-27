@@ -33,18 +33,11 @@ function arrEq(a, b) {
 
 console.log("figures runtime v" + F.FIGURES_RUNTIME_VERSION + " — primitive tests\n");
 
-// --- 1) solveKepler -----------------------------------------------------------
-console.log("solveKepler(M, e):");
-check("M=0 -> E≈0", approx(F.solveKepler(0, 0.5), 0, 1e-12));
-check("circular orbit e=0 -> E === M", approx(F.solveKepler(1.0, 0), 1.0, 1e-12));
-(function () {
-  // a known, eccentric case must satisfy Kepler's equation: E - e*sinE - M ≈ 0
-  var M = 1.0, e = 0.3;
-  var E = F.solveKepler(M, e);
-  check("converges: residual E - e·sinE - M ≈ 0", approx(E - e * Math.sin(E) - M, 0, 1e-9));
-})();
+// --- solveKepler RELOCATED to figures/orrery.js (v0.2.0): the runtime is now
+//     domain-general, so its primitive test no longer covers orbital mechanics —
+//     Kepler's equation belongs to the orrery, its only consumer. ---
 
-// --- 2) seededScatter ---------------------------------------------------------
+// --- 1) seededScatter ---------------------------------------------------------
 console.log("\nseededScatter(seed, count, fn):");
 (function () {
   var draw = function (s) { return F.seededScatter(s, 5, function (rng) { return rng(); }); };

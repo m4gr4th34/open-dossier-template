@@ -37,25 +37,14 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.1.0";
+  var FIGURES_RUNTIME_VERSION = "0.2.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact)
 
-  // -------------------------------------------------------------------------
-  // 1) solveKepler(M, e) — Kepler's equation solver (Newton's method).
-  //    Solves  E - e*sin(E) = M  for the eccentric anomaly E, the per-frame
-  //    physics core of any orbiting body. Six Newton iterations is plenty for
-  //    figure-grade accuracy across all bound eccentricities (0 <= e < 1).
-  //    Pure function. (Proven by the orrery.)
-  //      M : mean anomaly (radians)
-  //      e : eccentricity (0 = circle)
-  //    Returns the eccentric anomaly E (radians). For e = 0, E === M exactly.
-  // -------------------------------------------------------------------------
-  function solveKepler(M, e) {
-    var E = M; // good initial guess for low/moderate e
-    for (var i = 0; i < 6; i++) {
-      E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
-    }
-    return E;
-  }
+  // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
+  //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
+  //  structure, not orbital mechanics, so the CORE runtime now carries NO domain-
+  //  specific physics — it is a fully general figure engine: PRNG, seeded scatter,
+  //  log-zoom, scale-aware time, easing, SVG node/string emit, and the poster
+  //  registry below. Any project registers its own figure type on top.)
 
   // -------------------------------------------------------------------------
   // 2) Deterministic procedural generation.
@@ -161,12 +150,30 @@
   function escTxt(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
   // -------------------------------------------------------------------------
+  // 8) Figure-type REGISTRY — lets ANY project register a poster emitter under a
+  //    spec `type`, so the build-time sealer (render_figures.js) dispatches by
+  //    convention, NOT by hardcoded figure names. A downstream (non-astronomy)
+  //    project drops in its module, calls registerPoster("its-type", itsPosterFn),
+  //    and the sealer seals it — no fork of the template machinery. Live-only
+  //    figures register nothing. dedupPoster centralises the one snippet every live
+  //    renderer repeats: drop a sealed [data-poster] floor before rendering the
+  //    live ceiling (additive — modules may adopt it).
+  // -------------------------------------------------------------------------
+  var posterEmitters = {};
+  function registerPoster(type, fn) { posterEmitters[type] = fn; }
+  function dedupPoster(container) {
+    if (container && container.querySelector) {
+      var baked = container.querySelector("[data-poster]");
+      if (baked && baked.parentNode) baked.parentNode.removeChild(baked);
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Public namespace. Attached to window in the browser; also exposed for the
   // author-local Node test (no third-party loader, just a plain object).
   // -------------------------------------------------------------------------
   var API = {
     FIGURES_RUNTIME_VERSION: FIGURES_RUNTIME_VERSION,
-    solveKepler: solveKepler,
     mulberry32: mulberry32,
     seededScatter: seededScatter,
     logZoom: logZoom,
@@ -175,7 +182,10 @@
     el: el,
     r2: r2,
     escAttr: escAttr,
-    escTxt: escTxt
+    escTxt: escTxt,
+    posterEmitters: posterEmitters,
+    registerPoster: registerPoster,
+    dedupPoster: dedupPoster
   };
 
   if (typeof module !== "undefined" && module.exports) {

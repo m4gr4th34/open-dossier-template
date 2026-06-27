@@ -57,9 +57,8 @@
     return;
   }
 
-  // COMPOSITION: every primitive below IS the Phase-1 runtime's — never re-rolled.
+  // COMPOSITION: every GENERAL primitive below IS the runtime's — never re-rolled.
   var DossierFigures = NS;
-  var solveKepler    = DossierFigures.solveKepler;
   var seededScatter  = DossierFigures.seededScatter;
   var logZoom        = DossierFigures.logZoom;
   var scaleAwareTime = DossierFigures.scaleAwareTime;
@@ -71,6 +70,21 @@
 
   var TAU = Math.PI * 2;
   var ORBIT_SAMPLES = 96;   // single source for BOTH the live path and the poster
+
+  // solveKepler(M, e) — Kepler's equation solver (Newton's method). Solves
+  // E - e*sin(E) = M for the eccentric anomaly E, the per-frame physics core of an
+  // orbiting body. This is the orrery's ONE domain-specific primitive — it lives
+  // HERE, not in the general runtime, because only orbital mechanics needs it (a
+  // galaxy / cosmic web / uniform field is statistical structure, not an n-body
+  // integration). Six Newton iterations is plenty across all bound eccentricities
+  // (0 <= e < 1). Pure function; for e = 0, E === M exactly.
+  function solveKepler(M, e) {
+    var E = M; // good initial guess for low/moderate e
+    for (var i = 0; i < 6; i++) {
+      E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+    }
+    return E;
+  }
 
   function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
   function num(v, d) { return (typeof v === "number" && isFinite(v)) ? v : d; }
@@ -535,5 +549,6 @@
   }
 
   DossierFigures.renderOrrery = renderOrrery;
-  DossierFigures.renderOrreryPosterSVG = renderOrreryPosterSVG;
+  DossierFigures.renderOrreryPosterSVG = renderOrreryPosterSVG;   // back-compat (direct callers)
+  DossierFigures.registerPoster("orrery", renderOrreryPosterSVG); // registry (the sealer dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);

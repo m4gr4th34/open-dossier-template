@@ -415,5 +415,6 @@
   }
 
   DossierFigures.renderCosmicZoom = renderCosmicZoom;
-  DossierFigures.renderCosmicZoomPosterSVG = renderCosmicZoomPosterSVG;
+  DossierFigures.renderCosmicZoomPosterSVG = renderCosmicZoomPosterSVG;   // back-compat (direct callers)
+  DossierFigures.registerPoster("cosmic", renderCosmicZoomPosterSVG);     // registry (the sealer dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);

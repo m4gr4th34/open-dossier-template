@@ -27,28 +27,41 @@
 const fs = require("fs");
 const path = require("path");
 
-// Load the runtime + orrery poster path into Node WITHOUT a browser. The vendored
+// Load the runtime + every figure module into Node WITHOUT a browser. The vendored
 // modules attach to window.DossierFigures (UMD-lite); shim a minimal window so
-// require() registers them, then the PURE poster path is reachable.
+// require() registers them, then the PURE poster paths are reachable.
+//
+// AUTO-LOAD (so a downstream project drops in its OWN module — e.g. qc-frontier.js —
+// and registers a poster WITHOUT editing this file): require figures.js FIRST (it
+// defines DossierFigures + the registry), then EVERY other figures/*.js. Load order
+// among the modules does NOT matter — a composer's poster (e.g. cosmiczoom delegating
+// to the galaxy poster) resolves at SEAL time, by which point all modules are loaded;
+// nothing cross-references another module at require/IIFE time. figures.test.js is
+// skipped (it is a test, not a module).
 global.window = global.window || {};
-require("./figures/figures.js");   // -> window.DossierFigures (runtime primitives)
-require("./figures/orrery.js");    // -> renderOrrery + renderOrreryPosterSVG
-require("./figures/galaxy.js");    // -> renderGalaxy + renderGalaxyPosterSVG (DOM-free poster path)
-require("./figures/cosmiczoom.js");// -> renderCosmicZoom + renderCosmicZoomPosterSVG (delegates to galaxy poster)
+const FIG_DIR = path.join(__dirname, "figures");
+require(path.join(FIG_DIR, "figures.js"));   // -> window.DossierFigures (runtime + registry) — MUST be first
+fs.readdirSync(FIG_DIR)
+  .filter((f) => f.endsWith(".js") && f !== "figures.js" && f !== "figures.test.js")
+  .sort()
+  .forEach((f) => require(path.join(FIG_DIR, f)));   // each module self-registers its poster (if any)
 const DossierFigures = global.window.DossierFigures;
 
-// Pick the poster emitter by the spec's TOP-LEVEL discriminator key:
-//   `seam`   -> cosmic-zoom (composes orrery/galaxy under nested blocks)
-//   `disk`   -> galaxy
-//   `bodies` -> orrery
-// The cosmic check is FIRST and keyed on `seam` (present only in the cosmic
-// spec); a cosmic spec has NO top-level `disk`/`bodies`, so this never misfires
-// on figure-demo (bodies) or galaxy-demo (disk).
+// Dispatch by the spec's declared `type`, via the runtime poster REGISTRY that each
+// module populates (registerPoster). NO hardcoded figure names, NO domain-key sniff —
+// a downstream project's type works as soon as its module registers an emitter.
+// THREE outcomes:
+//   - type set + emitter registered -> seal with it          (.poster non-empty)
+//   - type set + NO emitter          -> live-ceiling-only      (.live = copy through, NOT an error)
+//   - type ABSENT (or bad spec)      -> FAIL LOUD              (.error; left unchanged)
 function posterFor(spec) {
-  if (spec && spec.seam) return DossierFigures.renderCosmicZoomPosterSVG(spec);
-  if (spec && spec.disk) return DossierFigures.renderGalaxyPosterSVG(spec);
-  if (spec && spec.bodies) return DossierFigures.renderOrreryPosterSVG(spec);
-  return "";
+  if (!spec || typeof spec.type !== "string" || !spec.type) {
+    return { poster: "", live: false, error: 'figure spec has no "type" — cannot dispatch a poster emitter' };
+  }
+  var emit = DossierFigures.posterEmitters[spec.type];
+  if (!emit) return { poster: "", live: true, error: null };           // declared type, no emitter -> live-only
+  var poster = emit(spec) || "";
+  return { poster: poster, live: false, error: poster ? null : ('poster emitter for type "' + spec.type + '" returned empty') };
 }
 
 // Decode the predefined entities so a data-figure value becomes raw JSON
@@ -115,29 +128,34 @@ function renderHtml(html) {
     if (!close) { out += html.slice(i); i = html.length; break; }  // unbalanced; bail safely
 
     // Generate the sealed poster from the SAME spec (pure, deterministic),
-    // dispatched by figure type. A figure whose spec matches no emitter (e.g.
-    // the not-yet-supported cosmic-zoom) is an error AND is LEFT UNCHANGED —
-    // never rewritten with an empty poster.
-    var poster = "", ok = false;
+    // dispatched by the spec's declared `type` via the runtime poster REGISTRY.
+    // THREE outcomes (see posterFor): seal | live-only copy-through | fail loud.
+    var disp;
     try {
       var spec = JSON.parse(decodeEntities(df));
-      poster = posterFor(spec);
-      ok = !!poster;
-    } catch (e) { ok = false; }
+      disp = posterFor(spec);
+    } catch (e) { disp = { poster: "", live: false, error: "data-figure is not valid JSON" }; }
 
-    if (ok) {
+    if (disp.poster) {
       // Mark the poster <svg> so the live runtime removes it before appending.
-      var tagged = poster.replace(/^<svg /, '<svg data-poster="1" ');
+      var tagged = disp.poster.replace(/^<svg /, '<svg data-poster="1" ');
       // New inner = the sealed poster + the existing inner MINUS any prior poster
       // (idempotent: regenerating discards the old <svg data-poster>). The figure's
-      // OPEN TAG is preserved verbatim, so data-figure stays byte-identical.
+      // OPEN TAG is preserved verbatim, so data-figure stays the source of truth.
       var inner = html.slice(gt + 1, close.start);
       var rest = inner.replace(/\s*<svg\b[^>]*\bdata-poster\b[\s\S]*?<\/svg>/i, "");
       out += html.slice(i, lt) + openTag + "\n    " + tagged + rest + html.slice(close.start, close.end);
       count++;
+    } else if (disp.live) {
+      // type is declared but registers NO poster emitter -> a live-ceiling-only
+      // figure (localgroup / cosmicweb / observableuniverse, or any future live-only
+      // type). Intentional, NOT an error: copy the figure through UNCHANGED.
+      out += html.slice(i, close.end);
     } else {
+      // type ABSENT, bad JSON, or an emitter that returned empty -> FAIL LOUD.
       errors++;
-      out += html.slice(i, close.end);   // unrecognized/failed -> figure copied through UNCHANGED
+      if (disp.error) console.error("  ! " + disp.error);
+      out += html.slice(i, close.end);   // left UNCHANGED — never rewritten with an empty poster
     }
     i = close.end;
   }
