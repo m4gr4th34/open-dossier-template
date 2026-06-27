@@ -472,14 +472,17 @@ label. Close on the line you want to leave the reader with.</p>
 
 </div>
 
+<script type="application/json" id="cites-data">
+{ "ref1": { "who": "REPLACE — Author et al. (Year)", "what": "REPLACE — what this source demonstrated, in plain language, and why it matters to this survey.", "src": "Journal Vol, Page (Year)" },
+  "ref2": { "who": "REPLACE — Author et al. (Year)", "what": "REPLACE.", "src": "Journal Vol, Page (Year)" } }
+</script>
 <script>
 // citation database — add an entry per chip:
 // KEY: {who:"Author(s) (Year)", what:"What they showed, 2 sentences, plain language.", src:"Journal Vol, Page"}
-const CITES = {
-  demo: {who:"This is a citation chip", what:"Tap any chip like this one and you get the source plus a two-sentence plain-language summary of what it actually showed \u2014 instead of a bare [7] sending you down a rabbit hole.", src:"You never leave the page."},
-  ref1: {who:"REPLACE \u2014 Author et al. (Year)", what:"REPLACE \u2014 what this source demonstrated, in plain language, and why it matters to this survey.", src:"Journal Vol, Page (Year)"},
-  ref2: {who:"REPLACE \u2014 Author et al. (Year)", what:"REPLACE.", src:"Journal Vol, Page (Year)"}
-};
+const CITES = Object.assign(
+  { demo: {who:"This is a citation chip", what:"Tap any chip like this one and you get the source plus a two-sentence plain-language summary of what it actually showed \u2014 instead of a bare [7] sending you down a rabbit hole.", src:"You never leave the page."} },
+  JSON.parse(document.getElementById('cites-data').textContent)
+);
 // one shared toggle behavior for terms and citations
 function closeCard(btn){ const c = btn._card; if(c){ c.remove(); btn._card = null; btn.setAttribute('aria-expanded','false'); } }
 function toggle(btn, html, extraClass){
