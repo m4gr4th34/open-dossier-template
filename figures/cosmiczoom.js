@@ -130,6 +130,7 @@
     var gz = spec.galaxy.zoom || {}, gLO = Math.max(1e-9, num(gz.lo, 1e-5)), gHI = Math.max(gLO * 1.0001, num(gz.hi, 200000));
     var lz = (spec.localgroup && spec.localgroup.zoom) || {}, lgLO = Math.max(1e-3, num(lz.lo, 40000)), lgHI = Math.max(lgLO * 1.0001, num(lz.hi, 8e6));
     var cw = (spec.cosmicweb && spec.cosmicweb.zoom) || {}, cwLO = Math.max(1e-3, num(cw.lo, 1e6)), cwHI = Math.max(cwLO * 1.0001, num(cw.hi, 1e9));
+    var ou = (spec.observableuniverse && spec.observableuniverse.zoom) || {}, ouLO = Math.max(1e-3, num(ou.lo, 1e8)), ouHI = Math.max(ouLO * 1.0001, num(ou.hi, 4.65e10));
 
     // --- the REGIME STACK (ordered INNER -> OUTER) + the boundary bands between
     //     adjacent regimes. Generalizes the old hardwired 2-layer crossfade: every
@@ -177,6 +178,22 @@
       fadeHi3 = Math.max(num(seam.fadeHiCWAU, lgEdgeAU * 6), fadeLo3 * 6);
       regimes.push({ name: "cosmicweb", childSpec: spec.cosmicweb, render: DossierFigures.renderCosmicWeb, unit: AU_PER_LY, lo: cwLO, hi: cwHI });
       boundaries.push({ fadeLo: fadeLo3, fadeHi: fadeHi3 });
+    }
+    // SLAB 4b: append the TERMINAL regime (observable universe) + the CW->OU boundary
+    // band — THE ENDING. Same conditional/back-compat pattern. NOTE the FLOOR is
+    // LOAD-BEARING here, unlike the earlier bands: cwEdgeAU*0.6 = 3.79e13 AU is BELOW
+    // the largest slab-3 sample (Cosmic web 4.4e13 AU), so without the 5e13 floor the
+    // "Cosmic web" view would already be fading. 5e13 (> 4.4e13) keeps slab-3 byte-
+    // identical AND sits past the framed cosmic web (520 Mly) so the whole web is seen
+    // before it dissolves into uniformity. Beyond fadeHi4: the homogeneous, isotropic
+    // observable universe, bounded by the horizon — there is nothing bigger.
+    var fadeLo4 = Infinity, fadeHi4 = Infinity;   // hoisted for regime(); Infinity = no terminal regime
+    if (spec.observableuniverse) {
+      var cwEdgeAU = cwHI * AU_PER_LY;            // cosmicweb.zoom.hi (ly) -> AU
+      fadeLo4 = Math.max(num(seam.fadeLoOUAU, cwEdgeAU * 0.6), 5e13);
+      fadeHi4 = Math.max(num(seam.fadeHiOUAU, cwEdgeAU * 6), fadeLo4 * 6);
+      regimes.push({ name: "observableuniverse", childSpec: spec.observableuniverse, render: DossierFigures.renderObservableUniverse, unit: AU_PER_LY, lo: ouLO, hi: ouHI });
+      boundaries.push({ fadeLo: fadeLo4, fadeHi: fadeHi4 });
     }
     var N = regimes.length;
 
@@ -314,9 +331,20 @@
       if (aAU < fadeHi2) return "seam (galaxy ↔ Local Group)";
       if (aAU < fadeLo3) return "the Local Group";             // identical for aAU < fadeLo3 (the slab-2 names)
       if (aAU < fadeHi3) return "seam (Local Group ↔ Cosmic Web)";
-      return "the cosmic web";
+      if (aAU < fadeLo4) return "the cosmic web";              // identical for aAU < fadeLo4 (the slab-3 names)
+      if (aAU < fadeHi4) return "seam (Cosmic Web ↔ observable universe)";
+      return "the observable universe";
     }
-    function updateReadout() { var a = scaleAU(); readout.textContent = "cosmic scale " + fmtScale(a) + " · " + regime(a); }
+    var horizonGly = num((spec.observableuniverse && spec.observableuniverse.horizon || {}).gly, 46.5);
+    function updateReadout() {
+      // At the wall (the observable horizon) the master bar speaks the honest line —
+      // never "edge of the universe". This is the master version of the OU child's label.
+      if (spec.observableuniverse && sliderM > 0.999) {
+        readout.textContent = "observable horizon (~" + horizonGly + " Gly) — we cannot see beyond this";
+        return;
+      }
+      var a = scaleAU(); readout.textContent = "cosmic scale " + fmtScale(a) + " · " + regime(a);
+    }
 
     // master scroll-to-zoom (children are pointer-events:none, so this owns it)
     stage.addEventListener("wheel", function (ev) {
@@ -353,7 +381,7 @@
 
     return {
       runtimeVersion: DossierFigures.FIGURES_RUNTIME_VERSION,
-      orrery: hOrr, galaxy: hGal, localgroup: regimes[2] && regimes[2].handle, cosmicweb: regimes[3] && regimes[3].handle,
+      orrery: hOrr, galaxy: hGal, localgroup: regimes[2] && regimes[2].handle, cosmicweb: regimes[3] && regimes[3].handle, observableuniverse: regimes[4] && regimes[4].handle,
       getState: function () {
         var a = scaleAU();
         return { sliderM: sliderM, scaleAU: a, scaleLY: a / AU_PER_LY,
@@ -361,6 +389,7 @@
           galaxyOpacity: parseFloat(layB.style.opacity || "1"),
           localgroupOpacity: regimes[2] ? parseFloat(regimes[2].layer.style.opacity || "0") : 0,
           cosmicwebOpacity: regimes[3] ? parseFloat(regimes[3].layer.style.opacity || "0") : 0,
+          observableuniverseOpacity: regimes[4] ? parseFloat(regimes[4].layer.style.opacity || "0") : 0,
           regimeOpacities: regimes.map(function (r, i) { return parseFloat(r.layer.style.opacity || (i === 0 ? "1" : "0")); }),
           voidOpacity: parseFloat(voidSvg.style.opacity || "0"),
           journeyPlaying: journeyPlaying, regime: regime(a) };
