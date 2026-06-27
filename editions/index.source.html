@@ -1,0 +1,121 @@
+<!--edition
+eyebrow: An Open Dossier · <b>NNN</b> · self-explaining edition · survey · v1.0
+title: YOUR PLAIN-LANGUAGE TITLE
+byline: YOUR NAME — YOUR AFFILIATION
+-->
+<!--slot:body-->
+<p class="abstract">YOUR SURVEY ABSTRACT. This dossier surveys [field]: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
+
+<!--mount:howto-->
+
+<!-- ============================================================
+     SURVEY LANDSCAPE — the survey-shaped scaffold's centrepiece.
+     One card per avenue/option in the field. Drive it from the
+     AVENUES array in the script below (single source -> cards).
+     Each card: name + one-line thesis, an honest status label,
+     an optional dated forecast, and its sources. The card's top
+     border is colored by status for at-a-glance scanning.
+     STATUS values: ESTABLISHED / OPEN-UNVERIFIED / FORECAST /
+     REPORTED (others fall back to a neutral chip + border).
+     ============================================================ -->
+<!--mount:landscape-->
+
+<!--mount:console-->
+
+<!-- ============================================================
+     AUTHOR INSTRUCTIONS (delete this comment when done):
+     This is the SURVEY-shaped self-explaining edition. The arc:
+       01 the field, and why survey it (problem as a story)
+       02 established foundations (plain prose + citations)
+       03 the avenues, one by one (each labeled in place)
+       04 what would settle the open questions
+       05 synthesis
+     Conventions:
+     - Wrap technical terms:  <button class="term" data-d="3-5 sentence plain explanation">term</button>
+     - Cite with chips:       <button class="cite" data-c="KEY">Venue 'YY</button>  (+ add KEY to CITES below)
+     - ESTABLISHED claims are asserted plainly, with citations. No box.
+     - OPEN-UNVERIFIED claims get an amber .openclaim box at the claim site.
+     - FORECAST claims get a violet .forecast box: state the estimate, the
+       reasoning, and the MANDATORY dated, falsifiable signpost.
+     - REPORTED items get a coral .reported box: name the interested-party
+       source, state plainly it is not independently reproduced, and give
+       the mundane candidate explanation with equal prominence.
+     - A genuine scientific DISPUTE is not a new status: render it as an
+       ESTABLISHED meta-claim ("the field is divided on X") citing both sides.
+     ============================================================ -->
+
+<h2><span class="num">01</span>THE FIELD, AND WHY SURVEY IT</h2>
+
+<p>Open with the field as a story: what is the question everyone in this area is
+circling, why is it hard, and why is a map of the whole landscape — rather than one
+more result — the useful thing to publish right now? Introduce your first
+<button class="term" data-d="Replace this with a 3-5 sentence plain-language explanation of the term, written for a smart non-specialist. What is it, why does it matter to this field, and what is the one surprising thing about it?">tappable term</button>
+here, and your first sourced claim
+<button class="cite" data-c="ref1">Journal 'YY</button>.</p>
+
+<p class="punch">End the opening with the one line a reader should carry into the rest of the survey.</p>
+
+<h2><span class="num">02</span>ESTABLISHED FOUNDATIONS</h2>
+
+<p>State plainly what the field has actually demonstrated — the bedrock every avenue
+shares. These are ESTABLISHED claims: asserted directly, each with a citation
+<button class="cite" data-c="ref2">Journal 'YY</button>. Being confident here is correct, not
+incautious; documented facts are bedrock, and timidity about them is its own kind of
+dishonesty. Save the hedging for the claims that have earned it.</p>
+
+<details class="deeper"><summary>Go deeper: NAME THE TECHNICAL LAYER</summary>
+<div class="body">Equations and formal detail live here, collapsed by default. The
+narrative above must be complete without opening this.
+<div class="eq" data-tex="E = mc^2"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">E = mc^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8641em;"></span><span class="mord mathnormal">m</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></div></div>
+</details>
+
+<h2><span class="num">03</span>THE AVENUES</h2>
+
+<p>The heart of the survey: walk each avenue in turn, and label each exactly as
+strongly as its evidence allows. The four conventions below show every status home.</p>
+
+<h3>Avenue A — a mature, documented direction</h3>
+<p>Describe it in plain language and assert what is established about it, with sources
+<button class="cite" data-c="ref1">Journal 'YY</button>. No callout box — established prose carries itself.</p>
+
+<h3>Avenue B — a direction with a central open question</h3>
+<p>Lay out the avenue, then mark the open question honestly, right where it arises:</p>
+<div class="openclaim">
+<span class="tag">OPEN-UNVERIFIED</span><b>Honest label:</b> DESCRIBE THE UNVERIFIED CLAIM. State that it is claim <span class="mono">CNN</span> in the public ledger and an open challenge: <b>the first person to confirm or refute it gets named credit in the next version.</b>
+</div>
+
+<h3>Avenue C — a direction you are making a forward bet on</h3>
+<p>Where you offer a judgment about how an avenue will develop, label it as a forecast —
+never smuggle an estimate in as a fact:</p>
+<div class="forecast">
+<span class="tag">FORECAST</span><b>Labeled estimate:</b> STATE THE ESTIMATE (e.g. ~35%) AND THE REASONING BEHIND IT. <b>Signpost:</b> name the dated, falsifiable event that will later mark this right or wrong (e.g. "by 2030, X is demonstrated at scale Y"). A forecast without a dated signpost is just an opinion with a number on it; the signpost is its verifier.
+</div>
+
+<h3>Avenue D — a direction sourced only to an interested party</h3>
+<p>Some avenues live mostly on vendor roadmaps, press-release figures, or claims that
+have not been independently reproduced. Record them — but mark the provenance plainly:</p>
+<div class="reported">
+<span class="tag">REPORTED</span><b>Non-independent source:</b> NAME THE INTERESTED-PARTY SOURCE and state plainly it is not independently reproduced. Give the mundane candidate explanation with at least equal prominence (or state that none has been identified). This is recorded for completeness; it is NOT the author's claim, and it gets no vote on any other claim's status.
+</div>
+
+<h2><span class="num">04</span>WHAT WOULD SETTLE THE OPEN QUESTIONS</h2>
+
+<p>For each open avenue, spell out the specific result, measurement, or signpost that
+would move it from open to established. This is what turns a survey from a snapshot into
+an instrument: a reader knows exactly what work is worth doing next, and your OPEN claims
+become standing invitations with named credit attached.</p>
+
+<h2><span class="num">05</span>SYNTHESIS</h2>
+
+<p>Pull the landscape together: which avenues are solid, which are live bets, which are
+mostly noise, and what the honest shape of the field is once every claim wears its true
+label. Close on the line you want to leave the reader with.</p>
+
+<p class="punch">End with the line your readers should carry away.</p>
+<!--/slot:body-->
+<!--slot:cites-->
+<script type="application/json" id="cites-data">
+{ "ref1": { "who": "REPLACE — Author et al. (Year)", "what": "REPLACE — what this source demonstrated, in plain language, and why it matters to this survey.", "src": "Journal Vol, Page (Year)" },
+  "ref2": { "who": "REPLACE — Author et al. (Year)", "what": "REPLACE.", "src": "Journal Vol, Page (Year)" } }
+</script>
+<!--/slot:cites-->
