@@ -128,6 +128,7 @@
     // child zoom ranges (to convert the master scale into each regime's slider)
     var oz = spec.orrery.zoom || {}, oLO = Math.max(1e-6, num(oz.lo, 0.3)), oHI = Math.max(oLO * 1.0001, num(oz.hi, 6000));
     var gz = spec.galaxy.zoom || {}, gLO = Math.max(1e-9, num(gz.lo, 1e-5)), gHI = Math.max(gLO * 1.0001, num(gz.hi, 200000));
+    var lz = (spec.localgroup && spec.localgroup.zoom) || {}, lgLO = Math.max(1e-3, num(lz.lo, 40000)), lgHI = Math.max(lgLO * 1.0001, num(lz.hi, 8e6));
 
     // --- the REGIME STACK (ordered INNER -> OUTER) + the boundary bands between
     //     adjacent regimes. Generalizes the old hardwired 2-layer crossfade: every
@@ -147,6 +148,21 @@
     var boundaries = [
       { fadeLo: fadeLo, fadeHi: fadeHi }   // orrery -> galaxy (the existing band; hands off in the void beyond the Oort)
     ];
+    // SLAB 2b: append the Local Group regime + the galaxy->LG boundary band, ONLY when
+    // the spec carries a localgroup block (back-compat: a 2-block cosmic spec still falls
+    // Mercury->Milky Way). The band is derived from the galaxy's outer ly edge and FLOORED
+    // strictly beyond the full-galaxy frame — the Oort lesson again: hand off in the VOID
+    // BEYOND the galaxy (the whole Milky Way framed/readable at fadeLo2, THEN it recedes).
+    // The 4e9 floor also keeps fadeLo2 > the largest slab-1 continuity sample (3.82e9 AU),
+    // so the orrery<->galaxy seam stays byte-identical below the band.
+    var fadeLo2 = Infinity, fadeHi2 = Infinity;   // hoisted for regime(); Infinity = no LG regime
+    if (spec.localgroup) {
+      var galaxyEdgeAU = gHI * AU_PER_LY;          // galaxy.zoom.hi (ly) -> AU
+      fadeLo2 = Math.max(num(seam.fadeLoLGAU, galaxyEdgeAU * 0.6), 4e9);
+      fadeHi2 = Math.max(num(seam.fadeHiLGAU, galaxyEdgeAU * 6), fadeLo2 * 6);
+      regimes.push({ name: "localgroup", childSpec: spec.localgroup, render: DossierFigures.renderLocalGroup, unit: AU_PER_LY, lo: lgLO, hi: lgHI });
+      boundaries.push({ fadeLo: fadeLo2, fadeHi: fadeHi2 });
+    }
     var N = regimes.length;
 
     // --- mount: OUTERMOST regime IN FLOW (gives the stage its height), inner
@@ -278,7 +294,10 @@
     function regime(aAU) {
       if (aAU <= fadeLo) return "solar system";
       if (aAU < fadeHi) return "seam (orrery ↔ galaxy)";
-      return (aAU / AU_PER_LY) < vOutLo ? "interstellar void" : "the galaxy";
+      if ((aAU / AU_PER_LY) < vOutLo) return "interstellar void";
+      if (aAU < fadeLo2) return "the galaxy";                  // identical for aAU < fadeLo2 (the 7 slab-1 names)
+      if (aAU < fadeHi2) return "seam (galaxy ↔ Local Group)";
+      return "the Local Group";
     }
     function updateReadout() { var a = scaleAU(); readout.textContent = "cosmic scale " + fmtScale(a) + " · " + regime(a); }
 
@@ -317,12 +336,14 @@
 
     return {
       runtimeVersion: DossierFigures.FIGURES_RUNTIME_VERSION,
-      orrery: hOrr, galaxy: hGal,
+      orrery: hOrr, galaxy: hGal, localgroup: regimes[2] && regimes[2].handle,
       getState: function () {
         var a = scaleAU();
         return { sliderM: sliderM, scaleAU: a, scaleLY: a / AU_PER_LY,
           orreryOpacity: parseFloat(layA.style.opacity || "1"),
           galaxyOpacity: parseFloat(layB.style.opacity || "1"),
+          localgroupOpacity: regimes[2] ? parseFloat(regimes[2].layer.style.opacity || "0") : 0,
+          regimeOpacities: regimes.map(function (r, i) { return parseFloat(r.layer.style.opacity || (i === 0 ? "1" : "0")); }),
           voidOpacity: parseFloat(voidSvg.style.opacity || "0"),
           journeyPlaying: journeyPlaying, regime: regime(a) };
       },
