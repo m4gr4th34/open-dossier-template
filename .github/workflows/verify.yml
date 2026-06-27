@@ -10,5 +10,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Recompute every quantitative claim in the manuscript
         run: python verification/verify_numbers.py
+      - name: Edition round-trip gate
+        run: node verify_edition.js

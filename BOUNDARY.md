@@ -126,14 +126,22 @@ reports rendering context, not a claim of the paper.
 3. Provenance / lineage bars = rendering-context, excluded from the content
    projection, permitted to differ floor-vs-live. This is the call that makes the
    live view legal.
+4. Carrier directions are opposite: `<!--mount:X-->` expands a SKIN fragment INTO a
+   content position (skin→content); `<!--slot:X-->` / `{{…}}` fills CONTENT INTO a
+   skin position (content→skin). Mounts live in the skin's fragment library; slots
+   and frontmatter live in the source.
 
 ## Sequencing the arc
 
 1. Pilot the extraction on the merged front door (`index.html`, now the richest single
    surface). Prove `wrap(extracted_source, current_skin)` is BYTE-IDENTICAL to today's
    hand-authored `index.html` — the same byte-identical proof gate the figure arc lived
-   by.
-2. Build the equivalence gate (the load-bearing piece — build it early).
+   by. **DONE (step 1b).**
+2a. Round-trip gate (`verify_edition.js`) — **DONE**: asserts `index.html ==
+   render(source, skin)`, fail-loud, in CI (the `verify-claims` workflow). Protects the
+   partition the moment the source is edited.
+2b. Content-projection equivalence gate — **DEFERRED to step 4**, when a live reader
+   (`skin@HEAD`) and a markdown projection exist to compare: `floor == live == markdown`.
 3. Add the markdown / llms.txt projection (falls out of the source for free).
 4. Build the build-time static live reader.
 5. Rewire `freeze_chapter.py` to capture the source and emit the projections.

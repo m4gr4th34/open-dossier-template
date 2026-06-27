@@ -139,13 +139,16 @@ verification script, and its claim ledger all live here.
   Do not create releases without the author's explicit instruction.
 - NEVER modify anything in timestamps/ — those are cryptographic proofs.
 - File map:
-  - index.html        — the paper: self-explaining edition + avenue landscape + verification console
+  - index.html        — the paper (GENERATED: edit editions/index.source.html + skin/edition.html, then `npm run render-edition`; never hand-edit — CI's `check-edition` gate enforces it). Self-explaining edition + avenue landscape + verification console.
+  - editions/         — skin-free content source (index.source.html) for the front door
+  - skin/             — the wrapper/skin (edition.html) the source renders into
   - paper.html        — redirect stub → index.html (legacy link target)
   - dossier.html      — audit trail (red team, citation audit)
   - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)
   - verification/     — verify script, audits, red-team report, format spec
   - figures/          — vendored living-figures runtime (interactive SVG via data-figure)
   - claim_ledger.csv  — every claim, typed, with honest status
+  - BOUNDARY.md       — the content/skin/machinery boundary spec (live-edition arc; the source/skin/render partition)
 - Living figures (interactive SVG): authored as a `data-figure` JSON spec that
   declares a top-level `"type"`, rendered by the vendored `figures/` runtime, sealed
   into a static JS-off poster by `render-figures` (mirrors `render-math`). The core

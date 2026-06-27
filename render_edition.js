@@ -3,18 +3,24 @@
 /*
  * render_edition.js — rejoin the partitioned front door into index.html.
  *
- * Pure Node, no browser, never run in CI. Reads the skin-free content source
- * (editions/index.source.html) and the skin wrapper (skin/edition.html), then
+ * Reads the skin-free content source (editions/index.source.html) and the skin
+ * wrapper (skin/edition.html), then
  *   - substitutes {{eyebrow}}/{{title}}/{{byline}} from the source frontmatter,
  *   - substitutes {{body}} with the source body (mounts expanded from skin
  *     fragments) and {{cites}} with the source's inert cite-data block,
- *   - strips the skin-internal <!--fragment:X--> definitions,
- *   - writes index.html.
+ *   - strips the skin-internal <!--fragment:X--> definitions.
  * Idempotent; fail-loud (nonzero exit) on any missing slot / mount / fragment
  * or any leftover {{ }} / <!--mount: / <!--fragment: in the output.
  *
- * This is author-local tooling, exactly like render_math.js / render_figures.js;
- * readers need nothing and CI never runs it.
+ * Exposes renderEdition() -> the rendered HTML string (writes NOTHING); the CLI
+ * tail writes index.html. The CLI write path is author-local, exactly like
+ * render_math.js / render_figures.js — readers need nothing and the writer is
+ * never run in CI. The renderEdition() export IS used in CI, by verify_edition.js
+ * (the round-trip gate), which only renders in memory.
+ *
+ * Usage:
+ *   node render_edition.js     # writes index.html from source + skin
+ *   npm run render-edition
  */
 const fs = require('fs');
 const path = require('path');
@@ -30,59 +36,70 @@ const sub = (hay, token, value, label) => {
   return hay.replace(token, () => value);          // function form: no $-pattern interpretation
 };
 
-const skin = fs.readFileSync(SKIN, 'utf8');
-const source = fs.readFileSync(SOURCE, 'utf8');
+// Read source + skin, substitute every slot/mount, and RETURN the rendered
+// index.html as a string. Writes nothing. Fail-loud on any missing piece.
+function renderEdition() {
+  const skin = fs.readFileSync(SKIN, 'utf8');
+  const source = fs.readFileSync(SOURCE, 'utf8');
 
-// --- source: frontmatter ---
-const fm = source.match(/^<!--edition\n([\s\S]*?)\n-->\n/);
-if (!fm) die('source: missing <!--edition ... --> frontmatter header');
-const front = {};
-for (const line of fm[1].split('\n')) {
-  const m = line.match(/^(eyebrow|title|byline): ([\s\S]*)$/);
-  if (m) front[m[1]] = m[2];
+  // --- source: frontmatter ---
+  const fm = source.match(/^<!--edition\n([\s\S]*?)\n-->\n/);
+  if (!fm) die('source: missing <!--edition ... --> frontmatter header');
+  const front = {};
+  for (const line of fm[1].split('\n')) {
+    const m = line.match(/^(eyebrow|title|byline): ([\s\S]*)$/);
+    if (m) front[m[1]] = m[2];
+  }
+  for (const k of ['eyebrow', 'title', 'byline']) {
+    if (!(k in front)) die('source: frontmatter missing "' + k + '"');
+  }
+
+  // --- source: body + cites slots ---
+  function readSlot(name) {
+    const re = new RegExp('<!--slot:' + name + '-->\\n([\\s\\S]*?)\\n<!--/slot:' + name + '-->');
+    const m = source.match(re);
+    if (!m) die('source: missing <!--slot:' + name + '--> ... <!--/slot:' + name + '--> block');
+    return m[1];
+  }
+  let body = readSlot('body');
+  const cites = readSlot('cites');
+
+  // --- skin: split wrapper from the fragment definitions ---
+  const cut = skin.indexOf('<!--fragment:');
+  if (cut < 0) die('skin: no <!--fragment:...--> definitions found');
+  const wrapper = skin.slice(0, cut);          // the document with {{...}} slots
+  const fragsSection = skin.slice(cut);        // the skin-internal fragment library
+  function readFragment(name) {
+    const re = new RegExp('<!--fragment:' + name + '-->\\n([\\s\\S]*?)\\n<!--/fragment:' + name + '-->');
+    const m = fragsSection.match(re);
+    if (!m) die('skin: missing <!--fragment:' + name + '--> ... <!--/fragment:' + name + '--> block');
+    return m[1];
+  }
+
+  // --- expand the mounts inside the body with the skin fragments ---
+  for (const name of ['howto', 'landscape', 'console']) {
+    body = sub(body, '<!--mount:' + name + '-->', readFragment(name), 'mount:' + name);
+  }
+
+  // --- fill the wrapper slots ---
+  let out = wrapper;
+  out = sub(out, '{{eyebrow}}', front.eyebrow, 'eyebrow');
+  out = sub(out, '{{title}}', front.title, 'title');
+  out = sub(out, '{{byline}}', front.byline, 'byline');
+  out = sub(out, '{{body}}', body, 'body');
+  out = sub(out, '{{cites}}', cites, 'cites');
+
+  // --- fail loud on any unresolved token leaking into the output ---
+  const leak = out.match(/\{\{[a-z]+\}\}|<!--mount:|<!--fragment:/);
+  if (leak) die('output still contains an unresolved token: ' + JSON.stringify(leak[0]));
+
+  return out;
 }
-for (const k of ['eyebrow', 'title', 'byline']) {
-  if (!(k in front)) die('source: frontmatter missing "' + k + '"');
+
+if (require.main === module) {
+  const html = renderEdition();
+  fs.writeFileSync(OUT, html);
+  process.stdout.write('render_edition: wrote ' + path.relative(ROOT, OUT) + ' (' + html.length + ' bytes)\n');
 }
 
-// --- source: body + cites slots ---
-function readSlot(name) {
-  const re = new RegExp('<!--slot:' + name + '-->\\n([\\s\\S]*?)\\n<!--/slot:' + name + '-->');
-  const m = source.match(re);
-  if (!m) die('source: missing <!--slot:' + name + '--> ... <!--/slot:' + name + '--> block');
-  return m[1];
-}
-let body = readSlot('body');
-const cites = readSlot('cites');
-
-// --- skin: split wrapper from the fragment definitions ---
-const cut = skin.indexOf('<!--fragment:');
-if (cut < 0) die('skin: no <!--fragment:...--> definitions found');
-const wrapper = skin.slice(0, cut);          // the document with {{...}} slots
-const fragsSection = skin.slice(cut);        // the skin-internal fragment library
-function readFragment(name) {
-  const re = new RegExp('<!--fragment:' + name + '-->\\n([\\s\\S]*?)\\n<!--/fragment:' + name + '-->');
-  const m = fragsSection.match(re);
-  if (!m) die('skin: missing <!--fragment:' + name + '--> ... <!--/fragment:' + name + '--> block');
-  return m[1];
-}
-
-// --- expand the mounts inside the body with the skin fragments ---
-for (const name of ['howto', 'landscape', 'console']) {
-  body = sub(body, '<!--mount:' + name + '-->', readFragment(name), 'mount:' + name);
-}
-
-// --- fill the wrapper slots ---
-let out = wrapper;
-out = sub(out, '{{eyebrow}}', front.eyebrow, 'eyebrow');
-out = sub(out, '{{title}}', front.title, 'title');
-out = sub(out, '{{byline}}', front.byline, 'byline');
-out = sub(out, '{{body}}', body, 'body');
-out = sub(out, '{{cites}}', cites, 'cites');
-
-// --- fail loud on any unresolved token leaking into the output ---
-const leak = out.match(/\{\{[a-z]+\}\}|<!--mount:|<!--fragment:/);
-if (leak) die('output still contains an unresolved token: ' + JSON.stringify(leak[0]));
-
-fs.writeFileSync(OUT, out);
-process.stdout.write('render_edition: wrote ' + path.relative(ROOT, OUT) + ' (' + out.length + ' bytes)\n');
+module.exports = { renderEdition };

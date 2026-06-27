@@ -95,6 +95,12 @@ continues, on the same page, as the self-explaining narrative read top to
 bottom. One page, one edition. (`paper.html` is now just a redirect stub that
 forwards to `index.html`, kept so old links and frozen chapters resolve.)
 
+**Generated, never hand-edited.** `index.html` is BUILT from
+`editions/index.source.html` (the skin-free content) + `skin/edition.html` (the
+wrapper) by `npm run render-edition`. Edit the SOURCE and re-render; never
+hand-edit `index.html` — CI's edition round-trip gate (`npm run check-edition`)
+fails the build if `index.html` drifts from `render(source, skin)`. See BOUNDARY.md.
+
 **The interactive instrument (top of the page).**
 
 - Port every Python check into the `buildChecks()` console verbatim

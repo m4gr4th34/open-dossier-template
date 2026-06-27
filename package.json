@@ -6,7 +6,9 @@
   "license": "MIT",
   "scripts": {
     "render-math": "node render_math.js",
-    "render-figures": "node render_figures.js"
+    "render-figures": "node render_figures.js",
+    "render-edition": "node render_edition.js",
+    "check-edition": "node verify_edition.js"
   },
   "dependencies": {
     "katex": "0.16.47"
