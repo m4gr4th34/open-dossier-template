@@ -47,21 +47,36 @@ function esc(s) {
                   .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// The HONEST LABEL (doctrine-critical): a back-catalog reader is the current-skin RE-SKIN,
-// never the DOI'd record. The banner says so plainly and points at the immutable frozen record
-// (chapters/<tag>/index.html), carrying its timestamp and DOI when present in lineage. The label
-// must NEVER imply the re-skin IS the record. Styled inline (no skin CSS change) so the empty
-// working-draft slot stays byte-identical; the CSS vars resolve from the rendered :root.
+// The HONEST LABEL (doctrine-critical) + the CITE-THE-RECORD affordance: a back-catalog reader
+// is the current-skin RE-SKIN, never the DOI'd record. The banner (a) labels it the current
+// edition and says plainly it is NOT the record, (b) gives a "Cite this chapter" line with the
+// version DOI (and the concept/all-versions DOI when distinct) as the citable identifier, and
+// (c) links to the immutable version of record (chapters/<tag>/index.html). The DOI is the
+// citation; the record door is the bytes. It must NEVER imply the re-skin IS the record — it
+// points AT it. Styled inline (no skin CSS change) so the EMPTY working-draft slot stays
+// byte-identical; the CSS vars resolve from the rendered :root.
 function recordBanner(ch) {
+  const tag = esc(ch.tag);
   const date = ch.released ? esc(ch.released) : 'the release date';
-  const doi = ch.version_doi || ch.concept_doi || '';
-  const doiBit = doi ? ' · DOI ' + esc(doi) : '';
-  return '\n  <div class="record-note" role="note" style="margin:18px 0;padding:12px 16px;'
+  const vdoi = ch.version_doi || '', cdoi = ch.concept_doi || '';
+  const doiLink = (id, label) => '<a href="https://doi.org/' + esc(id) + '" target="_blank" rel="noopener">' + label + '</a>';
+  let cite;
+  if (vdoi) {
+    cite = 'DOI ' + doiLink(vdoi, esc(vdoi) + ' ↗')
+      + ((cdoi && cdoi !== vdoi) ? ' · ' + doiLink(cdoi, 'all versions ↗') : '');
+  } else if (cdoi) {
+    cite = 'DOI (all versions) ' + doiLink(cdoi, esc(cdoi) + ' ↗');
+  } else {
+    cite = 'the version of record (no DOI registered yet)';
+  }
+  return '\n  <div class="record-note" role="note" style="margin:18px 0;padding:13px 16px;'
     + 'border:1px solid var(--line);border-left:4px solid var(--open);border-radius:var(--r-lg);'
-    + 'background:var(--open-soft);color:var(--ink2);font-size:14.5px;line-height:1.55">'
-    + '<b style="color:var(--open)">Reading the current edition.</b> '
-    + 'The version of record (timestamped ' + date + doiBit + ') is '
-    + '<a href="../../chapters/' + esc(ch.tag) + '/index.html">chapters/' + esc(ch.tag) + '/index.html</a>.'
+    + 'background:var(--open-soft);color:var(--ink2);font-size:14px;line-height:1.55">'
+    + '<div><b style="color:var(--open)">Reading the current edition.</b> '
+    + 'A current-skin reading view of a sealed chapter (released ' + date + ') — not the version of record.</div>'
+    + '<div style="margin-top:6px"><b>Cite this chapter:</b> ' + cite + '</div>'
+    + '<div style="margin-top:4px"><a href="../../chapters/' + tag + '/index.html" target="_blank" rel="noopener">View the version of record ↗</a>'
+    + ' <span style="opacity:.85">— the immutable, DOI\'d bytes (chapters/' + tag + '/index.html).</span></div>'
     + '</div>';
 }
 

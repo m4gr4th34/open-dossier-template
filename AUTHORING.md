@@ -359,6 +359,17 @@ Each edition also carries a compact **lineage strip** ("Chapter K of N · ← pr
 view all chapters →") that appears only when chapters exist. Both read `lineage.json`
 live, so they update the moment a new chapter is frozen.
 
+**The timeline reads oldest → newest, with the frontier at the foot.** `lineage.html` lists the
+sealed chapters first — Chapter 1 at the top, numbered 1..N top-down by the CSS counter — then the
+**working-draft frontier** card last (dashed, no number): the current editions, which become the
+next chapter when sealed. **Two doors per sealed chapter:** *Read (current edition) →* opens the
+re-skinned reading view at `live/<tag>/index.html`; *Version of record ↗* opens the frozen
+`chapters/<tag>/index.html` — the immutable bytes the **DOI** cites. Read it fresh; cite the
+record. The DOI is the citation, the record door is the bytes, and each re-skin repeats the same
+cite-the-record affordance in its own banner. This linking *is* the routing — there is no Pages
+config that makes one URL "the chapter"; the lineage's honest links send readers to the reading
+view and citations to the record.
+
 **Ancestors-only — this is doctrine, not preference.** A chapter records and links only
 what came *before* it: the previous chapter and the view-all index. **Never forward.** A
 sealed, DOI'd chapter must not be edited to point at successors that did not exist when

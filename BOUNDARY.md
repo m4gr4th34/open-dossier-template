@@ -171,10 +171,15 @@ reports rendering context, not a claim of the paper.
    `verify_markdown.js` gates it byte-equal to `buildLlmsTxt()`). Per-chapter `<tag>.md`
    emission at freeze time is the remaining piece, landing with the step-5 baker.
 4. Build the build-time static live reader. **DONE (5b-ii-2b):** `render_backcatalog.js` +
-   `verify_backcatalog.js` + the `live/<tag>/` reading views, gated in CI. NOTE: this step
-   builds and gates the re-skinned readers but does NOT make them the default Pages URL —
-   the Pages-routing / default-URL question (whether `/`, `/live/<tag>/`, or the frozen record
-   answers a given path) is a separate follow-up, deliberately out of scope here.
+   `verify_backcatalog.js` + the `live/<tag>/` reading views, gated in CI.
+   **Reader-experience capstone — DONE:** `lineage.html` is now an oldest→newest timeline (sealed
+   Chapter 1..N top-down, the working-draft frontier card at the foot) where each sealed chapter
+   offers **two doors** — *Read (current edition) →* `live/<tag>/index.html` and *Version of
+   record ↗* `chapters/<tag>/index.html`, with the **DOI** shown as the citation — and each re-skin
+   carries the same **cite-the-record** banner. **Pages-routing is answered by honest linking**, not
+   config: there is no rule making one URL "the chapter"; the lineage's links send readers to the
+   reading view and citations to the immutable record. (The retired `paper.html` stub is dropped
+   from freeze's rewrite tuple — a dead no-op now the edition set is index/dossier/verify.)
 5. Rewire `freeze_chapter.py` to capture the source and emit the projections.
 
 Pre-split chapters have no source and are not retrofitted — reverse-engineering a

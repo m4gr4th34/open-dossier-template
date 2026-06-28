@@ -126,7 +126,7 @@
 <div class="wrap">
 
 <main>
-  <p class="intro">The working draft heads the list — the live editions, ahead of the latest sealed release. Sealed chapters follow below, oldest to newest, each a DOI-bearing release.</p>
+  <p class="intro">The timeline reads oldest to newest — Chapter 1 first, each a sealed, DOI-bearing release. The working draft is the living frontier at the foot of the list: the current editions, which become the next chapter when sealed.</p>
   <ol class="lineage" id="lineage"></ol>
 </main>
 
@@ -138,13 +138,14 @@
 </div>
 
 <script>
-// Renders lineage.json into the chapter list, newest-first: a synthetic
-// WORKING-DRAFT head entry (the live, unreleased tip — never stored in
-// lineage.json) sits above the sealed chapters, built with createElement/
-// textContent so titles/summaries can never inject markup. The working draft
-// ALWAYS shows (a brand-new dossier IS a working draft); a load failure still
-// shows it and appends a small note. No sealed chapter is marked "current" —
-// the working draft is the current, in-progress thing now.
+// Renders lineage.json into the chapter list, oldest to newest: the sealed
+// chapters come first (Chapter 1 at the top), then a synthetic WORKING-DRAFT
+// frontier entry (the live, unreleased tip — never stored in lineage.json)
+// sits at the FOOT, built with createElement/textContent so titles/summaries
+// can never inject markup. The working draft ALWAYS shows (a brand-new dossier
+// IS a working draft); a load failure still shows it and appends a small note.
+// No sealed chapter is marked "current" — the working-draft frontier is the
+// current, in-progress thing now.
 (function(){
   var ol = document.getElementById('lineage');
 
@@ -163,7 +164,7 @@
 
     var sum = document.createElement('p');
     sum.className = 'ch-summary';
-    sum.textContent = 'The next chapter, in progress — the live editions, ahead of the latest sealed release. No chapter number or DOI is claimed until it is sealed.';
+    sum.textContent = 'The living frontier — the current editions, ahead of the latest sealed release. Becomes the next chapter, with its own number and DOI, when sealed.';
     li.appendChild(sum);
 
     var meta = document.createElement('div');
@@ -172,11 +173,7 @@
     read.className = 'ch-read';
     read.href = 'index.html';            // live front door (self-explaining edition)
     read.textContent = 'Read the working draft →';
-    meta.appendChild(read);
-    var land = document.createElement('a');
-    land.href = 'index.html#landscape';  // the avenue landscape, now a section of the front door
-    land.textContent = 'The landscape →';
-    meta.appendChild(land);
+    meta.appendChild(read);              // one clean read door (the landscape is now part of the front door)
     li.appendChild(meta);
     return li;
   }
@@ -232,11 +229,18 @@
       cdoiEl.textContent = 'DOI (all versions): ' + cdoi + ' ↗';
       meta.appendChild(cdoiEl);
     }
+    // TWO doors per chapter: the PRIMARY read door is the current-skin re-skin (live/<tag>/),
+    // the RECORD door is the frozen, DOI'd bytes (chapters/<tag>/, via c.path) the DOI cites.
     var read = document.createElement('a');
     read.className = 'ch-read';
-    read.href = (c.path || '') + 'index.html';   // front door (self-explaining edition) = reader entry
-    read.textContent = 'Read this chapter →';
+    read.href = 'live/' + (c.tag || '') + '/index.html';   // current-skin reading view
+    read.textContent = 'Read (current edition) →';
     meta.appendChild(read);
+    var record = document.createElement('a');
+    record.href = (c.path || '') + 'index.html';           // the immutable record — the DOI'd bytes
+    record.target = '_blank'; record.rel = 'noopener';
+    record.textContent = 'Version of record ↗';
+    meta.appendChild(record);
 
     li.appendChild(meta);
     return li;
@@ -255,8 +259,8 @@
   }
 
   function render(chs){
-    ol.appendChild(draftHead());                 // working draft is ALWAYS the head
-    chs.forEach(function(c){ ol.appendChild(sealed(c)); });
+    chs.forEach(function(c){ ol.appendChild(sealed(c)); });  // sealed chapters oldest-first: Ch1..ChN, counter 1..N top-down
+    ol.appendChild(draftHead());                             // the living frontier — ALWAYS at the foot, no number
   }
 
   fetch('lineage.json').then(function(r){ return r.json(); }).then(function(d){

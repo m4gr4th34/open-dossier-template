@@ -104,7 +104,7 @@ def rewire(html):
         relative <img> src (figures at ANY path, via rewire_img_src) -> ../../
         so the frozen copy uses the single shared root copy rather than a
         missing per-chapter one.
-      - cross-edition + lineage NAV links (index/paper/dossier/verify/lineage.html)
+      - cross-edition + lineage NAV links (index/dossier/verify/lineage.html)
         -> ../../ so a sealed chapter is not a navigational dead-end: its nav
         returns the reader to the LIVE series, NOT to its frozen siblings in the
         same dir (frozen chapters are read leaves; navigation happens on the live
@@ -133,7 +133,9 @@ def rewire(html):
     # Exact value + closing quote so #anchors / suffixes are never matched. This
     # escapes the reader up to the LIVE series; it is never a forward/successor
     # claim, and the strip's fetch('lineage.json') is left to .catch->hide.
-    for page in ("index.html", "paper.html", "dossier.html", "verify.html", "lineage.html"):
+    # paper.html dropped: it is a retired redirect stub, never in EDITIONS, so rewriting it
+    # was a dead no-op. The tuple now matches the real frozen edition set + the lineage index.
+    for page in ("index.html", "dossier.html", "verify.html", "lineage.html"):
         reps.append(('href="' + page + '"', 'href="../../' + page + '"'))
 
     counts = {}
