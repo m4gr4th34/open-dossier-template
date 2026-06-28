@@ -1,11 +1,12 @@
 # BOUNDARY.md — the content / skin / machinery line
 
-**Status: design spec for the live-edition arc. Not yet implemented.** The
+**Status: implemented and shipped.** The
 floor/source/ceiling pattern this generalizes already ships for *figures*
 (`data-figure` + sealed poster + live runtime) and *math* (`data-tex` + KaTeX).
-This document promotes that same pattern to the *whole chapter*. As of this
-commit, no chapter-level source, live reader, markdown projection, or equivalence
-gate exists yet — this is the contract the arc will build to.
+This document promotes that same pattern to the *whole chapter*, and that work is
+now done: chapter-level source, the live reader, the markdown projection, and the
+equivalence gate all exist and are CI-gated (steps 1-5 below all DONE). This document
+is the contract the arc was built to, now fully realized.
 
 ## Why this exists
 
