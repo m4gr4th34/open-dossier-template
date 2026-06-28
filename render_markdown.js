@@ -170,11 +170,12 @@ function renderMarkdown() {
       .replace(/^\s*<div class="body">/, '')
       .replace(/<\/div>\s*$/, '');
     const maths = [];
+    // \uE000 = Unicode PUA sentinel — cannot occur in real prose/math source; safe split marker
     rest = rest.replace(/<div class="eq" data-tex="([^"]*)">[\s\S]*?<\/div>/g,
-      (m, tex) => { maths.push(decodeEntities(tex)); return ' M' + (maths.length - 1) + ' '; });
+      (m, tex) => { maths.push(decodeEntities(tex)); return '\uE000M' + (maths.length - 1) + '\uE000'; });
     const prose = collapseWs(inlineToMd(rest));
     let out = '**' + summary + '**';
-    const parts = prose.split(/ M(\d+) /);
+    const parts = prose.split(/\uE000M(\d+)\uE000/);
     for (let k = 0; k < parts.length; k++) {
       if (k % 2 === 0) { const txt = parts[k].trim(); if (txt) out += '\n\n' + txt; }
       else { out += '\n\n```math\n' + maths[+parts[k]] + '\n```'; }

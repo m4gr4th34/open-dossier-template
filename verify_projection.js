@@ -73,7 +73,8 @@ function citesData(src) {
 // rendering INSERTS text ("term (gloss)"), which would break a contiguous substring.
 // (Cites bracket the label, b/mono/em keep their text — normalize handles those.)
 function proseRuns(inner) {
-  return inner.replace(/<button class="term"[^>]*>[\s\S]*?<\/button>/g, '').split('');
+  // \uE000 = Unicode PUA sentinel — cannot occur in real prose/math source; safe split marker
+  return inner.replace(/<button class="term"[^>]*>[\s\S]*?<\/button>/g, '\uE000').split('\uE000');
 }
 
 function extractAtoms() {
