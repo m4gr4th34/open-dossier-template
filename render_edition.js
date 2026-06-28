@@ -43,7 +43,7 @@ const sub = (hay, token, value, label) => {
 // Read source + skin, substitute every slot/mount, bake the machinery, and RETURN the
 // rendered index.html as a string. Writes nothing. Fail-loud on any missing piece.
 // Paths default to the live root; pass them to render a back-catalog chapter (5b-ii-2).
-function renderEdition(skinPath = SKIN, sourcePath = SOURCE) {
+function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, recordNote = '') {
   const skin = fs.readFileSync(skinPath, 'utf8');
   const source = fs.readFileSync(sourcePath, 'utf8');
 
@@ -93,14 +93,18 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE) {
   out = sub(out, '{{byline}}', front.byline, 'byline');
   out = sub(out, '{{body}}', body, 'body');
   out = sub(out, '{{cites}}', cites, 'cites');
+  // {{record_note}}: EMPTY for the working draft (no frozen record to point at — byte-identical
+  // output), the honest-label banner for a back-catalog re-skin (render_backcatalog.js).
+  out = sub(out, '{{record_note}}', recordNote, 'record_note');
 
-  // --- fail loud on any unresolved token leaking into the output ---
-  const leak = out.match(/\{\{[a-z]+\}\}|<!--mount:|<!--fragment:/);
+  // --- fail loud on any unresolved token leaking into the output ([a-z_]+ also catches record_note) ---
+  const leak = out.match(/\{\{[a-z_]+\}\}|<!--mount:|<!--fragment:/);
   if (leak) die('output still contains an unresolved token: ' + JSON.stringify(leak[0]));
 
   // --- bake the machinery (avenue cards + console verdict) into the static floor,
-  //     so the front door ships readable with JS off (the JS ceiling re-renders identically) ---
-  out = bakeMachinery(out);
+  //     so the front door ships readable with JS off (the JS ceiling re-renders identically).
+  //     machinery null => live root readers (working draft); { avenues, verdict } => sealed data. ---
+  out = bakeMachinery(out, machinery || undefined);
 
   return out;
 }

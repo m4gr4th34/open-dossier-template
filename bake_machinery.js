@@ -32,9 +32,13 @@ const { readAvenues, runVerifier } = require('./render_markdown.js');
 
 function die(msg) { process.stderr.write('bake_machinery: ' + msg + '\n'); process.exit(1); }
 
-function bakeMachinery(html) {
-  const { avenues } = readAvenues();
-  const v = runVerifier();
+function bakeMachinery(html, source) {
+  // source defaults to the LIVE root readers (today's behavior). The back-catalog renderer
+  // (render_backcatalog.js) passes { avenues, verdict } read from a chapter's OWN sealed
+  // avenues.json, so a re-skin bakes from sealed data, not the live root.
+  const src = source || { avenues: readAvenues().avenues, verdict: runVerifier() };
+  const avenues = src.avenues;
+  const v = src.verdict;
 
   // --- CARDS: reproduce the runtime renderCards() markup EXACTLY (skin/edition.html) ---
   const STATUS = {

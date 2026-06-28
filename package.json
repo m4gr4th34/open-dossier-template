@@ -11,7 +11,9 @@
     "check-edition": "node verify_edition.js",
     "render-markdown": "node render_markdown.js",
     "check-markdown": "node verify_markdown.js",
-    "check-projection": "node verify_projection.js"
+    "check-projection": "node verify_projection.js",
+    "render-backcatalog": "node render_backcatalog.js",
+    "check-backcatalog": "node verify_backcatalog.js"
   },
   "dependencies": {
     "katex": "0.16.47"

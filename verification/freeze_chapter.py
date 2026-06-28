@@ -374,4 +374,16 @@ def main():
 
 
 if __name__ == "__main__":
+    # --reskin <tag>: read HTML on stdin, apply the SAME outward-rewire (../../) + sealed
+    # release-label bake freeze applies to a chapter's editions, and write to stdout. Used by
+    # render_backcatalog.js so a live/<tag>/ re-skin (one level deep, exactly like chapters/<tag>/)
+    # resolves shared assets/nav from the live root and its provenance bar reads "release <tag>",
+    # never the live default. REUSES rewire()/bake_release_label() — one implementation, so the
+    # current-skin reading view can never drift from the frozen record's chrome transform.
+    if len(sys.argv) >= 3 and sys.argv[1] == "--reskin":
+        html = sys.stdin.read()
+        html, _ = rewire(html)
+        html, _ = bake_release_label(html, sys.argv[2])
+        sys.stdout.write(html)
+        sys.exit(0)
     sys.exit(main())

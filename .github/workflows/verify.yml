@@ -21,3 +21,5 @@ jobs:
         run: node verify_markdown.js
       - name: Content-equivalence gate (prose)
         run: node verify_projection.js
+      - name: Back-catalog gate
+        run: node verify_backcatalog.js

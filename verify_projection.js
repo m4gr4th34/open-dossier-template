@@ -148,11 +148,15 @@ function extractAtoms(sourcePath) {
 //     from the location's own index.md — the gated avenues.json/verify_numbers.py projection —
 //     so it is self-contained: working draft now, every baked chapter once frozen (5b-ii-2).
 //   Returns { label, prose, machinery, misses } (never exits — caller aggregates). ---
-function checkLocation(baseDir, label) {
+//   htmlPath overrides where the baked HTML is read from (default baseDir/index.html). A
+//   back-catalog re-skin (5b-ii-2b) lives at live/<tag>/index.html but is gated against its
+//   chapter's OWN sealed source + index.md (baseDir = chapters/<tag>/), so a re-skin that lost
+//   or altered prose/machinery vs its frozen record bites here.
+function checkLocation(baseDir, label, htmlPath) {
   const atoms = extractAtoms(path.join(baseDir, 'editions', 'index.source.html'));
   if (!atoms.length) die('[' + label + '] no content atoms extracted — almost certainly an extraction bug, not an empty paper.');
 
-  const htmlRaw = fs.readFileSync(path.join(baseDir, 'index.html'), 'utf8');
+  const htmlRaw = fs.readFileSync(htmlPath || path.join(baseDir, 'index.html'), 'utf8');
   // data-d (term glosses) and data-tex (math) are CONTENT that lives only in attributes;
   // surface them so a tag-strip haystack still carries them.
   const attrDump = [...htmlRaw.matchAll(/\bdata-(?:d|tex)="([^"]*)"/g)].map(x => x[1]).join('\n');
@@ -219,13 +223,30 @@ function sealedChapters() {
     .sort();
 }
 
-// --- driver: the working draft AND every sealed chapter (floor leg) ----------
+// A live/<tag>/ back-catalog re-skin (5b-ii-2b) is content-checkable iff its sealed chapter
+// (source + index.md, under chapters/<tag>/) exists to compare against.
+function reskinnedChapters() {
+  const dir = path.join(ROOT, 'live');
+  if (!fs.existsSync(dir)) return [];
+  const sealed = new Set(sealedChapters());
+  return fs.readdirSync(dir, { withFileTypes: true })
+    .filter(d => d.isDirectory() && fs.existsSync(path.join(dir, d.name, 'index.html')))
+    .map(d => d.name)
+    .filter(name => sealed.has(name))
+    .sort();
+}
+
+// --- driver: the working draft, every sealed chapter (floor leg), AND every back-catalog
+//     re-skin (its live/<tag>/index.html vs the chapter's OWN sealed source + index.md) -------
 const results = [checkLocation(ROOT, 'working draft')];
 const chapters = sealedChapters();
 if (!chapters.length) {
   process.stdout.write('verify_projection: floor leg: 0 frozen chapters on disk (gate in place; bites on first freeze)\n');
 } else {
   for (const tag of chapters) results.push(checkLocation(path.join(ROOT, 'chapters', tag), 'chapters/' + tag));
+}
+for (const tag of reskinnedChapters()) {
+  results.push(checkLocation(path.join(ROOT, 'chapters', tag), 'live/' + tag, path.join(ROOT, 'live', tag, 'index.html')));
 }
 
 const totalMisses = results.reduce((s, r) => s + r.misses.length, 0);

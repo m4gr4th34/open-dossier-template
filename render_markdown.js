@@ -72,10 +72,14 @@ function citesData(source) {
 }
 
 // --- the consistency verifier (subprocess; results are single-sourced) --------
-function runVerifier() {
+function runVerifier(avenuesPath = null) {
+  // avenuesPath null => today's invocation (live root, byte-unchanged); a path => verify a
+  // frozen chapter against its OWN sealed avenues.json via verify_numbers.py --avenues (5b-ii-2a).
+  const args = ['verification/verify_numbers.py'];
+  if (avenuesPath) args.push('--avenues', path.resolve(avenuesPath));
   let out;
   try {
-    out = execFileSync('python3', ['verification/verify_numbers.py'], { cwd: ROOT, encoding: 'utf8' });
+    out = execFileSync('python3', args, { cwd: ROOT, encoding: 'utf8' });
   } catch (e) {
     if (e.code === 'ENOENT') die('python3 not found — refusing to fabricate consistency results.');
     out = (e.stdout != null) ? String(e.stdout) : '';     // nonzero exit (a check failed) still carries stdout
@@ -96,8 +100,8 @@ function runVerifier() {
 
 // --- avenues.json reader: the SINGLE source consumed by BOTH the markdown table below
 //     AND the HTML static-card baker (bake_machinery.js), so cards and table can't drift. -------
-function readAvenues() {
-  const data = JSON.parse(fs.readFileSync(AVENUES, 'utf8'));
+function readAvenues(avenuesPath = AVENUES) {
+  const data = JSON.parse(fs.readFileSync(avenuesPath, 'utf8'));
   const avenues = Array.isArray(data.avenues) ? data.avenues : die('avenues.json: no "avenues" array');
   return { avenues, rules: (data.checks || {}) };
 }

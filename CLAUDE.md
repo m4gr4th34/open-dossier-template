@@ -146,7 +146,9 @@ verification script, and its claim ledger all live here.
   - render_edition.js / verify_edition.js   — render index.html from source+skin (incl. baking); CI round-trip gate
   - bake_machinery.js — static-card baker: bakes avenue cards + console verdict into index.html (HTML twin of the md table, single-sourced from avenues.json + verify_numbers.py); called by render_edition
   - render_markdown.js / verify_markdown.js — render index.md+llms.txt from the source; CI projection gate
-  - verify_projection.js — content-equivalence gate (prose + floor + machinery legs): every source prose atom AND baked avenue/console machinery present in BOTH index.html and index.md, for the working draft AND every sealed chapter under chapters/<tag>/ (CI `check-projection`)
+  - verify_projection.js — content-equivalence gate (prose + floor + machinery legs): every source prose atom AND baked avenue/console machinery present in BOTH index.html and index.md, for the working draft, every sealed chapter under chapters/<tag>/, AND every back-catalog re-skin under live/<tag>/ (vs the chapter's own sealed source + index.md) (CI `check-projection`)
+  - render_backcatalog.js / verify_backcatalog.js — re-skin every lineage chapter into live/<tag>/index.html (current skin@HEAD + the chapter's OWN sealed source/avenues.json, with a banner pointing at the frozen record); CI sync gate (`check-backcatalog`). Re-skin ritual: after any skin/edition.html change run `npm run render-backcatalog`, commit live/ as a separate `chore(reskin)`.
+  - live/<tag>/         — GENERATED current-skin reading view of each frozen chapter (NOT the record; chapters/<tag>/ is the immutable DOI'd record)
   - paper.html        — redirect stub → index.html (legacy link target)
   - dossier.html      — audit trail (red team, citation audit)
   - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)

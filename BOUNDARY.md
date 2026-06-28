@@ -151,11 +151,16 @@ reports rendering context, not a claim of the paper.
    so `index.html` ships STATIC baked cards + verdict — JS-off readable, and comparable. The
    gate parses each location's own `index.md` for the machinery atoms, so it auto-covers baked
    chapters once frozen; the back-catalog **renderer** that bakes per-chapter machinery (so old
-   chapters re-skin with baked floors) is **5b-ii-2**. Its foundation is **5b-ii-2a (DONE)**:
-   freeze now seals each chapter's own `avenues.json` (verbatim, via `CAPTURE_VERBATIM`), and
-   `verify_numbers.py` accepts an optional `--avenues <path>` override (default byte-unchanged),
-   so a frozen chapter's cards + verdict can be re-derived from its OWN sealed data by the
-   canonical readers/verifier — no projection reversed. (Markdown machinery fidelity to
+   chapters re-skin with baked floors) is **5b-ii-2 — DONE**. Foundation **5b-ii-2a (DONE)**:
+   freeze seals each chapter's own `avenues.json` (verbatim, via `CAPTURE_VERBATIM`), and
+   `verify_numbers.py` accepts an optional `--avenues <path>` override (default byte-unchanged).
+   **5b-ii-2b (DONE)**: `render_backcatalog.js` re-skins every lineage chapter into
+   `live/<tag>/index.html` — wrap(sealed source, skin@HEAD) + machinery baked from the chapter's
+   OWN sealed `avenues.json` (cards from it, verdict via `--avenues` on it) + an honest-label
+   banner naming the frozen record, then the SAME outward-rewire/label-bake freeze applies
+   (reused via `freeze_chapter.py --reskin`, no divergence). `verify_backcatalog.js` gates
+   `live/<tag>` byte-equal to its render, and `verify_projection.js` now also walks `live/<tag>/`
+   (re-skin html vs the chapter's sealed source + `index.md`). (Markdown machinery fidelity to
    `avenues.json`/`verify_numbers.py` is already gated at step 3.)
 3. Add the markdown / llms.txt projection (falls out of the source for free).
    **Projection engine + front-door output DONE (step 3):** `render_markdown.js` emits
@@ -165,7 +170,11 @@ reports rendering context, not a claim of the paper.
    its `## Chapters` list is generated newest-first from `lineage.json` (single-sourced;
    `verify_markdown.js` gates it byte-equal to `buildLlmsTxt()`). Per-chapter `<tag>.md`
    emission at freeze time is the remaining piece, landing with the step-5 baker.
-4. Build the build-time static live reader.
+4. Build the build-time static live reader. **DONE (5b-ii-2b):** `render_backcatalog.js` +
+   `verify_backcatalog.js` + the `live/<tag>/` reading views, gated in CI. NOTE: this step
+   builds and gates the re-skinned readers but does NOT make them the default Pages URL —
+   the Pages-routing / default-URL question (whether `/`, `/live/<tag>/`, or the frozen record
+   answers a given path) is a separate follow-up, deliberately out of scope here.
 5. Rewire `freeze_chapter.py` to capture the source and emit the projections.
 
 Pre-split chapters have no source and are not retrofitted — reverse-engineering a
