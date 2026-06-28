@@ -370,6 +370,10 @@ cite-the-record affordance in its own banner. This linking *is* the routing — 
 config that makes one URL "the chapter"; the lineage's honest links send readers to the reading
 view and citations to the record.
 
+The root `llms.txt` deep-links each chapter's **sealed record markdown** (`chapters/<tag>/index.md`)
+**newest-first** for machine discovery — the stable, citable surface (parallel to "cite the version
+of record"), deliberately distinct from `lineage.html`'s human **oldest-first** reading order.
+
 **Ancestors-only — this is doctrine, not preference.** A chapter records and links only
 what came *before* it: the previous chapter and the view-all index. **Never forward.** A
 sealed, DOI'd chapter must not be edited to point at successors that did not exist when

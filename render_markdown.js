@@ -281,9 +281,16 @@ function buildLlmsTxt() {
   const chapters = (Array.isArray(lineage.chapters) ? lineage.chapters : []).slice()
     .sort((a, b) => (b.n || 0) - (a.n || 0));   // newest first
   out += '\n## Chapters\n\n';
+  // llms.txt chapter index is NEWEST-FIRST by design — machine-index convention (RSS/
+  // sitemap/changelog lead with latest), DISTINCT from lineage.html's oldest-first reading
+  // order (human narrative arc). The divergence is intentional; do not "align" them.
+  // Each deep-link targets the chapter's SEALED record markdown (chapters/<tag>/index.md),
+  // never the live re-skin — the llms index is a stable, citable surface (parallel to the
+  // cite-the-record rule); the re-skin is a reading view, not a citable artifact, so it has
+  // no .md twin here on purpose. Path uses the freeze-authoritative c.path field.
   out += chapters.length
     ? chapters.map(c => '- [Chapter ' + c.n + ' — ' + collapseWs(stripTags(String(c.title || c.tag || '')))
-                        + '](chapters/' + c.tag + '/index.md)').join('\n') + '\n'
+                        + '](' + (c.path || 'chapters/' + c.tag + '/') + 'index.md)').join('\n') + '\n'
     : 'No chapters frozen yet.\n';
   return out;
 }
