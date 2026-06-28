@@ -7,10 +7,13 @@ the backfill ritual, so the two can never drift. Pure stdlib (no third-party
 deps): importing this module pulls nothing heavy and runs nothing — all work is
 under main().
 
-A "chapter" is a RELEASE. Freezing copies the four editions of that release into
+A "chapter" is a RELEASE. Freezing copies the three editions of that release into
 chapters/<TAG>/ (write-once, immutable like timestamps/), rewires their two
 outward-local asset paths to the shared root, and appends the chapter to
-lineage.json. The live root pages stay mutable; chapters are the frozen lineage.
+lineage.json. It ALSO seals, verbatim (no rewire/label-bake), the chapter's content
+source + skin and its pre-built markdown projection (CAPTURE_VERBATIM), so the chapter
+can be re-skinned or read as clean text later without re-rendering the frozen editions.
+The live root pages stay mutable; chapters are the frozen lineage.
 
 Usage:
   python3 verification/freeze_chapter.py \
@@ -52,6 +55,11 @@ CHAPTERS = os.path.join(REPO_ROOT, "chapters")
 
 # The three editions (index.html, dossier.html, verify.html) frozen together so their intra-set relative links keep working.
 EDITIONS = ["index.html", "dossier.html", "verify.html"]
+
+# Sealed VERBATIM (no rewire/label-bake): the chapter's own notarized content source
+# + skin, and its pre-built CI-gated markdown projection. These let the chapter be
+# re-skinned and read as clean text later without ever re-rendering the frozen editions.
+CAPTURE_VERBATIM = ["editions/index.source.html", "skin/edition.html", "index.md"]
 
 
 def abort(msg):
@@ -285,11 +293,12 @@ def main():
               " — a chapter that fails the honesty gate must not be frozen.")
     print("Gate: check_placeholders passed" + note + ".")
 
-    # --- step 3: SNAPSHOT (copy whatever subset of the four exists) ---
+    # --- step 3: SNAPSHOT (copy whatever subset of the three exists) ---
     present = [f for f in EDITIONS if os.path.isfile(os.path.join(source_dir, f))]
     missing = [f for f in EDITIONS if f not in present]
     if not present:
-        abort("none of the four editions found in source dir: " + source_dir)
+        abort("none of the three editions (index.html, dossier.html, verify.html) "
+              "found in source dir: " + source_dir)
 
     os.makedirs(chapter_dir, exist_ok=False)
     rewired_summary = {}
@@ -306,6 +315,22 @@ def main():
             fh.write(html)
         if counts:
             rewired_summary[f] = counts
+
+    # --- step 3b: SEAL the verbatim build inputs (content source + skin) and the
+    #     pre-built, CI-gated markdown projection — RAW bytes, relative path preserved,
+    #     NO rewire() and NO bake_release_label(). These are the chapter's notarized
+    #     content source and its clean-text reading copy, sealed exactly as built on main
+    #     (so the chapter can be re-skinned / read as text later without re-rendering the
+    #     frozen editions). Same present/missing subset handling as the editions above.
+    cap_present = [f for f in CAPTURE_VERBATIM if os.path.isfile(os.path.join(source_dir, f))]
+    cap_missing = [f for f in CAPTURE_VERBATIM if f not in cap_present]
+    for rel in cap_present:
+        dst = os.path.join(chapter_dir, rel)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        with open(os.path.join(source_dir, rel), "rb") as fh:
+            raw = fh.read()
+        with open(dst, "wb") as fh:
+            fh.write(raw)
 
     # --- step 5: APPEND ---
     n = max((int(c.get("n", 0)) for c in lineage["chapters"]), default=0) + 1
@@ -331,6 +356,10 @@ def main():
     print("  editions frozen : " + ", ".join(present))
     if missing:
         print("  editions MISSING: " + ", ".join(missing) + " (copied the subset that existed)")
+    if cap_present:
+        print("  sealed verbatim : " + ", ".join(cap_present) + " (raw bytes; no rewire/label-bake)")
+    if cap_missing:
+        print("  verbatim MISSING: " + ", ".join(cap_missing) + " (sealed the subset that existed)")
     if rewired_summary:
         for f, counts in rewired_summary.items():
             bits = ", ".join(k + "->../../ x" + str(v) for k, v in counts.items())
