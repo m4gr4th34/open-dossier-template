@@ -8,11 +8,14 @@
  *   - substitutes {{eyebrow}}/{{title}}/{{byline}} from the source frontmatter,
  *   - substitutes {{body}} with the source body (mounts expanded from skin
  *     fragments) and {{cites}} with the source's inert cite-data block,
- *   - strips the skin-internal <!--fragment:X--> definitions.
+ *   - strips the skin-internal <!--fragment:X--> definitions,
+ *   - bakes the avenue cards + console verdict into the static floor (bake_machinery.js),
+ *     so the front door ships readable with JS off (the JS ceiling re-renders identically).
  * Idempotent; fail-loud (nonzero exit) on any missing slot / mount / fragment
  * or any leftover {{ }} / <!--mount: / <!--fragment: in the output.
  *
- * Exposes renderEdition() -> the rendered HTML string (writes NOTHING); the CLI
+ * Exposes renderEdition(skinPath?, sourcePath?) -> the rendered HTML string (writes NOTHING);
+ * paths default to the live root; pass them to render a back-catalog chapter. The CLI
  * tail writes index.html. The CLI write path is author-local, exactly like
  * render_math.js / render_figures.js — readers need nothing and the writer is
  * never run in CI. The renderEdition() export IS used in CI, by verify_edition.js
@@ -24,6 +27,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { bakeMachinery } = require('./bake_machinery.js');
 
 const ROOT = __dirname;
 const SKIN = path.join(ROOT, 'skin', 'edition.html');
@@ -36,11 +40,12 @@ const sub = (hay, token, value, label) => {
   return hay.replace(token, () => value);          // function form: no $-pattern interpretation
 };
 
-// Read source + skin, substitute every slot/mount, and RETURN the rendered
-// index.html as a string. Writes nothing. Fail-loud on any missing piece.
-function renderEdition() {
-  const skin = fs.readFileSync(SKIN, 'utf8');
-  const source = fs.readFileSync(SOURCE, 'utf8');
+// Read source + skin, substitute every slot/mount, bake the machinery, and RETURN the
+// rendered index.html as a string. Writes nothing. Fail-loud on any missing piece.
+// Paths default to the live root; pass them to render a back-catalog chapter (5b-ii-2).
+function renderEdition(skinPath = SKIN, sourcePath = SOURCE) {
+  const skin = fs.readFileSync(skinPath, 'utf8');
+  const source = fs.readFileSync(sourcePath, 'utf8');
 
   // --- source: frontmatter ---
   const fm = source.match(/^<!--edition\n([\s\S]*?)\n-->\n/);
@@ -92,6 +97,10 @@ function renderEdition() {
   // --- fail loud on any unresolved token leaking into the output ---
   const leak = out.match(/\{\{[a-z]+\}\}|<!--mount:|<!--fragment:/);
   if (leak) die('output still contains an unresolved token: ' + JSON.stringify(leak[0]));
+
+  // --- bake the machinery (avenue cards + console verdict) into the static floor,
+  //     so the front door ships readable with JS off (the JS ceiling re-renders identically) ---
+  out = bakeMachinery(out);
 
   return out;
 }

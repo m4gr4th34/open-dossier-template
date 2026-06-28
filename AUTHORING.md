@@ -97,7 +97,10 @@ forwards to `index.html`, kept so old links and frozen chapters resolve.)
 
 **Generated, never hand-edited.** `index.html` is BUILT from
 `editions/index.source.html` (the skin-free content) + `skin/edition.html` (the
-wrapper) by `npm run render-edition`. Edit the SOURCE and re-render; never
+wrapper) by `npm run render-edition`, which also **bakes the avenue cards + console
+verdict into static bytes** (`bake_machinery.js`, the HTML twin of the markdown table —
+single-sourced from `avenues.json` + `verify_numbers.py`), so the front door is readable
+with JS OFF (the in-page JS re-renders identically). Edit the SOURCE and re-render; never
 hand-edit `index.html` — CI's edition round-trip gate (`npm run check-edition`)
 fails the build if `index.html` drifts from `render(source, skin)`. See BOUNDARY.md.
 
@@ -108,12 +111,13 @@ markdown projection gate (`npm run check-markdown`) enforces it too.
 
 On top of those, the **content-equivalence gate** (`npm run check-projection`) asserts
 every PROSE atom of the source (headings, paragraphs, term glosses, cite who/what/src,
-math, callouts) appears in BOTH `index.html` and `index.md` — so the two editions can't
-quietly diverge in what they say. It runs for the live working draft **and every sealed
-chapter** under `chapters/<tag>/` (the floor leg), so frozen chapters stay self-consistent
-too. And `llms.txt` is **lineage-driven** — its `## Chapters` list is generated from
-`lineage.json`; regenerate it with `npm run render-markdown`, never hand-edit. See
-BOUNDARY.md (step 2b).
+math, callouts) AND the **baked MACHINERY** (each avenue's name/thesis/status and each
+console check label + the tally) appears in BOTH `index.html` and `index.md` — so the two
+editions can't quietly diverge in what they say. It runs for the live working draft **and
+every sealed chapter** under `chapters/<tag>/` (the floor leg), so frozen chapters stay
+self-consistent too. And `llms.txt` is **lineage-driven** — its `## Chapters` list is
+generated from `lineage.json`; regenerate it with `npm run render-markdown`, never
+hand-edit. See BOUNDARY.md (step 2b).
 
 **The interactive instrument (top of the page).**
 

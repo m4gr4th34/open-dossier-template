@@ -339,7 +339,7 @@
   <div class="kicker teal">THE LANDSCAPE · SURVEY</div>
   <h2>Avenues at a glance</h2>
   <p class="lede">Every avenue in this survey, each with its honest status label and — where the avenue is a forward bet — a dated forecast. <span class="mono">The labels are the verification here: each is exactly as strong as its evidence.</span></p>
-  <div class="av-grid" id="av-grid"></div>
+  <div class="av-grid" id="av-grid" data-baked="1"><div class="av-card t-est"><div class="av-top"><span class="av-name">PLACEHOLDER avenue A</span><span class="s-chip s-est">ESTABLISHED</span></div><p class="av-thesis">One-line thesis — what this avenue is and why it's in play.</p><div class="av-meta"><span class="srcs"><span class="ref">REF1</span><span class="ref">REF2</span></span></div></div><div class="av-card t-open"><div class="av-top"><span class="av-name">PLACEHOLDER avenue B</span><span class="s-chip s-open">OPEN-UNVERIFIED</span></div><p class="av-thesis">One-line thesis for an avenue with a central open question.</p><div class="av-meta"><span class="srcs"><span class="ref">REF3</span></span></div></div><div class="av-card t-forecast"><div class="av-top"><span class="av-name">PLACEHOLDER avenue C</span><span class="s-chip s-forecast">FORECAST</span></div><p class="av-thesis">One-line thesis for an avenue you're making a forward bet on.</p><div class="av-meta"><span class="fc"><span class="pct">~35%</span> <span class="by">by 2030</span></span><span class="srcs"><span class="ref">REF4</span></span></div></div><div class="av-card t-reported"><div class="av-top"><span class="av-name">PLACEHOLDER avenue D</span><span class="s-chip s-reported">REPORTED</span></div><p class="av-thesis">One-line thesis sourced only to an interested party / roadmap.</p><div class="av-meta"><span class="srcs"><span class="ref">REF5</span></span></div></div></div>
   <div class="legend">
     <span class="item"><span class="s-chip s-est">ESTABLISHED</span> documented, cited</span>
     <span class="item"><span class="s-chip s-open">OPEN-UNVERIFIED</span> the author's open claim</span>
@@ -354,14 +354,14 @@
   <p class="lede">A survey's verification weight sits mostly in the <a href="dossier.html">citation audit</a>; the console here runs the <em>consistency</em> checks — cross-avenue totals, internal arithmetic, and the rule that every forecast carries a dated signpost. Same arithmetic as <span class="mono">verification/verify_numbers.py</span>, which CI reruns on every commit.</p>
   <div class="console">
     <div class="console-head">
-      <span class="label">consistency console · <span id="ncheck">N</span> checks</span>
+      <span class="label">consistency console · <span id="ncheck">3</span> checks</span>
       <button id="run">Run all checks</button>
     </div>
-    <div id="log" aria-live="polite">
-      <div class="row">
-        <span class="badge" style="color:var(--ink2);border:1px solid var(--line)">IDLE</span>
-        <span class="what" style="color:var(--ink2)">Awaiting run. Don't trust this paper — run it.</span>
-      </div>
+    <div id="log" aria-live="polite" data-baked="1">
+      <div class="row"><span class="badge p">PASS</span><span class="what">01 · Consistency: at least one avenue in the landscape</span></div>
+      <div class="row"><span class="badge p">PASS</span><span class="what">02 · Consistency: every FORECAST has a dated signpost</span></div>
+      <div class="row"><span class="badge p">PASS</span><span class="what">03 · Consistency: all forecast probabilities lie in [0,100]</span></div>
+      <div class="tally">TOTAL: 3 checks · 3 pass · 0 fail — All checks pass — the survey is internally consistent.</div>
     </div>
   </div>
 </section>
@@ -589,12 +589,18 @@ function renderLandscapeError(){
     'View this page on the live site or a local server — a file:// double-click can\'t fetch it.</p></div>';
   document.getElementById('ncheck').textContent = '0';
 }
+// data-baked guard: a static-baked floor (bake_machinery.js) already carries the cards +
+// console verdict; still load AVENUES/RULES so the Run button works, but DON'T re-render the
+// cards or let a fetch failure (file://) overwrite the baked floor.
+const baked = !!document.querySelector('#av-grid[data-baked]');
 fetch('avenues.json').then(r=>r.json()).then(d=>{
   AVENUES = Array.isArray(d.avenues) ? d.avenues : [];
   RULES   = d.checks || {};
-  renderCards();
-  document.getElementById('ncheck').textContent = buildChecks().length;
-}).catch(renderLandscapeError);
+  if(!baked){
+    renderCards();
+    document.getElementById('ncheck').textContent = buildChecks().length;
+  }
+}).catch(()=>{ if(!baked) renderLandscapeError(); });
 
 runBtn.addEventListener('click', () => {
   runBtn.disabled = true; logEl.innerHTML = '';

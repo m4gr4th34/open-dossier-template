@@ -145,10 +145,14 @@ reports rendering context, not a claim of the paper.
    `index.html` and `index.md`, so the two renderings can't diverge in what they SAY — now
    for the live working draft **and every sealed chapter** under `chapters/<tag>/` (5b-i; a
    chapter's rewired/baked `index.html` vs its verbatim `index.md`, chrome normalized away).
-   The **machinery leg** (baked avenue cards vs the markdown avenue table) is still **pending
-   5b-ii's static-card baker**: a frozen `index.html` ships EMPTY card shells (runtime-filled
-   from `avenues.json`), so there are no baked cards to compare yet. (Markdown machinery
-   fidelity to `avenues.json`/`verify_numbers.py` is already gated at step 3.)
+   The **machinery leg** (baked avenue cards + console verdict vs the markdown table/list) is
+   **DONE for the working draft (5b-ii-1)**: `render_edition.js` now runs `bake_machinery.js`
+   (the HTML twin of the md table, single-sourced from `avenues.json` + `verify_numbers.py`),
+   so `index.html` ships STATIC baked cards + verdict — JS-off readable, and comparable. The
+   gate parses each location's own `index.md` for the machinery atoms, so it auto-covers baked
+   chapters once frozen; the back-catalog **renderer** that bakes per-chapter machinery (so old
+   chapters re-skin with baked floors) is **5b-ii-2**. (Markdown machinery fidelity to
+   `avenues.json`/`verify_numbers.py` is already gated at step 3.)
 3. Add the markdown / llms.txt projection (falls out of the source for free).
    **Projection engine + front-door output DONE (step 3):** `render_markdown.js` emits
    `index.md` (avenue table from `avenues.json`, checks from `verify_numbers.py`, prose

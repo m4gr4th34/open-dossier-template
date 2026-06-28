@@ -139,13 +139,14 @@ verification script, and its claim ledger all live here.
   Do not create releases without the author's explicit instruction.
 - NEVER modify anything in timestamps/ — those are cryptographic proofs.
 - File map:
-  - index.html        — the paper (GENERATED: edit editions/index.source.html + skin/edition.html, then `npm run render-edition`; never hand-edit — CI's `check-edition` gate enforces it). Self-explaining edition + avenue landscape + verification console.
+  - index.html        — the paper (GENERATED: edit editions/index.source.html + skin/edition.html, then `npm run render-edition`; never hand-edit — CI's `check-edition` gate enforces it). Self-explaining edition + avenue landscape + verification console, with the cards + console verdict BAKED to static bytes (JS-off readable).
   - editions/         — skin-free content source (index.source.html) for the front door
   - skin/             — the wrapper/skin (edition.html) the source renders into
   - index.md / llms.txt — GENERATED skin-free markdown projection of the source (edit the source, `npm run render-markdown`; never hand-edit — CI's `check-markdown` gate enforces it). llms.txt's chapter index is lineage-driven from lineage.json.
-  - render_edition.js / verify_edition.js   — render index.html from source+skin; CI round-trip gate
+  - render_edition.js / verify_edition.js   — render index.html from source+skin (incl. baking); CI round-trip gate
+  - bake_machinery.js — static-card baker: bakes avenue cards + console verdict into index.html (HTML twin of the md table, single-sourced from avenues.json + verify_numbers.py); called by render_edition
   - render_markdown.js / verify_markdown.js — render index.md+llms.txt from the source; CI projection gate
-  - verify_projection.js — content-equivalence gate (prose, floor leg): every source prose atom present in BOTH index.html and index.md, for the working draft AND every sealed chapter under chapters/<tag>/ (CI `check-projection`)
+  - verify_projection.js — content-equivalence gate (prose + floor + machinery legs): every source prose atom AND baked avenue/console machinery present in BOTH index.html and index.md, for the working draft AND every sealed chapter under chapters/<tag>/ (CI `check-projection`)
   - paper.html        — redirect stub → index.html (legacy link target)
   - dossier.html      — audit trail (red team, citation audit)
   - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)

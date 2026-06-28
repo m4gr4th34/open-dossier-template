@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 /*
- * verify_projection.js — Content-equivalence gate (BOUNDARY.md step 2b), PROSE + FLOOR legs.
+ * verify_projection.js — Content-equivalence gate (BOUNDARY.md step 2b): PROSE + FLOOR + MACHINERY.
  *
  * For EACH location — the live working draft AND every sealed chapter under chapters/<tag>/ —
  * asserts every prose content atom of that location's source (editions/index.source.html)
@@ -14,10 +14,12 @@
  * index.md is sealed verbatim; normalize() strips tags / paths / md markers, so those
  * chrome/path differences never leak into the content comparison.
  *
- * The MACHINERY leg (baked avenue cards vs the markdown avenue table) is still deferred to
- * 5b-ii: a frozen index.html still ships EMPTY card shells (runtime-filled from avenues.json),
- * so there are no baked cards to compare yet. Markdown machinery fidelity to avenues.json /
- * verify_numbers.py is already gated by step 3.
+ * The MACHINERY leg (baked avenue cards + console verdict vs the markdown table/list) is DONE
+ * for the working draft (5b-ii-1): index.html now ships STATICALLY BAKED cards + verdict
+ * (bake_machinery.js), so they can be compared. Machinery atoms are parsed from each location's
+ * own index.md (the gated avenues.json/verify_numbers.py projection), so the check is
+ * self-contained and auto-covers every baked chapter once frozen (5b-ii-2). Markdown machinery
+ * fidelity to avenues.json / verify_numbers.py is already gated by step 3.
  *
  * Pure Node, read-only (renders nothing, writes nothing). Author-local AND in CI.
  *
@@ -139,7 +141,13 @@ function extractAtoms(sourcePath) {
 }
 
 // --- check ONE location: a dir holding editions/index.source.html + index.html + index.md.
-//     Returns { label, atoms: <checked count>, misses: [...] } (never exits — caller aggregates). ---
+//   PROSE leg: every source prose atom present in both renderings.
+//   MACHINERY leg: every avenue (name/thesis/status) + console (check label, tally) atom from
+//     THIS location's index.md present in its BAKED index.html, normalized (the baked cards'
+//     split spans / the table's escaped pipes compare by what they SAY, not markup). Sourced
+//     from the location's own index.md — the gated avenues.json/verify_numbers.py projection —
+//     so it is self-contained: working draft now, every baked chapter once frozen (5b-ii-2).
+//   Returns { label, prose, machinery, misses } (never exits — caller aggregates). ---
 function checkLocation(baseDir, label) {
   const atoms = extractAtoms(path.join(baseDir, 'editions', 'index.source.html'));
   if (!atoms.length) die('[' + label + '] no content atoms extracted — almost certainly an extraction bug, not an empty paper.');
@@ -149,27 +157,53 @@ function checkLocation(baseDir, label) {
   // surface them so a tag-strip haystack still carries them.
   const attrDump = [...htmlRaw.matchAll(/\bdata-(?:d|tex)="([^"]*)"/g)].map(x => x[1]).join('\n');
   const hayHtml = normalize(htmlRaw) + ' ' + normalize(attrDump);
-  const hayMd = normalize(fs.readFileSync(path.join(baseDir, 'index.md'), 'utf8'));
+  const mdRaw = fs.readFileSync(path.join(baseDir, 'index.md'), 'utf8');
+  const hayMd = normalize(mdRaw);
+  const misses = [];
 
+  // --- PROSE leg ---
   const seen = new Set();
-  const checks = [];
+  const prose = [];
   for (const a of atoms) {
     const na = normalize(a.text);
     if (!na || !/[a-z0-9]/i.test(na)) continue;                    // skip empty / punctuation-only runs
     if (seen.has(na)) continue;
     seen.add(na);
-    checks.push({ cat: a.cat, na });
+    prose.push({ cat: a.cat, na });
   }
-  if (process.argv.includes('--list')) {
-    process.stderr.write('--- [' + label + '] ' + checks.length + ' content atoms ---\n');
-    for (const c of checks) process.stderr.write('[' + c.cat + '] ' + c.na.slice(0, 100) + '\n');
-  }
-  const misses = [];
-  for (const c of checks) {
+  for (const c of prose) {
     if (!hayHtml.includes(c.na)) misses.push('MISSING from live: ' + c.na.slice(0, 80));
     if (!hayMd.includes(c.na)) misses.push('MISSING from markdown: ' + c.na.slice(0, 80));
   }
-  return { label, atoms: checks.length, misses };
+
+  // --- MACHINERY leg: avenue + console atoms parsed from this location's index.md ---
+  const mach = [];
+  let mm;
+  const rowRe = /^\| (.+?) \| (.+?) \| (.+?) \| (.+?) \| (.+?) \|$/gm;     // ## Avenues table rows
+  while ((mm = rowRe.exec(mdRaw))) {
+    if (mm[1] === 'Avenue' || /^-+$/.test(mm[1].trim())) continue;        // skip header / separator
+    mach.push(['avenue-name', mm[1]], ['avenue-thesis', mm[2]], ['avenue-status', mm[3]]);
+  }
+  const labelRe = /^- \[(?:PASS|FAIL)\] (.+)$/gm;                          // ## Consistency checks rows
+  while ((mm = labelRe.exec(mdRaw))) mach.push(['check-label', mm[1]]);
+  const tallyM = mdRaw.match(/\*\*TOTAL: ([^*]+)\*\*/);                    // the verdict tally line
+  if (tallyM) mach.push(['tally', 'TOTAL: ' + tallyM[1].trim()]);
+
+  const machChecks = [];
+  for (const [cat, text] of mach) {
+    const na = normalize(text);
+    if (!na) continue;
+    machChecks.push({ cat, na });
+    if (!hayHtml.includes(na)) misses.push('machinery MISSING from live: [' + cat + '] ' + na.slice(0, 80));
+    if (!hayMd.includes(na)) misses.push('machinery MISSING from markdown: [' + cat + '] ' + na.slice(0, 80));
+  }
+
+  if (process.argv.includes('--list')) {
+    process.stderr.write('--- [' + label + '] ' + prose.length + ' prose + ' + machChecks.length + ' machinery atoms ---\n');
+    for (const c of prose) process.stderr.write('[' + c.cat + '] ' + c.na.slice(0, 100) + '\n');
+    for (const c of machChecks) process.stderr.write('[machinery:' + c.cat + '] ' + c.na.slice(0, 100) + '\n');
+  }
+  return { label, prose: prose.length, machinery: machChecks.length, misses };
 }
 
 // A well-formed sealed chapter (5a) carries all three of these; partial dirs are skipped.
@@ -201,6 +235,7 @@ if (totalMisses) {
   process.exit(1);
 }
 
-process.stdout.write('verify_projection: content-equivalence (prose) OK — '
-  + results.map(r => '[' + r.label + '] ' + r.atoms).join(', ') + ' atoms present in both renderings\n');
+process.stdout.write('verify_projection: content-equivalence (prose + machinery) OK — '
+  + results.map(r => '[' + r.label + '] ' + r.prose + ' prose + ' + r.machinery + ' machinery').join(', ')
+  + ' atoms present in both renderings\n');
 process.exit(0);

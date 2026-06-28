@@ -94,10 +94,17 @@ function runVerifier() {
   return { checks, tally, summary };
 }
 
-// --- avenues table (read straight from avenues.json, the single source) -------
-function renderAvenuesTable() {
+// --- avenues.json reader: the SINGLE source consumed by BOTH the markdown table below
+//     AND the HTML static-card baker (bake_machinery.js), so cards and table can't drift. -------
+function readAvenues() {
   const data = JSON.parse(fs.readFileSync(AVENUES, 'utf8'));
   const avenues = Array.isArray(data.avenues) ? data.avenues : die('avenues.json: no "avenues" array');
+  return { avenues, rules: (data.checks || {}) };
+}
+
+// --- avenues table (read straight from avenues.json, the single source) -------
+function renderAvenuesTable() {
+  const { avenues } = readAvenues();
   const esc = s => String(s).replace(/\|/g, '\\|').replace(/\n/g, ' ');
   const rows = avenues.map(a => {
     const fc = (a.status === 'FORECAST' && a.forecast != null)
@@ -286,4 +293,4 @@ if (require.main === module) {
     + path.relative(ROOT, OUT_LLMS) + ' (' + llms.length + ' chars)\n');
 }
 
-module.exports = { renderMarkdown, buildLlmsTxt };
+module.exports = { renderMarkdown, buildLlmsTxt, readAvenues, runVerifier };

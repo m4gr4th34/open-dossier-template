@@ -448,12 +448,18 @@ function renderLandscapeError(){
     'View this page on the live site or a local server — a file:// double-click can\'t fetch it.</p></div>';
   document.getElementById('ncheck').textContent = '0';
 }
+// data-baked guard: a static-baked floor (bake_machinery.js) already carries the cards +
+// console verdict; still load AVENUES/RULES so the Run button works, but DON'T re-render the
+// cards or let a fetch failure (file://) overwrite the baked floor.
+const baked = !!document.querySelector('#av-grid[data-baked]');
 fetch('avenues.json').then(r=>r.json()).then(d=>{
   AVENUES = Array.isArray(d.avenues) ? d.avenues : [];
   RULES   = d.checks || {};
-  renderCards();
-  document.getElementById('ncheck').textContent = buildChecks().length;
-}).catch(renderLandscapeError);
+  if(!baked){
+    renderCards();
+    document.getElementById('ncheck').textContent = buildChecks().length;
+  }
+}).catch(()=>{ if(!baked) renderLandscapeError(); });
 
 runBtn.addEventListener('click', () => {
   runBtn.disabled = true; logEl.innerHTML = '';
