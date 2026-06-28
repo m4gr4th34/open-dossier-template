@@ -140,8 +140,14 @@ reports rendering context, not a claim of the paper.
 2a. Round-trip gate (`verify_edition.js`) — **DONE**: asserts `index.html ==
    render(source, skin)`, fail-loud, in CI (the `verify-claims` workflow). Protects the
    partition the moment the source is edited.
-2b. Content-projection equivalence gate — **DEFERRED to step 4**, when a live reader
-   (`skin@HEAD`) and a markdown projection exist to compare: `floor == live == markdown`.
+2b. Content-projection equivalence gate — **PARTIAL**: the **prose leg DONE**
+   (`verify_projection.js`) asserts every prose content atom of the source appears in BOTH
+   `index.html` and `index.md`, so the two renderings can't diverge in what they SAY. The
+   **machinery leg** (baked avenue cards + console verdict, live-vs-markdown) and the
+   **floor leg** (frozen `chapters/<tag>/` vs live) are **deferred to step 5**, where the
+   freeze baker creates the static baked surfaces those legs need to compare (live machinery
+   is runtime-built today; markdown machinery fidelity to `avenues.json`/`verify_numbers.py`
+   is already gated at step 3).
 3. Add the markdown / llms.txt projection (falls out of the source for free).
    **Projection engine + front-door output DONE (step 3):** `render_markdown.js` emits
    `index.md` (avenue table from `avenues.json`, checks from `verify_numbers.py`, prose

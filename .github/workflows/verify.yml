@@ -19,3 +19,5 @@ jobs:
         run: node verify_edition.js
       - name: Markdown projection gate
         run: node verify_markdown.js
+      - name: Content-equivalence gate (prose)
+        run: node verify_projection.js

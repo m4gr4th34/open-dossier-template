@@ -106,6 +106,11 @@ token-efficient, skin-free markdown — avenue table from `avenues.json`, checks
 `verify_numbers.py`) via `npm run render-markdown`; never hand-edit `index.md` — CI's
 markdown projection gate (`npm run check-markdown`) enforces it too.
 
+On top of those, the **content-equivalence gate** (`npm run check-projection`) asserts
+every PROSE atom of the source (headings, paragraphs, term glosses, cite who/what/src,
+math, callouts) appears in BOTH `index.html` and `index.md` — so the two editions can't
+quietly diverge in what they say. See BOUNDARY.md (step 2b, prose leg).
+
 **The interactive instrument (top of the page).**
 
 - Port every Python check into the `buildChecks()` console verbatim

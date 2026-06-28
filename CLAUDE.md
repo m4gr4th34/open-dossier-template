@@ -145,6 +145,7 @@ verification script, and its claim ledger all live here.
   - index.md / llms.txt — GENERATED skin-free markdown projection of the source (edit the source, `npm run render-markdown`; never hand-edit — CI's `check-markdown` gate enforces it)
   - render_edition.js / verify_edition.js   — render index.html from source+skin; CI round-trip gate
   - render_markdown.js / verify_markdown.js — render index.md+llms.txt from the source; CI projection gate
+  - verify_projection.js — content-equivalence gate (prose): every source prose atom present in BOTH index.html and index.md (CI `check-projection`)
   - paper.html        — redirect stub → index.html (legacy link target)
   - dossier.html      — audit trail (red team, citation audit)
   - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)
