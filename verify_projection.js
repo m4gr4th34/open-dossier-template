@@ -1,31 +1,35 @@
 #!/usr/bin/env node
 'use strict';
 /*
- * verify_projection.js — Content-equivalence gate (BOUNDARY.md step 2b), PROSE leg.
+ * verify_projection.js — Content-equivalence gate (BOUNDARY.md step 2b), PROSE + FLOOR legs.
  *
- * Asserts every prose content atom of the source (editions/index.source.html) appears
- * in BOTH renderings (index.html, index.md), which — with the round-trip gates bounding
+ * For EACH location — the live working draft AND every sealed chapter under chapters/<tag>/ —
+ * asserts every prose content atom of that location's source (editions/index.source.html)
+ * appears in BOTH of its renderings (index.html, index.md). With the round-trip gates bounding
  * each rendering (verify_edition.js: index.html == render(source, skin); verify_markdown.js:
- * index.md == text(source)) — proves the two projections carry identical prose content.
+ * index.md == text(source)), this proves the two projections carry identical prose content —
+ * for the working draft and, once frozen, for every chapter of the lineage (the FLOOR leg).
  *
- * The MACHINERY leg (baked avenue cards + console verdict, live-vs-markdown) is deferred
- * to step 5 (needs the freeze baker; live machinery is runtime-built today). Markdown
- * machinery fidelity to avenues.json / verify_numbers.py is already gated by step 3.
+ * A frozen chapter's index.html is rewired (../../) and pv-state-baked at freeze time while its
+ * index.md is sealed verbatim; normalize() strips tags / paths / md markers, so those
+ * chrome/path differences never leak into the content comparison.
+ *
+ * The MACHINERY leg (baked avenue cards vs the markdown avenue table) is still deferred to
+ * 5b-ii: a frozen index.html still ships EMPTY card shells (runtime-filled from avenues.json),
+ * so there are no baked cards to compare yet. Markdown machinery fidelity to avenues.json /
+ * verify_numbers.py is already gated by step 3.
  *
  * Pure Node, read-only (renders nothing, writes nothing). Author-local AND in CI.
  *
  * Usage:
- *   node verify_projection.js          # exit 0 = prose present in both; exit 1 = a miss
- *   node verify_projection.js --list   # also dump the extracted atoms to stderr
+ *   node verify_projection.js          # exit 0 = prose present in both, every location
+ *   node verify_projection.js --list   # also dump the extracted atoms per location to stderr
  *   npm run check-projection
  */
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = __dirname;
-const SOURCE = path.join(ROOT, 'editions', 'index.source.html');
-const HTML = path.join(ROOT, 'index.html');
-const MD = path.join(ROOT, 'index.md');
 
 function die(msg) { process.stderr.write('verify_projection: ' + msg + '\n'); process.exit(1); }
 
@@ -77,8 +81,8 @@ function proseRuns(inner) {
   return inner.replace(/<button class="term"[^>]*>[\s\S]*?<\/button>/g, '\uE000').split('\uE000');
 }
 
-function extractAtoms() {
-  const src = fs.readFileSync(SOURCE, 'utf8');
+function extractAtoms(sourcePath) {
+  const src = fs.readFileSync(sourcePath, 'utf8');
   const front = frontmatter(src);
   const cites = citesData(src);
   const body = slot(src, 'body').replace(/<!--[\s\S]*?-->/g, ' ');   // drop mounts + authoring comments
@@ -134,42 +138,69 @@ function extractAtoms() {
   return atoms;
 }
 
-// --- the gate ----------------------------------------------------------------
-const atoms = extractAtoms();
-if (!atoms.length) die('no content atoms extracted — almost certainly an extraction bug, not an empty paper.');
+// --- check ONE location: a dir holding editions/index.source.html + index.html + index.md.
+//     Returns { label, atoms: <checked count>, misses: [...] } (never exits — caller aggregates). ---
+function checkLocation(baseDir, label) {
+  const atoms = extractAtoms(path.join(baseDir, 'editions', 'index.source.html'));
+  if (!atoms.length) die('[' + label + '] no content atoms extracted — almost certainly an extraction bug, not an empty paper.');
 
-const htmlRaw = fs.readFileSync(HTML, 'utf8');
-// data-d (term glosses) and data-tex (math) are CONTENT that lives only in attributes;
-// surface them so a tag-strip haystack still carries them.
-const attrDump = [...htmlRaw.matchAll(/\bdata-(?:d|tex)="([^"]*)"/g)].map(x => x[1]).join('\n');
-const hayHtml = normalize(htmlRaw) + ' ' + normalize(attrDump);
-const hayMd = normalize(fs.readFileSync(MD, 'utf8'));
+  const htmlRaw = fs.readFileSync(path.join(baseDir, 'index.html'), 'utf8');
+  // data-d (term glosses) and data-tex (math) are CONTENT that lives only in attributes;
+  // surface them so a tag-strip haystack still carries them.
+  const attrDump = [...htmlRaw.matchAll(/\bdata-(?:d|tex)="([^"]*)"/g)].map(x => x[1]).join('\n');
+  const hayHtml = normalize(htmlRaw) + ' ' + normalize(attrDump);
+  const hayMd = normalize(fs.readFileSync(path.join(baseDir, 'index.md'), 'utf8'));
 
-const seen = new Set();
-const checks = [];
-for (const a of atoms) {
-  const na = normalize(a.text);
-  if (!na || !/[a-z0-9]/i.test(na)) continue;                     // skip empty / punctuation-only runs
-  if (seen.has(na)) continue;
-  seen.add(na);
-  checks.push({ cat: a.cat, na });
+  const seen = new Set();
+  const checks = [];
+  for (const a of atoms) {
+    const na = normalize(a.text);
+    if (!na || !/[a-z0-9]/i.test(na)) continue;                    // skip empty / punctuation-only runs
+    if (seen.has(na)) continue;
+    seen.add(na);
+    checks.push({ cat: a.cat, na });
+  }
+  if (process.argv.includes('--list')) {
+    process.stderr.write('--- [' + label + '] ' + checks.length + ' content atoms ---\n');
+    for (const c of checks) process.stderr.write('[' + c.cat + '] ' + c.na.slice(0, 100) + '\n');
+  }
+  const misses = [];
+  for (const c of checks) {
+    if (!hayHtml.includes(c.na)) misses.push('MISSING from live: ' + c.na.slice(0, 80));
+    if (!hayMd.includes(c.na)) misses.push('MISSING from markdown: ' + c.na.slice(0, 80));
+  }
+  return { label, atoms: checks.length, misses };
 }
 
-if (process.argv.includes('--list')) {
-  process.stderr.write('--- ' + checks.length + ' content atoms ---\n');
-  for (const c of checks) process.stderr.write('[' + c.cat + '] ' + c.na.slice(0, 100) + '\n');
+// A well-formed sealed chapter (5a) carries all three of these; partial dirs are skipped.
+function sealedChapters() {
+  const dir = path.join(ROOT, 'chapters');
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => d.name)
+    .filter(name => fs.existsSync(path.join(dir, name, 'index.html'))
+                 && fs.existsSync(path.join(dir, name, 'index.md'))
+                 && fs.existsSync(path.join(dir, name, 'editions', 'index.source.html')))
+    .sort();
 }
 
-const misses = [];
-for (const c of checks) {
-  if (!hayHtml.includes(c.na)) misses.push('MISSING from live: ' + c.na.slice(0, 80));
-  if (!hayMd.includes(c.na)) misses.push('MISSING from markdown: ' + c.na.slice(0, 80));
+// --- driver: the working draft AND every sealed chapter (floor leg) ----------
+const results = [checkLocation(ROOT, 'working draft')];
+const chapters = sealedChapters();
+if (!chapters.length) {
+  process.stdout.write('verify_projection: floor leg: 0 frozen chapters on disk (gate in place; bites on first freeze)\n');
+} else {
+  for (const tag of chapters) results.push(checkLocation(path.join(ROOT, 'chapters', tag), 'chapters/' + tag));
 }
-if (misses.length) {
-  for (const x of misses) process.stderr.write('verify_projection: ' + x + '\n');
-  process.stderr.write('verify_projection: ' + misses.length + ' content atom(s) not present in both renderings — fix the renderer/source, never the gate.\n');
+
+const totalMisses = results.reduce((s, r) => s + r.misses.length, 0);
+if (totalMisses) {
+  for (const r of results) for (const x of r.misses) process.stderr.write('verify_projection: [' + r.label + '] ' + x + '\n');
+  process.stderr.write('verify_projection: ' + totalMisses + ' content atom(s) not present in both renderings — fix the renderer/source, never the gate.\n');
   process.exit(1);
 }
 
-process.stdout.write('verify_projection: content-equivalence (prose) OK — ' + checks.length + ' atoms present in both renderings\n');
+process.stdout.write('verify_projection: content-equivalence (prose) OK — '
+  + results.map(r => '[' + r.label + '] ' + r.atoms).join(', ') + ' atoms present in both renderings\n');
 process.exit(0);

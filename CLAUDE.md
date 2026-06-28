@@ -142,10 +142,10 @@ verification script, and its claim ledger all live here.
   - index.html        — the paper (GENERATED: edit editions/index.source.html + skin/edition.html, then `npm run render-edition`; never hand-edit — CI's `check-edition` gate enforces it). Self-explaining edition + avenue landscape + verification console.
   - editions/         — skin-free content source (index.source.html) for the front door
   - skin/             — the wrapper/skin (edition.html) the source renders into
-  - index.md / llms.txt — GENERATED skin-free markdown projection of the source (edit the source, `npm run render-markdown`; never hand-edit — CI's `check-markdown` gate enforces it)
+  - index.md / llms.txt — GENERATED skin-free markdown projection of the source (edit the source, `npm run render-markdown`; never hand-edit — CI's `check-markdown` gate enforces it). llms.txt's chapter index is lineage-driven from lineage.json.
   - render_edition.js / verify_edition.js   — render index.html from source+skin; CI round-trip gate
   - render_markdown.js / verify_markdown.js — render index.md+llms.txt from the source; CI projection gate
-  - verify_projection.js — content-equivalence gate (prose): every source prose atom present in BOTH index.html and index.md (CI `check-projection`)
+  - verify_projection.js — content-equivalence gate (prose, floor leg): every source prose atom present in BOTH index.html and index.md, for the working draft AND every sealed chapter under chapters/<tag>/ (CI `check-projection`)
   - paper.html        — redirect stub → index.html (legacy link target)
   - dossier.html      — audit trail (red team, citation audit)
   - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)

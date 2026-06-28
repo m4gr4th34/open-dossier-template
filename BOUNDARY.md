@@ -140,20 +140,23 @@ reports rendering context, not a claim of the paper.
 2a. Round-trip gate (`verify_edition.js`) — **DONE**: asserts `index.html ==
    render(source, skin)`, fail-loud, in CI (the `verify-claims` workflow). Protects the
    partition the moment the source is edited.
-2b. Content-projection equivalence gate — **PARTIAL**: the **prose leg DONE**
-   (`verify_projection.js`) asserts every prose content atom of the source appears in BOTH
-   `index.html` and `index.md`, so the two renderings can't diverge in what they SAY. The
-   **machinery leg** (baked avenue cards + console verdict, live-vs-markdown) and the
-   **floor leg** (frozen `chapters/<tag>/` vs live) are **deferred to step 5**, where the
-   freeze baker creates the static baked surfaces those legs need to compare (live machinery
-   is runtime-built today; markdown machinery fidelity to `avenues.json`/`verify_numbers.py`
-   is already gated at step 3).
+2b. Content-projection equivalence gate — **PARTIAL**: the **prose + floor legs DONE**
+   (`verify_projection.js`) assert every prose content atom of the source appears in BOTH
+   `index.html` and `index.md`, so the two renderings can't diverge in what they SAY — now
+   for the live working draft **and every sealed chapter** under `chapters/<tag>/` (5b-i; a
+   chapter's rewired/baked `index.html` vs its verbatim `index.md`, chrome normalized away).
+   The **machinery leg** (baked avenue cards vs the markdown avenue table) is still **pending
+   5b-ii's static-card baker**: a frozen `index.html` ships EMPTY card shells (runtime-filled
+   from `avenues.json`), so there are no baked cards to compare yet. (Markdown machinery
+   fidelity to `avenues.json`/`verify_numbers.py` is already gated at step 3.)
 3. Add the markdown / llms.txt projection (falls out of the source for free).
    **Projection engine + front-door output DONE (step 3):** `render_markdown.js` emits
    `index.md` (avenue table from `avenues.json`, checks from `verify_numbers.py`, prose
    with inline glosses/cites/LaTeX/labels) and a root `llms.txt`; `verify_markdown.js`
-   gates `index.md == text(source)` in CI. Per-chapter `<tag>.md` and the full lineage
-   `llms.txt` index land at step 5 (freeze), when sealed chapters exist to enumerate.
+   gates `index.md == text(source)` in CI. The **lineage `llms.txt` index is DONE (5b-i)** —
+   its `## Chapters` list is generated newest-first from `lineage.json` (single-sourced;
+   `verify_markdown.js` gates it byte-equal to `buildLlmsTxt()`). Per-chapter `<tag>.md`
+   emission at freeze time is the remaining piece, landing with the step-5 baker.
 4. Build the build-time static live reader.
 5. Rewire `freeze_chapter.py` to capture the source and emit the projections.
 

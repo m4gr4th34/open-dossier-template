@@ -9,9 +9,9 @@
  * re-rendered from the source, this fails loud — the same discipline the edition
  * round-trip gate (verify_edition.js) applies to index.html.
  *
- * Also light-checks llms.txt: it must parse as the minimal standard structure
- * (H1 + a blockquote summary + a "## Editions" list linking index.md) and match
- * buildLlmsTxt().
+ * Also checks llms.txt: it must parse as the minimal structure (H1 + a blockquote
+ * summary + a "## Working draft" entry linking index.md + a "## Chapters" section)
+ * AND equal buildLlmsTxt() — which is lineage-driven, so the index can't go stale.
  *
  * Pure Node (+ the verifier subprocess, via renderMarkdown). Read-only: renders in
  * memory, writes nothing. Runs author-local AND in CI (the verify-claims workflow).
@@ -44,17 +44,26 @@ if (rendered !== onDisk) {
        '  Run `npm run render-markdown` and commit the result — never hand-edit index.md.');
 }
 
-// CHECK 2 — llms.txt: minimal structure + in sync with the generator.
+// CHECK 2 — llms.txt: minimal structure + byte-equality with the (lineage-driven) generator.
 const llms = fs.readFileSync(OUT_LLMS, 'utf8');
 const structure = [
   [/^# .+/m, 'missing an H1 title'],
   [/^> .+/m, 'missing the blockquote summary'],
-  [/^## Editions\b/m, 'missing the "## Editions" section'],
-  [/\]\(index\.md\)/, 'the Editions list does not link index.md'],
+  [/^## Working draft\b/m, 'missing the "## Working draft" section'],
+  [/^## Chapters\b/m, 'missing the "## Chapters" section'],
+  [/\]\(index\.md\)/, 'the working-draft entry does not link index.md'],
 ];
 for (const [re, msg] of structure) if (!re.test(llms)) fail('llms.txt ' + msg + '.');
-if (buildLlmsTxt() !== llms) {
-  fail('llms.txt out of sync — run `npm run render-markdown` and commit the result.');
+const llmsFresh = buildLlmsTxt();
+if (llmsFresh !== llms) {
+  const a = llms.split('\n'), b = llmsFresh.split('\n');
+  const n = Math.min(a.length, b.length);
+  let i = 0; while (i < n && a[i] === b[i]) i++;
+  const ctx = s => JSON.stringify((s === undefined ? '<EOF>' : s).slice(0, 80));
+  process.stderr.write('verify_markdown: llms.txt first differing line ' + (i + 1) + '\n');
+  process.stderr.write('  on-disk : ' + ctx(a[i]) + '\n');
+  process.stderr.write('  rendered: ' + ctx(b[i]) + '\n');
+  fail('llms.txt out of sync with lineage.json + source — run `npm run render-markdown` and commit the result.');
 }
 
 process.stdout.write('verify_markdown: markdown projection OK — index.md + llms.txt match the source\n');

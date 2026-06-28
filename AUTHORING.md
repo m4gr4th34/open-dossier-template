@@ -109,7 +109,11 @@ markdown projection gate (`npm run check-markdown`) enforces it too.
 On top of those, the **content-equivalence gate** (`npm run check-projection`) asserts
 every PROSE atom of the source (headings, paragraphs, term glosses, cite who/what/src,
 math, callouts) appears in BOTH `index.html` and `index.md` — so the two editions can't
-quietly diverge in what they say. See BOUNDARY.md (step 2b, prose leg).
+quietly diverge in what they say. It runs for the live working draft **and every sealed
+chapter** under `chapters/<tag>/` (the floor leg), so frozen chapters stay self-consistent
+too. And `llms.txt` is **lineage-driven** — its `## Chapters` list is generated from
+`lineage.json`; regenerate it with `npm run render-markdown`, never hand-edit. See
+BOUNDARY.md (step 2b).
 
 **The interactive instrument (top of the page).**
 

@@ -35,6 +35,7 @@ const SOURCE = path.join(ROOT, 'editions', 'index.source.html');
 const AVENUES = path.join(ROOT, 'avenues.json');
 const OUT_MD = path.join(ROOT, 'index.md');
 const OUT_LLMS = path.join(ROOT, 'llms.txt');
+const LINEAGE = path.join(ROOT, 'lineage.json');
 
 function die(msg) { process.stderr.write('render_markdown: ' + msg + '\n'); process.exit(1); }
 
@@ -249,18 +250,31 @@ function renderMarkdown() {
   return md;
 }
 
-// --- llms.txt (minimal standard form; indexes what EXISTS — the working draft) -
+// --- llms.txt: lineage-driven index (H1 + summary + working draft + chapters, newest-first).
+//     Chapters are single-sourced from lineage.json — never reads the chapters/ dir, never
+//     hand-lists. Empty lineage renders an honest "No chapters frozen yet." ---
 function buildLlmsTxt() {
   const source = readSource();
   const front = frontmatter(source);
   const absM = slot(source, 'body').match(/<p class="abstract">([\s\S]*?)<\/p>/);
   const abs = absM ? collapseWs(stripTags(absM[1])) : '';
   const firstSentence = (abs.match(/^.*?\.(?=\s|$)/) || [abs])[0].trim();
-  return '# ' + collapseWs(stripTags(front.title)) + '\n\n'
+
+  let out = '# ' + collapseWs(stripTags(front.title)) + '\n\n'
     + '> ' + (firstSentence || 'A self-explaining Open Dossier survey.') + '\n\n'
-    + '## Editions\n\n'
-    + '- [The paper (front door)](index.md) — the self-explaining edition: the avenue landscape, the consistency checks, and the full narrative, projected skin-free from the source.\n\n'
-    + 'Per-chapter `<tag>.md` files and a full lineage index will appear here once chapters are frozen (see BOUNDARY.md, step 5). For now this indexes the live working draft only.\n';
+    + '## Working draft\n\n'
+    + '- [The paper (front door)](index.md) — the live self-explaining edition: avenue landscape, consistency checks, and the full narrative, projected skin-free from the source.\n';
+
+  let lineage = { chapters: [] };
+  try { lineage = JSON.parse(fs.readFileSync(LINEAGE, 'utf8')); } catch (e) { /* no lineage yet -> empty */ }
+  const chapters = (Array.isArray(lineage.chapters) ? lineage.chapters : []).slice()
+    .sort((a, b) => (b.n || 0) - (a.n || 0));   // newest first
+  out += '\n## Chapters\n\n';
+  out += chapters.length
+    ? chapters.map(c => '- [Chapter ' + c.n + ' — ' + collapseWs(stripTags(String(c.title || c.tag || '')))
+                        + '](chapters/' + c.tag + '/index.md)').join('\n') + '\n'
+    : 'No chapters frozen yet.\n';
+  return out;
 }
 
 if (require.main === module) {
