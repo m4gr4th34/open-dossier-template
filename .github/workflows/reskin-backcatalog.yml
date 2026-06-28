@@ -1,0 +1,83 @@
+name: reskin-backcatalog
+# Auto-regenerate and commit the back-catalog reading views (live/<tag>/) whenever an INPUT that
+# determines their bytes changes. Full automation: humans never run `npm run render-backcatalog`.
+# The gates run BEFORE the commit, so a bad reskin is RED CI, never served bytes.
+#
+# Disjoint-by-construction: this workflow writes ONLY live/. freeze-chapter.yml writes ONLY
+# chapters/ + lineage.json; auto-timestamp.yml writes ONLY timestamps/ + provenance.json. Because
+# the write-sets are disjoint, the `git pull --rebase` before push always replays this live/-only
+# commit cleanly onto a concurrent push. It uses its OWN concurrency group and never shares
+# auto-timestamp.yml's (which must not be modified).
+on:
+  push:
+    branches: [main]
+    paths:
+      # The skin the chapters are re-skinned INTO.
+      - 'skin/edition.html'
+      # The renderer + everything it pulls in to produce live/<tag>/index.html bytes.
+      - 'render_backcatalog.js'
+      - 'render_edition.js'
+      - 'render_markdown.js'
+      - 'bake_machinery.js'
+      # Shelled by the renderer, with their output baked INTO live/: the SAME outward-rewire +
+      # release-label bake (freeze_chapter.py --reskin) and the per-chapter console verdict
+      # (verify_numbers.py --avenues <sealed>). A change to either changes the reskin bytes.
+      - 'verification/freeze_chapter.py'
+      - 'verification/verify_numbers.py'
+      # NOTE: lineage.json is intentionally NOT a trigger. A newly frozen chapter gets its live/
+      # view generated ATOMICALLY in the same freeze commit (freeze-chapter.yml runs the renderer),
+      # so this workflow owns only the skin/renderer-change case — re-skinning the EXISTING catalog.
+      # No overlap with freeze.
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reskin-main-push
+  cancel-in-progress: false   # never cancel a half-done push — let it finish, then run
+
+jobs:
+  reskin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main           # default depth is fine — no tags/history are read
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'   # render_backcatalog shells python3 (verify_numbers.py + freeze_chapter.py --reskin)
+
+      - name: Regenerate the back-catalog reading views
+        run: npm run render-backcatalog        # writes live/<tag>/index.html for every lineage chapter
+
+      # --- GATE-GUARD: fail closed. Both gates run BEFORE the commit, so broken output is red
+      #     CI and is NEVER committed/served. ---
+      - name: Back-catalog sync gate (regenerated == render)
+        run: npm run check-backcatalog
+      - name: Content-equivalence gate (live/<tag> carries its sealed prose + machinery)
+        run: node verify_projection.js
+
+      - name: Commit regenerated live/ (only live/, loop-safe)
+        run: |
+          set -euo pipefail
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Commit & push ONLY the reskin outputs, by explicit path. The nothing-to-commit guard
+          # means an input change that produces identical bytes (or an empty lineage) is a clean no-op.
+          git add live/
+          if git diff --cached --quiet; then
+            echo "live/ already current — nothing to regenerate."
+            exit 0
+          fi
+
+          # [skip ci] keeps the bot's own commit from re-triggering CI. (Belt-and-suspenders:
+          # live/ is NOT in the paths filter above, so even without it this would not re-trigger.)
+          git commit -m "chore(reskin): regenerate back-catalog for skin ${GITHUB_SHA::7} [skip ci]"
+          git pull --rebase origin main   # replay our live/-only commit onto any concurrent disjoint push
+          git push

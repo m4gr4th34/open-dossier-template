@@ -396,10 +396,22 @@ It carries a banner that names the frozen record — `chapters/<tag>/index.html`
 timestamp and DOI — so the label is **never false**: the re-skin says plainly it is the current
 edition, not the record. The record is never touched; the re-skin is an additional door so the
 whole back-catalog stays readable in the current skin (Pages serves only the latest commit).
-**Re-skin ritual:** after any change to `skin/edition.html`, run `npm run render-backcatalog`
-and commit the regenerated `live/` in a SEPARATE `chore(reskin)` commit (so a skin change and
-its regenerated reading views read as one legible unit). `check-backcatalog` goes red if `live/`
-is stale.
+**The back-catalog lifecycle is fully automatic — humans never run it.** Two complementary
+workflows keep `live/` correct, each owning one half:
+- **A new chapter is born WITH its reading view.** When a chapter is frozen, `freeze-chapter.yml`
+  runs the renderer in the SAME job and adds `live/<tag>/` to the freeze commit — so the chapter
+  and its current-skin reading view land atomically, in one commit, with no second trigger.
+- **Skin / renderer changes re-skin the existing catalog.** `reskin-backcatalog.yml` fires on a
+  change to the skin, the renderers/baker, or the shared rewire/verifier the reskin shells, and
+  regenerates every existing `live/<tag>/`. (It does NOT watch `lineage.json` — freeze already owns
+  new chapters — so the two never overlap.)
+
+Both paths run the gates BEFORE committing — `check-backcatalog` (regenerated == render) and
+`verify_projection.js` (each `live/<tag>` carries its sealed chapter's prose + machinery) — so a
+bad reskin is **red CI, never served bytes**; both commit by explicit path as `github-actions[bot]`
+with `[skip ci]`. You do not run anything. `npm run render-backcatalog` remains available purely as
+a **local-preview convenience** (to eyeball a skin change before pushing) — it is not a required
+step, and you need not commit its output, since the workflows regenerate and commit `live/`.
 
 **Frozen = immutable.** `chapters/<tag>/` is write-once, exactly like `timestamps/` —
 never modify a frozen chapter. The one thing freezing *does* adjust is navigation: a

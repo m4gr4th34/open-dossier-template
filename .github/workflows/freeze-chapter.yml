@@ -34,6 +34,10 @@ jobs:
         with:
           python-version: '3.12'
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'        # render-backcatalog (run below) needs node in addition to python3
+
       - name: Freeze released chapter into lineage
         # Release-supplied fields are passed as ENV VARS (not inlined via ${{ }}),
         # so titles/bodies containing spaces, quotes, or newlines can't break the
@@ -87,12 +91,24 @@ jobs:
             --tag "$TAG" --title "$TITLE" --summary "$SUMMARY" \
             --released "$RELEASED" --version-doi "$VERSION_DOI" --concept-doi "$CONCEPT_DOI"
 
-          # --- commit & push ONLY the freeze outputs, by explicit path ---
-          git add chapters/ lineage.json
+          # --- generate the new chapter's CURRENT-skin reading view (live/<tag>/) ATOMICALLY, so
+          #     the chapter is born WITH its reading view in ONE commit. Regenerate-all is
+          #     idempotent; the git-add guard below scopes the commit to just the new live/<tag>/.
+          #     (render_backcatalog has no single-chapter mode; all-or-nothing is fine here.) ---
+          npm run render-backcatalog
+
+          # --- GATE-GUARD (fail-closed, BEFORE any commit): never seal a chapter with a broken
+          #     reading view. set -euo pipefail aborts the job here if either gate fails, so the
+          #     chapter + live/ are NOT committed — loud, not silent. ---
+          npm run check-backcatalog          # the new live/<tag> == what render_backcatalog produces
+          node verify_projection.js          # the new live/<tag> carries its sealed prose + machinery
+
+          # --- commit & push ONLY the freeze outputs + the new reading view, by explicit path ---
+          git add chapters/ lineage.json live/
           if git diff --cached --quiet; then
             echo "Nothing to freeze."
           else
-            git commit -m "freeze(lineage): archive chapter ${TAG} + register in lineage.json [skip ci]"
+            git commit -m "freeze(lineage): archive chapter ${TAG} + its live/ reading view + register in lineage.json [skip ci]"
             git pull --rebase origin main   # replay our disjoint commit on top of any concurrent provenance push
             git push
           fi

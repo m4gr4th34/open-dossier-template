@@ -180,6 +180,13 @@ reports rendering context, not a claim of the paper.
    config: there is no rule making one URL "the chapter"; the lineage's links send readers to the
    reading view and citations to the immutable record. (The retired `paper.html` stub is dropped
    from freeze's rewrite tuple — a dead no-op now the edition set is index/dossier/verify.)
+   **Back-catalog lifecycle fully automated (5c — DONE):** `freeze-chapter.yml` runs the renderer
+   in the freeze job, so a new chapter is born WITH its `live/<tag>/` view in one commit;
+   `reskin-backcatalog.yml` regenerates the existing catalog on any skin/renderer change. Both
+   fail-close on the gates before committing. `verify.yml`'s standalone back-catalog byte-sync gate
+   was removed as structurally redundant — `live/` freshness is now guaranteed at WRITE time (the
+   gate only flickered red→green on a push); `verify_backcatalog.js` lives on as both workflows'
+   pre-commit guard. Zero human action: nobody runs `render-backcatalog`.
 5. Rewire `freeze_chapter.py` to capture the source and emit the projections.
 
 Pre-split chapters have no source and are not retrofitted — reverse-engineering a
