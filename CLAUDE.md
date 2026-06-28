@@ -150,7 +150,7 @@ verification script, and its claim ledger all live here.
   - paper.html        — redirect stub → index.html (legacy link target)
   - dossier.html      — audit trail (red team, citation audit)
   - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)
-  - verification/     — verify script, audits, red-team report, format spec
+  - verification/     — verify script, audits, red-team report, format spec (verify_numbers.py takes an optional `--avenues <path>` override; no flag = live root, byte-unchanged). avenues.json is sealed into each frozen chapter so its verdict derives from its OWN data.
   - figures/          — vendored living-figures runtime (interactive SVG via data-figure)
   - claim_ledger.csv  — every claim, typed, with honest status
   - BOUNDARY.md       — the content/skin/machinery boundary spec (live-edition arc; the source/skin/render partition)

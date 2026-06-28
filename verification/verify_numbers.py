@@ -49,6 +49,12 @@ def check(label, computed, claimed_lo, claimed_hi, fmt="{:.4g}"):
 # ----------------------------------------------------------------
 HERE = os.path.dirname(os.path.abspath(__file__))
 AVENUES_PATH = os.path.join(HERE, os.pardir, "avenues.json")
+# Optional: --avenues <path> overrides the data file (used by the back-catalog baker to
+# verify a frozen chapter against its OWN sealed avenues.json). No flag => live-root default.
+for i, a in enumerate(sys.argv):
+    if a == "--avenues" and i + 1 < len(sys.argv):
+        AVENUES_PATH = os.path.abspath(sys.argv[i + 1])
+        break
 with open(AVENUES_PATH, encoding="utf-8") as f:
     _data = json.load(f)
 AVENUES = _data.get("avenues", [])

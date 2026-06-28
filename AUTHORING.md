@@ -348,6 +348,12 @@ own stable path, so every one stays readable forever.
 hand-edit `lineage.json`; the freeze step appends to it, so the page and the archive
 can never disagree about what exists.
 
+Each frozen chapter also seals its **own `avenues.json`** (verbatim, alongside its source +
+skin + `index.md`), so a chapter carries the avenue data behind its baked cards. The
+verifier takes an optional `python verification/verify_numbers.py --avenues <path>` override
+(no flag = the live root, byte-unchanged) — so a frozen chapter's verdict can be recomputed
+from its OWN sealed `avenues.json` by the canonical verifier, never by reversing a projection.
+
 `lineage.html` is the persistent **series index** — the reader's map of the whole arc.
 Each edition also carries a compact **lineage strip** ("Chapter K of N · ← previous ·
 view all chapters →") that appears only when chapters exist. Both read `lineage.json`

@@ -151,7 +151,11 @@ reports rendering context, not a claim of the paper.
    so `index.html` ships STATIC baked cards + verdict — JS-off readable, and comparable. The
    gate parses each location's own `index.md` for the machinery atoms, so it auto-covers baked
    chapters once frozen; the back-catalog **renderer** that bakes per-chapter machinery (so old
-   chapters re-skin with baked floors) is **5b-ii-2**. (Markdown machinery fidelity to
+   chapters re-skin with baked floors) is **5b-ii-2**. Its foundation is **5b-ii-2a (DONE)**:
+   freeze now seals each chapter's own `avenues.json` (verbatim, via `CAPTURE_VERBATIM`), and
+   `verify_numbers.py` accepts an optional `--avenues <path>` override (default byte-unchanged),
+   so a frozen chapter's cards + verdict can be re-derived from its OWN sealed data by the
+   canonical readers/verifier — no projection reversed. (Markdown machinery fidelity to
    `avenues.json`/`verify_numbers.py` is already gated at step 3.)
 3. Add the markdown / llms.txt projection (falls out of the source for free).
    **Projection engine + front-door output DONE (step 3):** `render_markdown.js` emits
