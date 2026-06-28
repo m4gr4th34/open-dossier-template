@@ -1,0 +1,9 @@
+# YOUR PLAIN-LANGUAGE TITLE
+
+> YOUR SURVEY ABSTRACT.
+
+## Editions
+
+- [The paper (front door)](index.md) — the self-explaining edition: the avenue landscape, the consistency checks, and the full narrative, projected skin-free from the source.
+
+Per-chapter `<tag>.md` files and a full lineage index will appear here once chapters are frozen (see BOUNDARY.md, step 5). For now this indexes the live working draft only.

@@ -8,7 +8,9 @@
     "render-math": "node render_math.js",
     "render-figures": "node render_figures.js",
     "render-edition": "node render_edition.js",
-    "check-edition": "node verify_edition.js"
+    "check-edition": "node verify_edition.js",
+    "render-markdown": "node render_markdown.js",
+    "check-markdown": "node verify_markdown.js"
   },
   "dependencies": {
     "katex": "0.16.47"

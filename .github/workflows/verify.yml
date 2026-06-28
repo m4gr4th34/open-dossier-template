@@ -17,3 +17,5 @@ jobs:
         run: python verification/verify_numbers.py
       - name: Edition round-trip gate
         run: node verify_edition.js
+      - name: Markdown projection gate
+        run: node verify_markdown.js

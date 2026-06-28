@@ -143,6 +143,11 @@ reports rendering context, not a claim of the paper.
 2b. Content-projection equivalence gate — **DEFERRED to step 4**, when a live reader
    (`skin@HEAD`) and a markdown projection exist to compare: `floor == live == markdown`.
 3. Add the markdown / llms.txt projection (falls out of the source for free).
+   **Projection engine + front-door output DONE (step 3):** `render_markdown.js` emits
+   `index.md` (avenue table from `avenues.json`, checks from `verify_numbers.py`, prose
+   with inline glosses/cites/LaTeX/labels) and a root `llms.txt`; `verify_markdown.js`
+   gates `index.md == text(source)` in CI. Per-chapter `<tag>.md` and the full lineage
+   `llms.txt` index land at step 5 (freeze), when sealed chapters exist to enumerate.
 4. Build the build-time static live reader.
 5. Rewire `freeze_chapter.py` to capture the source and emit the projections.
 

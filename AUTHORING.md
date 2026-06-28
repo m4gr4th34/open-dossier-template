@@ -101,6 +101,11 @@ wrapper) by `npm run render-edition`. Edit the SOURCE and re-render; never
 hand-edit `index.html` — CI's edition round-trip gate (`npm run check-edition`)
 fails the build if `index.html` drifts from `render(source, skin)`. See BOUNDARY.md.
 
+The same source also projects to **`index.md` + `llms.txt`** (the GENERATED,
+token-efficient, skin-free markdown — avenue table from `avenues.json`, checks from
+`verify_numbers.py`) via `npm run render-markdown`; never hand-edit `index.md` — CI's
+markdown projection gate (`npm run check-markdown`) enforces it too.
+
 **The interactive instrument (top of the page).**
 
 - Port every Python check into the `buildChecks()` console verbatim
