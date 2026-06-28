@@ -79,8 +79,9 @@ is `wrap(source, skin)`.
 3. **Clean markdown / llms.txt** = `text(source@tag)`. Skin stripped; machinery
    rendered as its data and results (avenue table as markdown, checks as a pass/fail
    list); terms as inline glosses, cites as references, figures as poster-alt +
-   caption, math as LaTeX. Emitted as `<tag>.md` per chapter plus a root `llms.txt`
-   indexing the lineage. The token-efficient, agent-readable form.
+   caption, math as LaTeX. Emitted as `chapters/<tag>/index.md` per sealed chapter (the working
+   draft at the root `index.md`) plus a root `llms.txt` indexing the lineage. The token-efficient,
+   agent-readable form.
 4. **The source itself** — notarized alongside the floor, so the content the live and
    markdown renderings draw from is itself frozen and timestamped. This is what makes
    the live view honest: the skin is live, but the content is immutable and notarized.
@@ -140,7 +141,7 @@ reports rendering context, not a claim of the paper.
 2a. Round-trip gate (`verify_edition.js`) — **DONE**: asserts `index.html ==
    render(source, skin)`, fail-loud, in CI (the `verify-claims` workflow). Protects the
    partition the moment the source is edited.
-2b. Content-projection equivalence gate — **PARTIAL**: the **prose + floor legs DONE**
+2b. Content-projection equivalence gate — **DONE (all three legs)**: the **prose + floor legs**
    (`verify_projection.js`) assert every prose content atom of the source appears in BOTH
    `index.html` and `index.md`, so the two renderings can't diverge in what they SAY — now
    for the live working draft **and every sealed chapter** under `chapters/<tag>/` (5b-i; a
@@ -168,8 +169,11 @@ reports rendering context, not a claim of the paper.
    with inline glosses/cites/LaTeX/labels) and a root `llms.txt`; `verify_markdown.js`
    gates `index.md == text(source)` in CI. The **lineage `llms.txt` index is DONE (5b-i)** —
    its `## Chapters` list is generated newest-first from `lineage.json` (single-sourced;
-   `verify_markdown.js` gates it byte-equal to `buildLlmsTxt()`). Per-chapter `<tag>.md`
-   emission at freeze time is the remaining piece, landing with the step-5 baker.
+   `verify_markdown.js` gates it byte-equal to `buildLlmsTxt()`). Per-chapter markdown is also
+   **DONE (5a)**: each frozen chapter seals its own `index.md` verbatim (via `CAPTURE_VERBATIM`)
+   at `chapters/<tag>/index.md` — consumed by the back-catalog renderer, the content-equivalence
+   gate, and the `llms.txt` per-chapter deep-links. (It shipped as the sealed `index.md`, not a
+   separately-emitted `<tag>.md`.)
 4. Build the build-time static live reader. **DONE (5b-ii-2b):** `render_backcatalog.js` +
    `verify_backcatalog.js` + the `live/<tag>/` reading views, gated in CI.
    **Reader-experience capstone — DONE:** `lineage.html` is now an oldest→newest timeline (sealed
@@ -187,7 +191,10 @@ reports rendering context, not a claim of the paper.
    was removed as structurally redundant — `live/` freshness is now guaranteed at WRITE time (the
    gate only flickered red→green on a push); `verify_backcatalog.js` lives on as both workflows'
    pre-commit guard. Zero human action: nobody runs `render-backcatalog`.
-5. Rewire `freeze_chapter.py` to capture the source and emit the projections.
+5. Rewire `freeze_chapter.py` to capture the source and emit the projections. **DONE (5a):**
+   freeze seals each chapter's content source + skin + its pre-built `index.md` projection +
+   `avenues.json` verbatim (via `CAPTURE_VERBATIM`) — the source is captured and the markdown
+   projection is sealed per chapter at `chapters/<tag>/index.md`.
 
 Pre-split chapters have no source and are not retrofitted — reverse-engineering a
 source from frozen chrome is lossy and the gate cannot protect a fabricated source.
