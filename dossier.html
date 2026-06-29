@@ -3,15 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Audit Trail — DOSSIER NNN (Open Dossier)</title>
+<title>DOSSIER NNN — YOUR TITLE (Open Dossier)</title>
+<meta name="description" content="YOUR ONE-LINE DESCRIPTION. A survey that explains itself.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="katex/katex.min.css">
 <style>
   :root{
     --ink:#17262c;--ink2:#586a6f;--paper:#f3f6f5;--card:#ffffff;
-    --teal:#0c8f86;--teal-soft:#e2efed;--coral:#cf5d36;--coral-soft:#fbe9e3;--violet:#6b4e9b;
-    --pass:#1d9b62;--fail:#cf3a2c;--open:#bd861d;--line:rgba(23,38,44,.085);
+    --teal:#0c8f86;--teal-soft:#e2efed;--coral:#cf5d36;--coral-soft:#fbe9e3;--violet:#6b4e9b;--violet-soft:#efe9f6;
+    --pass:#1d9b62;--fail:#cf3a2c;--open:#bd861d;--open-soft:#fdf6e9;--line:rgba(23,38,44,.085);
     --serif:'Spectral',Georgia,serif;
     --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
     --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
@@ -38,58 +40,82 @@
     opacity:.05;mix-blend-mode:multiply;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.65}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px}
+  /* paper's reading column is 720; its chrome is the narrowest width that keeps
+     the 5-button nav AND the 4-item provenance bar single-row (measured: nav
+     needs >=818, bar >=769) so the title stays aligned with the other editions
+     (no wrap-bounce) while trimming the chrome overhang over the 720 column. */
+  .chrome{max-width:820px;margin:0 auto;padding:0 20px}
   a{color:var(--teal)}
-  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
-  .chrome{max-width:880px;margin:0 auto;padding:0 20px}
   header{padding:54px 0 26px;border-bottom:3px solid var(--ink)}
   .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
   .eyebrow b{color:var(--coral)}
   h1{font-family:var(--serif);font-weight:800;font-size:clamp(27px,4.6vw,44px);line-height:1.12;margin:.4em 0 .25em;letter-spacing:-.014em}
   .byline{font-family:var(--serif);font-style:italic;color:var(--ink2)}
-  .statusbar{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
-  .chip{font-family:var(--mono);font-size:12.5px;padding:7px 12px;border:1.5px solid var(--ink);background:var(--card);display:flex;gap:8px;align-items:center}
-  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
-  .dot.g{background:var(--pass)}.dot.o{background:var(--open)}.dot.t{background:var(--teal)}.dot.v{background:var(--violet)}.dot.c{background:var(--coral)}
-  section{padding:38px 0 8px}
-  h2{font-family:var(--serif);font-weight:600;font-size:25px;margin:0 0 4px}
-  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
-  .kicker.teal{color:var(--teal)}.kicker.coral{color:var(--coral)}.kicker.violet{color:var(--violet)}
-  p.lede{color:var(--ink2);max-width:64ch;margin-top:6px}
+  .howto{background:var(--card);border:1.5px solid var(--ink);padding:14px 16px;font-size:15px;margin:18px 0 8px}
+  .howto .mono{font-family:var(--mono);font-size:13px}
+  h2{font-family:var(--serif);font-weight:600;font-size:27px;margin:48px 0 6px;line-height:1.2}
+  h2 .num{color:var(--coral);font-family:var(--mono);font-size:15px;font-weight:600;vertical-align:middle;margin-right:10px}
+  h3{font-family:var(--serif);font-weight:600;font-size:20px;margin:26px 0 2px}
+  p{margin:14px 0;max-width:68ch}
 
-  /* citations */
-  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card)}
-  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
-  td.st{font-family:var(--mono);font-size:11.5px;white-space:nowrap}
-  td.st.v{color:var(--pass)}
-  td.st.fl{color:var(--open)}
-  td.st.rp{color:var(--coral)}
-  details.block summary{cursor:pointer;font-family:var(--mono);font-size:13px;padding:10px 0;color:var(--teal)}
+  /* tappable terms */
+  .term{background:linear-gradient(transparent 70%, var(--teal-soft) 70%);border:none;border-bottom:1.5px dashed var(--teal);
+        padding:0 1px;font:inherit;color:inherit;cursor:pointer;text-align:left}
+  .term:focus-visible{outline:2.5px solid var(--coral);outline-offset:2px}
+  /* citation chips */
+  .cite{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--violet);background:var(--violet-soft);
+        border:1px solid var(--violet);border-radius:10px;padding:1px 8px;cursor:pointer;vertical-align:2px}
+  .cite:focus-visible{outline:2.5px solid var(--coral);outline-offset:2px}
+  /* the expansion card both produce */
+  .popcard{display:block;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);
+           padding:12px 14px;margin:10px 0;font-size:15px;color:var(--ink2);max-width:68ch;animation:open .18s ease-out}
+  .popcard.citecard{border-left-color:var(--violet)}
+  .popcard b{color:var(--ink)}
+  .popcard .src{font-family:var(--mono);font-size:11.5px;color:var(--ink2);display:block;margin-top:6px}
+  @keyframes open{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.popcard{animation:none}}
 
-  /* findings */
-  .finding{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--open);margin:10px 0}
-  .finding.resolved{border-left-color:var(--pass)}
-  .finding summary{cursor:pointer;padding:13px 16px;font-weight:600;display:flex;gap:10px;align-items:baseline;list-style:none}
-  .finding summary::-webkit-details-marker{display:none}
-  .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:2px 7px;flex:0 0 auto}
-  .tag.res{color:var(--pass);border:1px solid var(--pass)}
-  .tag.open{color:var(--open);border:1px solid var(--open)}
-  .finding .body{padding:0 16px 14px;color:var(--ink2);max-width:70ch}
+  /* go-deeper layers */
+  details.deeper{background:var(--card);border:1px solid var(--line);margin:16px 0}
+  details.deeper summary{cursor:pointer;padding:12px 15px;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--violet);list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:'\25B8 ';color:var(--violet)}
+  details.deeper[open] summary::before{content:'\25BE '}
+  details.deeper .body{padding:0 15px 14px;font-size:15px;color:var(--ink2)}
+  .eq{
+    font-size:15px; margin:14px 0; padding:16px 18px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--r-lg); box-shadow:var(--shadow-soft);
+    overflow-x:auto; overflow-y:hidden;
+  }
+  .eq .katex{color:var(--ink); font-size:1.05em}
+  .eq .katex-display{margin:0}              /* container already provides spacing */
+  span.math .katex{color:var(--ink)}        /* inline math inherits ink */
 
-  /* pipeline */
-  ol.phases{list-style:none;counter-reset:ph -1;padding:0;margin:14px 0}
-  ol.phases li{counter-increment:ph;background:var(--card);border:1px solid var(--line);padding:14px 16px 14px 64px;position:relative;margin:8px 0;max-width:74ch}
-  ol.phases li::before{content:counter(ph);position:absolute;left:16px;top:12px;font-family:var(--serif);font-weight:800;font-size:26px;color:var(--violet)}
-  ol.phases b{display:block}
-  ol.phases span{color:var(--ink2);font-size:14.5px}
+  /* ===== honest-label callouts at the claim site =====
+     One per survey status that needs a visible home in prose:
+       .openclaim  amber   OPEN-UNVERIFIED  (the author's own open claim)
+       .forecast   violet  FORECAST         (labeled estimate + dated signpost)
+       .reported   coral   REPORTED         (interested-party / not independently reproduced)
+     ESTABLISHED needs no box — it is asserted plainly, with citations. */
+  .openclaim,.forecast,.reported{padding:14px 16px;margin:18px 0;font-size:15.5px;border:1px solid;border-left-width:5px}
+  .openclaim{background:var(--open-soft);border-color:var(--open)}
+  .forecast{background:var(--violet-soft);border-color:var(--violet)}
+  .reported{background:var(--coral-soft);border-color:var(--coral)}
+  .openclaim .tag,.forecast .tag,.reported .tag{font-family:var(--mono);font-size:11px;padding:2px 7px;margin-right:8px;border:1px solid}
+  .openclaim .tag{color:var(--open);border-color:var(--open)}
+  .forecast .tag{color:var(--violet);border-color:var(--violet)}
+  .reported .tag{color:var(--coral);border-color:var(--coral)}
 
-  footer{margin-top:44px;padding:22px 0 56px;border-top:3px solid var(--ink);font-size:13.5px;color:var(--ink2)}
+  .punch{font-family:var(--serif);font-style:italic;font-size:20px;border-left:4px solid var(--coral);padding:6px 0 6px 16px;margin:26px 0;max-width:60ch}
+  footer{margin-top:56px;padding:22px 0 60px;border-top:3px solid var(--ink);font-size:14px;color:var(--ink2)}
   .mono{font-family:var(--mono)}
-  @media(max-width:560px){th:nth-child(1),td:nth-child(1){display:none}}
-  .cta{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 4px}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
   .btn{font-family:var(--mono);font-size:13.5px;font-weight:600;text-decoration:none;padding:11px 16px;border:1.5px solid var(--ink);color:var(--ink);background:var(--card);white-space:nowrap}
   .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .cta{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 4px}
   .btn:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
 .provenance{display:flex;flex-wrap:wrap;gap:0;margin:18px 0 4px;border:1.5px solid var(--ink);background:var(--card);font-family:var(--mono);font-size:12px;overflow:hidden}
 .provenance .pv-item{display:flex;flex-direction:column;gap:2px;padding:9px 14px;border-right:1px solid var(--line);text-decoration:none;color:var(--ink);min-width:0}
@@ -100,40 +126,36 @@
 .provenance a.pv-item .pv-v{color:var(--teal)}
 #pv-state{color:var(--open,#b07d1f)}
 @media(max-width:560px){.provenance .pv-item{flex:1 1 45%;border-bottom:1px solid var(--line)}}
-  .publish-cta{margin:46px 0 8px;padding:22px 24px;border:1.5px solid var(--teal);background:var(--teal-soft,#e3f0f0);
-    display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;justify-content:space-between}
-  .publish-cta .pc-text{flex:1 1 320px;min-width:0}
-  .publish-cta .pc-h{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--ink);margin:0 0 3px}
-  .publish-cta .pc-sub{font-size:14px;color:var(--ink2);margin:0}
-  .publish-cta a.pc-btn{flex:0 0 auto;font-family:var(--mono);font-size:14px;font-weight:600;text-decoration:none;
-    background:var(--teal);color:#fff;padding:12px 20px;white-space:nowrap;
-    border-radius:var(--r-sm);
-    background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
-    box-shadow:0 4px 14px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.32);
-    transition:filter .2s ease, box-shadow .2s ease, transform .12s ease}
-  .publish-cta a.pc-btn:hover{
-    background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
-    box-shadow:0 8px 22px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.36);
-    transform:translateY(-1px);
-    filter:brightness(1.04);
-  }
+.publish-cta{margin:46px 0 8px;padding:22px 24px;border:1.5px solid var(--teal);background:var(--teal-soft,#e3f0f0);
+  display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;justify-content:space-between}
+.publish-cta .pc-text{flex:1 1 320px;min-width:0}
+.publish-cta .pc-h{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--ink);margin:0 0 3px}
+.publish-cta .pc-sub{font-size:14px;color:var(--ink2);margin:0}
+.publish-cta a.pc-btn{flex:0 0 auto;font-family:var(--mono);font-size:14px;font-weight:600;text-decoration:none;
+  background:var(--teal);color:#fff;padding:12px 20px;white-space:nowrap;
+  border-radius:var(--r-sm);
+  background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
+  box-shadow:0 4px 14px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.32);
+  transition:filter .2s ease, box-shadow .2s ease, transform .12s ease}
+.publish-cta a.pc-btn:hover{
+  background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
+  box-shadow:0 8px 22px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.36);
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
 
   /* ===== elevated-light "instrument" surface treatment ===== */
-  table,.finding,ol.phases li,.provenance{
+  .howto,.popcard,details.deeper,.provenance{
     border-radius:var(--r-lg); overflow:hidden;
     background:linear-gradient(180deg,#ffffff,#f4f8f7);
     box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.85);
   }
-  .finding{transition:box-shadow .2s ease, transform .2s ease}
-  .finding:hover{
-    box-shadow:var(--shadow-lift), inset 0 1px 0 rgba(255,255,255,.85); transform:translateY(-3px);
+  /* status callouts keep their honest-label colour; only round + lift */
+  .openclaim,.forecast,.reported{
+    border-radius:var(--r-lg);
+    box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.5);
   }
-  .chip,.tag{border-radius:var(--r-pill)}
-  .dot.g{box-shadow:0 0 7px -1px var(--pass)}
-  .dot.o{box-shadow:0 0 7px -1px var(--open)}
-  .dot.t{box-shadow:0 0 7px -1px var(--teal)}
-  .dot.v{box-shadow:0 0 7px -1px var(--violet)}
-  .dot.c{box-shadow:0 0 7px -1px var(--coral)}
+  .openclaim .tag,.forecast .tag,.reported .tag{border-radius:var(--r-pill)}
   .btn{border-radius:var(--r-sm); transition:box-shadow .2s ease, transform .2s ease}
   .btn:not(.primary):hover{ box-shadow:var(--shadow-soft); transform:translateY(-2px); }
   .btn.primary{
@@ -147,6 +169,61 @@
   }
   .publish-cta{border-radius:var(--r-lg)}
   h1{font-weight:500; letter-spacing:-.014em}
+
+  /* ===== instrument-surface polish for the merged landscape (avenue grid + console) ===== */
+  .av-card,.console{
+    border-radius:var(--r-lg); overflow:hidden;
+    background:linear-gradient(180deg,#ffffff,#f4f8f7);
+    box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.85);
+    transition:box-shadow .2s ease, transform .2s ease;
+  }
+  .av-card:hover{
+    box-shadow:var(--shadow-lift), inset 0 1px 0 rgba(255,255,255,.85); transform:translateY(-3px);
+  }
+  .s-chip{border-radius:var(--r-pill)}
+  button#run{
+    border-radius:var(--r-sm);
+    background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
+    box-shadow:0 4px 14px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.32);
+    transition:box-shadow .2s ease, transform .2s ease;
+  }
+  button#run:hover{
+    background:linear-gradient(180deg, color-mix(in oklab, white 14%, var(--teal)), var(--teal));
+    box-shadow:0 8px 22px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,.36);
+    transform:translateY(-1px);
+  }
+
+  /* ===== figures + dependency-free lightbox (inert with no figures) ===== */
+  figure{
+    margin:28px 0; padding:0;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--r-lg); overflow:hidden;
+    box-shadow:var(--shadow-soft);
+  }
+  figure img{
+    display:block; width:100%; height:auto; cursor:zoom-in;
+  }
+  figcaption{
+    font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:var(--ink2); text-align:center;
+    padding:11px 16px 13px; border-top:1px solid var(--line);
+  }
+  /* lightbox — overlay must clear the grain overlay at z-index:9999 */
+  .lbx{
+    position:fixed; inset:0; z-index:10000;
+    display:none; align-items:center; justify-content:center;
+    background:rgba(23,38,44,.78); padding:24px; cursor:zoom-out;
+    -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+  }
+  .lbx.open{display:flex}
+  .lbx img{
+    max-width:min(1100px,94vw); max-height:92vh; width:auto; height:auto;
+    border-radius:var(--r-lg); box-shadow:var(--shadow-lift);
+    background:var(--card);
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .lbx img{transition:transform .2s ease}
+  }
 
   /* ===== lineage strip (hidden until lineage.json has chapters) ===== */
   .lineage-strip{
@@ -163,6 +240,109 @@
   .lineage-strip a{color:var(--teal)}
   .lineage-strip .sep{color:var(--line); }
   .lineage-strip .ls-all{margin-left:auto; font-weight:500}
+
+  /* ===== merged from the landscape (index.html): abstract + kicker/lede ===== */
+  .abstract{font-family:var(--serif);font-size:17.5px;max-width:70ch;margin-top:18px}
+  .abstract b{color:var(--teal)}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+  .kicker.teal{color:var(--teal)}.kicker.coral{color:var(--coral)}.kicker.violet{color:var(--violet)}
+  p.lede{color:var(--ink2);max-width:66ch;margin-top:6px}
+
+  /* ===== survey landscape — card grid (survey-default keystone) ===== */
+  .av-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
+  .av-card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--line);padding:15px 16px 16px;display:flex;flex-direction:column;gap:9px}
+  .av-card.t-est{border-top-color:var(--pass)}
+  .av-card.t-open{border-top-color:var(--open)}
+  .av-card.t-forecast{border-top-color:var(--violet)}
+  .av-card.t-reported{border-top-color:var(--coral)}
+  .av-card .av-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .av-card .av-name{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.2}
+  .av-card .av-thesis{color:var(--ink2);font-size:14.5px;margin:0}
+  .av-card .av-meta{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:4px}
+  .av-card .fc{font-family:var(--mono);font-size:13px}
+  .av-card .fc .pct{font-weight:600}
+  .av-card .fc .by{color:var(--ink2)}
+  .av-card .fc.missing{color:var(--fail)}
+  .av-card .srcs{display:flex;flex-wrap:wrap;gap:5px}
+  .av-card .srcs .ref{font-family:var(--mono);font-size:11px;color:var(--violet);background:var(--violet-soft);border:1px solid var(--violet);border-radius:9px;padding:0 7px}
+  .av-card .srcs .none{color:var(--ink2);font-size:12px;font-family:var(--mono)}
+
+  /* ===== status chips — one home per honest label (incl. new REPORTED token #4) ===== */
+  .s-chip{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;padding:2px 8px;border:1px solid;white-space:nowrap;display:inline-block;flex:0 0 auto}
+  .s-est{color:var(--pass);border-color:var(--pass)}
+  .s-open{color:var(--open);border-color:var(--open)}
+  .s-forecast{color:var(--violet);border-color:var(--violet)}
+  .s-reported{color:var(--coral);border-color:var(--coral);background:var(--coral-soft)}
+  .s-default{color:var(--ink2);border-color:var(--line)}
+  .legend{display:flex;flex-wrap:wrap;gap:14px 18px;margin-top:14px;font-size:13px;color:var(--ink2)}
+  .legend span.item{display:inline-flex;align-items:center;gap:7px}
+
+  /* verification/consistency console */
+  .console{background:var(--card);border:1.5px solid var(--ink);margin-top:18px}
+  .console-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .console-head .label{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+  button#run{font-family:var(--mono);font-size:14px;font-weight:600;background:var(--teal);color:#fff;border:none;padding:10px 18px;cursor:pointer}
+  button#run[disabled]{background:var(--ink2);cursor:default}
+  #log{font-family:var(--mono);font-size:13px;padding:10px 16px 14px;min-height:80px}
+  .row{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line);align-items:baseline}
+  .row:last-child{border-bottom:none}
+  .badge{flex:0 0 auto;font-weight:600;padding:1px 7px;font-size:11.5px}
+  .badge.p{color:var(--pass);border:1px solid var(--pass)}
+  .badge.f{color:var(--fail);border:1px solid var(--fail)}
+  .row .what{flex:1 1 auto;min-width:0}
+  .row .nums{flex:0 0 auto;color:var(--ink2)}
+  .tally{margin-top:10px;padding-top:10px;border-top:2px solid var(--ink);font-weight:600}
+  @media(max-width:560px){.row{flex-wrap:wrap}.row .nums{width:100%;padding-left:46px}}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  .chrome{max-width:880px;margin:0 auto;padding:0 20px}
+  .statusbar{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
+  .chip{font-family:var(--mono);font-size:12.5px;padding:7px 12px;border:1.5px solid var(--ink);background:var(--card);display:flex;gap:8px;align-items:center}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .dot.g{background:var(--pass)}.dot.o{background:var(--open)}.dot.t{background:var(--teal)}.dot.v{background:var(--violet)}.dot.c{background:var(--coral)}
+  section{padding:38px 0 8px}
+  h2{font-family:var(--serif);font-weight:600;font-size:25px;margin:0 0 4px}
+  p.lede{color:var(--ink2);max-width:64ch;margin-top:6px}
+  /* citations */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card)}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+  td.st{font-family:var(--mono);font-size:11.5px;white-space:nowrap}
+  td.st.v{color:var(--pass)}
+  td.st.fl{color:var(--open)}
+  td.st.rp{color:var(--coral)}
+  details.block summary{cursor:pointer;font-family:var(--mono);font-size:13px;padding:10px 0;color:var(--teal)}
+  /* findings */
+  .finding{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--open);margin:10px 0}
+  .finding.resolved{border-left-color:var(--pass)}
+  .finding summary{cursor:pointer;padding:13px 16px;font-weight:600;display:flex;gap:10px;align-items:baseline;list-style:none}
+  .finding summary::-webkit-details-marker{display:none}
+  .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:2px 7px;flex:0 0 auto}
+  .tag.res{color:var(--pass);border:1px solid var(--pass)}
+  .tag.open{color:var(--open);border:1px solid var(--open)}
+  .finding .body{padding:0 16px 14px;color:var(--ink2);max-width:70ch}
+  /* pipeline */
+  ol.phases{list-style:none;counter-reset:ph -1;padding:0;margin:14px 0}
+  ol.phases li{counter-increment:ph;background:var(--card);border:1px solid var(--line);padding:14px 16px 14px 64px;position:relative;margin:8px 0;max-width:74ch}
+  ol.phases li::before{content:counter(ph);position:absolute;left:16px;top:12px;font-family:var(--serif);font-weight:800;font-size:26px;color:var(--violet)}
+  ol.phases b{display:block}
+  ol.phases span{color:var(--ink2);font-size:14.5px}
+  @media(max-width:560px){th:nth-child(1),td:nth-child(1){display:none}}
+  table,.finding,ol.phases li{
+    border-radius:var(--r-lg); overflow:hidden;
+    background:linear-gradient(180deg,#ffffff,#f4f8f7);
+    box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  .finding{transition:box-shadow .2s ease, transform .2s ease}
+  .finding:hover{
+    box-shadow:var(--shadow-lift), inset 0 1px 0 rgba(255,255,255,.85); transform:translateY(-3px);
+  }
+  .chip,.tag{border-radius:var(--r-pill)}
+  .dot.g{box-shadow:0 0 7px -1px var(--pass)}
+  .dot.o{box-shadow:0 0 7px -1px var(--open)}
+  .dot.t{box-shadow:0 0 7px -1px var(--teal)}
+  .dot.v{box-shadow:0 0 7px -1px var(--violet)}
+  .dot.c{box-shadow:0 0 7px -1px var(--coral)}
 </style>
 </head>
 <body>
@@ -246,6 +426,7 @@
   </ol>
 </section>
 
+
 <div class="publish-cta">
   <div class="pc-text">
     <p class="pc-h">Want to publish like this?</p>
@@ -287,6 +468,158 @@ document.getElementById('cites').innerHTML = cites.map((c, i) =>
 ).join('');
 </script>
 <script>
+// citation database — add an entry per chip:
+// KEY: {who:"Author(s) (Year)", what:"What they showed, 2 sentences, plain language.", src:"Journal Vol, Page"}
+const CITES = Object.assign(
+  { demo: {who:"This is a citation chip", what:"Tap any chip like this one and you get the source plus a two-sentence plain-language summary of what it actually showed \u2014 instead of a bare [7] sending you down a rabbit hole.", src:"You never leave the page."} },
+  (document.getElementById('cites-data') ? JSON.parse(document.getElementById('cites-data').textContent) : {})
+);
+// one shared toggle behavior for terms and citations
+function closeCard(btn){ const c = btn._card; if(c){ c.remove(); btn._card = null; btn.setAttribute('aria-expanded','false'); } }
+function toggle(btn, html, extraClass){
+  if(btn._card){ closeCard(btn); return; }
+  const card = document.createElement('span');
+  card.className = 'popcard' + (extraClass ? ' ' + extraClass : '');
+  card.innerHTML = html;
+  const block = btn.closest('p, .howto, .body, .openclaim, .forecast, .reported') || btn.parentNode;
+  block.insertAdjacentElement('afterend', card);
+  btn._card = card; btn.setAttribute('aria-expanded','true');
+}
+document.querySelectorAll('.term').forEach(btn=>{
+  btn.setAttribute('aria-expanded','false');
+  btn.addEventListener('click', ()=> toggle(btn, btn.dataset.d));
+});
+document.querySelectorAll('.cite').forEach(btn=>{
+  btn.setAttribute('aria-expanded','false');
+  btn.addEventListener('click', ()=>{
+    const c = CITES[btn.dataset.c];
+    if(!c) return;
+    toggle(btn, '<b>'+c.who+':</b> '+c.what+'<span class="src">'+c.src+'</span>', 'citecard');
+  });
+});
+</script>
+<script>
+// ---------------------------------------------------------------
+// SURVEY LANDSCAPE — single source of truth for the cards.
+// One object per avenue. Replace the PLACEHOLDER rows with yours.
+//   name     : avenue/option name
+//   thesis   : one-line plain-language thesis
+//   status   : ESTABLISHED | OPEN-UNVERIFIED | FORECAST | REPORTED
+//              (any other ladder status renders as a neutral chip)
+//   forecast : integer percent, or null  (only meaningful for FORECAST)
+//   signpost : dated, falsifiable signpost string — MANDATORY for a
+//              FORECAST (a forecast without one is just an opinion with
+//              a number on it; the card flags it in red)
+//   cites    : array of citation keys (match dossier.html's audit)
+// ---------------------------------------------------------------
+let AVENUES = [];
+let RULES = {};
+
+const STATUS = {
+  "ESTABLISHED":     {cls:"s-est",      tcls:"t-est"},
+  "OPEN-UNVERIFIED": {cls:"s-open",     tcls:"t-open"},
+  "FORECAST":        {cls:"s-forecast", tcls:"t-forecast"},
+  "REPORTED":        {cls:"s-reported", tcls:"t-reported"},
+};
+const statusMeta = s => STATUS[s] || {cls:"s-default", tcls:""};
+
+function chip(s){ return '<span class="s-chip '+statusMeta(s).cls+'">'+s+'</span>'; }
+function forecastCell(a){
+  if(a.status !== "FORECAST") return '';
+  if(!a.signpost)             return '<span class="fc missing">⚠ forecast needs a dated signpost</span>';
+  const pct = (a.forecast==null) ? '?' : a.forecast+'%';
+  return '<span class="fc"><span class="pct">~'+pct+'</span> <span class="by">by '+a.signpost+'</span></span>';
+}
+function sourcesCell(a){
+  if(!a.cites || !a.cites.length) return '<span class="srcs"><span class="none">no sources</span></span>';
+  return '<span class="srcs">'+a.cites.map(c=>'<span class="ref">'+c+'</span>').join('')+'</span>';
+}
+
+function renderCards(){
+  document.getElementById('av-grid').innerHTML = AVENUES.map(a =>
+    '<div class="av-card '+statusMeta(a.status).tcls+'">'+
+      '<div class="av-top"><span class="av-name">'+a.name+'</span>'+chip(a.status)+'</div>'+
+      '<p class="av-thesis">'+a.thesis+'</p>'+
+      '<div class="av-meta">'+forecastCell(a)+sourcesCell(a)+'</div>'+
+    '</div>'
+  ).join('');
+}
+
+// ---------------------------------------------------------------
+// CONSISTENCY CONSOLE — checks computed from AVENUES; the RULES they
+// enforce are single-sourced from avenues.json's "checks" block (the
+// same file verify_numbers.py reads), so a threshold can't drift
+// between this page and the verifier. RULES is set by the loader below.
+// ---------------------------------------------------------------
+function buildChecks(){
+  const c = [];
+  const minAvenues   = (RULES.min_avenues ?? 1);
+  const signpostReq  = (RULES.forecast_signpost_required ?? true);
+  const pctMin       = (RULES.forecast_pct_min ?? 0);
+  const pctMax       = (RULES.forecast_pct_max ?? 100);
+
+  const forecasts    = AVENUES.filter(a=>a.status==="FORECAST");
+  const withSignpost = forecasts.filter(a=>!!a.signpost).length;
+  const outOfRange   = AVENUES.filter(a=>a.forecast!=null && (a.forecast<pctMin || a.forecast>pctMax)).length;
+
+  c.push(["Consistency: at least one avenue in the landscape", AVENUES.length, [minAvenues, 9999]]);
+  const expSign = signpostReq ? forecasts.length : withSignpost;
+  c.push(["Consistency: every FORECAST has a dated signpost", withSignpost, [expSign, expSign]]);
+  c.push(["Consistency: all forecast probabilities lie in ["+pctMin+","+pctMax+"]", outOfRange, [0, 0]]);
+  return c;
+}
+
+const fmt = v => v >= 1e4 ? v.toExponential(2) : (Number.isInteger(v) ? String(v) : v.toFixed(4));
+const runBtn = document.getElementById('run');
+const logEl  = document.getElementById('log');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function renderLandscapeError(){
+  document.getElementById('av-grid').innerHTML =
+    '<div class="av-card"><div class="av-top"><span class="av-name">Landscape unavailable</span></div>'+
+    '<p class="av-thesis">The avenue data loads from <span class="mono">avenues.json</span>. '+
+    'View this page on the live site or a local server — a file:// double-click can\'t fetch it.</p></div>';
+  document.getElementById('ncheck').textContent = '0';
+}
+// data-baked guard: a static-baked floor (bake_machinery.js) already carries the cards +
+// console verdict; still load AVENUES/RULES so the Run button works, but DON'T re-render the
+// cards or let a fetch failure (file://) overwrite the baked floor.
+const baked = !!document.querySelector('#av-grid[data-baked]');
+if (document.getElementById('av-grid')) {
+fetch('avenues.json').then(r=>r.json()).then(d=>{
+  AVENUES = Array.isArray(d.avenues) ? d.avenues : [];
+  RULES   = d.checks || {};
+  if(!baked){
+    renderCards();
+    document.getElementById('ncheck').textContent = buildChecks().length;
+  }
+}).catch(()=>{ if(!baked) renderLandscapeError(); });
+
+runBtn.addEventListener('click', () => {
+  runBtn.disabled = true; logEl.innerHTML = '';
+  const checks = buildChecks(); let pass = 0;
+  checks.forEach((ck, i) => {
+    const [label, val, [lo, hi]] = ck, ok = val >= lo && val <= hi;
+    if(ok) pass++;
+    const row = document.createElement('div'); row.className = 'row'; row.style.opacity = '0';
+    row.innerHTML = '<span class="badge ' + (ok?'p':'f') + '">' + (ok?'PASS':'FAIL') + '</span>' +
+      '<span class="what">' + String(i+1).padStart(2,'0') + ' · ' + label + '</span>' +
+      '<span class="nums">' + fmt(val) + ' ∈ [' + fmt(lo) + ', ' + fmt(hi) + ']</span>';
+    logEl.appendChild(row);
+    const show = () => { row.style.transition = 'opacity .25s'; row.style.opacity = '1'; };
+    reduced ? show() : setTimeout(show, 90 * i);
+    if(i === checks.length - 1){
+      const t = document.createElement('div'); t.className = 'tally';
+      t.textContent = 'TOTAL: ' + checks.length + ' checks · ' + pass + ' pass · ' +
+        (checks.length - pass) + ' fail' +
+        (pass === checks.length ? ' — the survey is internally consistent.' : ' — fix the paper, not the tolerance.');
+      const fin = () => { logEl.appendChild(t); runBtn.disabled = false; runBtn.textContent = 'Run again'; };
+      reduced ? fin() : setTimeout(fin, 90 * i + 350);
+    }
+  });
+});
+}
+</script>
+<script>
 fetch('provenance.json').then(r=>r.json()).then(p=>{
   const d=document.getElementById('pv-doi'), v=document.getElementById('pv-doi-v');
   if(!p.version_doi || p.version_doi.indexOf('TODO')===0){
@@ -298,6 +631,44 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
   document.getElementById('pv-state').textContent='release '+p.release_tag+' (+ live edits)';
 }).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository \u2197';
   document.getElementById('pv-doi').href='https://github.com/YOURUSER/YOURREPO';});
+</script>
+<div class="lbx" id="lbx" role="dialog" aria-modal="true" aria-label="Figure, full size" aria-hidden="true">
+  <img id="lbx-img" alt="">
+</div>
+<script>
+(function(){
+  var lbx = document.getElementById('lbx');
+  var lbxImg = document.getElementById('lbx-img');
+  if(!lbx || !lbxImg) return;
+  var imgs = document.querySelectorAll('figure img');
+  if(!imgs.length) return;            // INERT when there are no figures
+  var lastFocus = null;
+  function open(src, alt){
+    lastFocus = document.activeElement;
+    lbxImg.src = src; lbxImg.alt = alt || '';
+    lbx.classList.add('open'); lbx.setAttribute('aria-hidden','false');
+    lbx.tabIndex = -1; lbx.focus();
+  }
+  function close(){
+    lbx.classList.remove('open'); lbx.setAttribute('aria-hidden','true');
+    lbxImg.src = '';
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  imgs.forEach(function(img){
+    img.setAttribute('role','button');
+    img.setAttribute('tabindex','0');
+    if(!img.getAttribute('aria-label'))
+      img.setAttribute('aria-label','View figure full size');
+    img.addEventListener('click', function(){ open(img.currentSrc||img.src, img.alt); });
+    img.addEventListener('keydown', function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(img.currentSrc||img.src, img.alt); }
+    });
+  });
+  lbx.addEventListener('click', close);   // backdrop OR image click closes (cursor:zoom-out)
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' && lbx.classList.contains('open')) close();
+  });
+})();
 </script>
 <script>
 // Lineage strip — mirrors the provenance fetch shape against lineage.json.

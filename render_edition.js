@@ -33,11 +33,16 @@ const ROOT = __dirname;
 const SKIN = path.join(ROOT, 'skin', 'edition.html');
 const SOURCE = path.join(ROOT, 'editions', 'index.source.html');
 const OUT = path.join(ROOT, 'index.html');
-// The editions this template renders + gates. One entry today (the front door);
-// dossier/verify join as additional entries when they come under the skin.
+const DOSSIER_SOURCE = path.join(ROOT, 'editions', 'dossier.source.html');
+const DOSSIER_OUT = path.join(ROOT, 'dossier.html');
+// The editions this template renders + gates. index + dossier today; verify joins as a
+// third entry when it comes under the skin.
 // Single-sourced here because verify_edition.js already imports from this module —
 // the writer (below) and the gate (there) loop the SAME list, so they can't drift.
-const EDITIONS = [{ source: SOURCE, out: OUT }];
+const EDITIONS = [
+  { source: SOURCE, out: OUT },
+  { source: DOSSIER_SOURCE, out: DOSSIER_OUT },
+];
 
 function die(msg) { process.stderr.write('render_edition: ' + msg + '\n'); process.exit(1); }
 const sub = (hay, token, value, label) => {

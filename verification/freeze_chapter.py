@@ -60,7 +60,7 @@ EDITIONS = ["index.html", "dossier.html", "verify.html"]
 # + skin, its pre-built CI-gated markdown projection, and its own avenue data (avenues.json).
 # These let the chapter be re-skinned, read as clean text, and re-bake / verify its machinery
 # from its OWN sealed data (verify_numbers.py --avenues) — without re-rendering the frozen editions.
-CAPTURE_VERBATIM = ["editions/index.source.html", "skin/edition.html", "index.md", "avenues.json"]
+CAPTURE_VERBATIM = ["editions/index.source.html", "editions/dossier.source.html", "skin/edition.html", "index.md", "avenues.json"]
 
 
 def abort(msg):
