@@ -163,7 +163,7 @@
   <section>
     <p class="kicker">the depth</p>
     <h2>And it generalizes.</h2>
-    <p>The cosmic zoom isn't a one-off. It is two ordinary living figures, composed. Each stands on its own:</p>
+    <p>The cosmic zoom isn't a one-off. It is five ordinary living figures, composed. Each stands on its own:</p>
 
     <div class="figcard depth">
       <iframe src="figure-demo.html?embed=1" loading="lazy"
@@ -182,10 +182,34 @@
       halo, unfolded from a single 760-byte spec — not a stored point cloud, a generator. Change the seed and
       you get a different, equally lawful galaxy.</p>
 
-    <p>The thread through all three: <strong>figures store generators, not output.</strong> The runtime is
+    <div class="figcard depth">
+      <iframe src="localgroup-demo.html?embed=1" loading="lazy"
+              title="The Local Group — real galaxies plus a seeded dwarf swarm"></iframe>
+    </div>
+    <p class="cap"><b>One step out: a real catalog.</b> The two bright spirals are the Milky Way ("you are
+      here") and Andromeda, the dominant pair ~2.5&nbsp;Mly apart — a real named-galaxy catalog, with a
+      seeded dwarf swarm filling in around them.</p>
+
+    <div class="figcard depth">
+      <iframe src="cosmicweb-demo.html?embed=1" loading="lazy"
+              title="The Cosmic Web — filaments, voids, and real clusters"></iframe>
+    </div>
+    <p class="cap"><b>Foam, not a grid.</b> Galaxies and clusters strung along filaments between dark voids
+      — a node-and-filament seeded foam over a real cluster catalog. The faint strands are the filaments;
+      the dim points are the galaxies that gather along them, leaving the voids dark.</p>
+
+    <div class="figcard depth">
+      <iframe src="observableuniverse-demo.html?embed=1" loading="lazy"
+              title="The Observable Universe — where the zoom honestly stops"></iframe>
+    </div>
+    <p class="cap"><b>Where sight stops.</b> Past the cosmic web the clustering washes out into a uniform,
+      isotropic field, bounded by the observable horizon. The zoom ends where sight ends — not where the
+      universe ends.</p>
+
+    <p>The thread through all six: <strong>figures store generators, not output.</strong> The runtime is
       vendored, pinned, and zero-dependency, and the render modules <em>compose</em> a small set of shared
       primitives — the Kepler solve, the seeded scatter, the logarithmic zoom — rather than reimplementing
-      them. The cosmic zoom reuses the orrery and the galaxy the very same way. Small inputs, lawful math,
+      them. The cosmic zoom reuses all five — the orrery, the galaxy, the Local Group, the cosmic web, and the observable universe — the very same way. Small inputs, lawful math,
       one runtime: that is what keeps a figure both light enough to archive and faithful enough to trust.</p>
   </section>
 
@@ -209,7 +233,7 @@
     <p class="kicker">the invitation</p>
     <h2>Fork it and publish.</h2>
     <p>There's no plug-in to install and no platform to join. The whole capability is a vendored runtime and a
-      handful of plain-text specs sitting in a public repository — and this page is just three sealed demos in
+      handful of plain-text specs sitting in a public repository — and this page is just six sealed demos in
       <code>&lt;iframe&gt;</code>s. If you have a result worth reading, you can have figures like these under
       it by the end of the afternoon.</p>
     <p>The work makes the argument. Start from the template:
