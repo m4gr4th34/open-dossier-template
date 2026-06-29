@@ -108,6 +108,8 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   out = sub(out, '{{byline}}', front.byline, 'byline');
   out = sub(out, '{{body}}', body, 'body');
   out = sub(out, '{{cites}}', cites, 'cites');
+  out = sub(out, '{{head_extra}}', readSlot('head_extra', ''), 'head_extra');
+  out = sub(out, '{{foot}}', readSlot('foot', ''), 'foot');
   // {{record_note}}: EMPTY for the working draft (no frozen record to point at — byte-identical
   // output), the honest-label banner for a back-catalog re-skin (render_backcatalog.js).
   out = sub(out, '{{record_note}}', recordNote, 'record_note');
