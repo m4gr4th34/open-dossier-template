@@ -104,14 +104,20 @@ def rewire(html):
         relative <img> src (figures at ANY path, via rewire_img_src) -> ../../
         so the frozen copy uses the single shared root copy rather than a
         missing per-chapter one.
-      - cross-edition + lineage NAV links (index/dossier/verify/lineage.html)
-        -> ../../ so a sealed chapter is not a navigational dead-end: its nav
-        returns the reader to the LIVE series, NOT to its frozen siblings in the
-        same dir (frozen chapters are read leaves; navigation happens on the live
-        site). This is an UPWARD/ANCESTOR escape only — linking the live lineage
-        index is not a forward claim (a sealed chapter still asserts nothing about
-        successors), and the lineage STRIP's fetch('lineage.json') is deliberately
-        left untouched (it .catch->hides in the subdir, which is intended).
+      - SERIES-LEVEL NAV: lineage.html -> ../../ ONLY. A sealed chapter ships its
+        own editions (index/dossier/verify.html) as siblings in chapters/<tag>/,
+        so their nav is LEFT BARE and resolves to those sealed siblings — a reader
+        inside a DOI'd snapshot stays inside it when moving between its own
+        editions. Only lineage.html escapes ../../: there is no per-chapter copy
+        (chapters/<tag>/lineage.html 404s) and the lineage index is a series-level
+        view, not part of the sealed snapshot. This REVERSES the earlier "frozen
+        chapters are read leaves, escape to the live series" rule — pointing a
+        sealed page's own nav at the mutable live tip silently walked the reader
+        out of the notarized snapshot, a seal-honesty break rather than a
+        convenience. Linking the live lineage index is still not a forward/
+        successor claim (a sealed chapter asserts nothing about successors), and
+        the lineage STRIP's fetch('lineage.json') is deliberately left untouched
+        (it .catch->hides in the subdir, which is intended).
 
     Leaves absolute URLs (http...) and in-page anchors (#...) alone. Asset rewrites
     handle both quote styles; NAV rewrites are double-quote-only so the strip's
@@ -126,17 +132,19 @@ def rewire(html):
         # forward-compat (only rewritten if present in a future figure-bearing chapter)
         reps.append(("href=" + q + "assets/", "href=" + q + "../../assets/"))
 
-    # cross-edition + lineage NAV -> live root. DOUBLE-QUOTE ONLY on purpose: the
-    # editions write every HTML attribute with double quotes, whereas the lineage
-    # strip's JS uses single quotes (e.g. all.href='lineage.html'). Restricting to
-    # double quotes rewrites the real nav links without ever touching that JS.
-    # Exact value + closing quote so #anchors / suffixes are never matched. This
-    # escapes the reader up to the LIVE series; it is never a forward/successor
-    # claim, and the strip's fetch('lineage.json') is left to .catch->hide.
-    # paper.html dropped: it is a retired redirect stub, never in EDITIONS, so rewriting it
-    # was a dead no-op. The tuple now matches the real frozen edition set + the lineage index.
-    for page in ("index.html", "dossier.html", "verify.html", "lineage.html"):
-        reps.append(('href="' + page + '"', 'href="../../' + page + '"'))
+    # DOUBLE-QUOTE ONLY on purpose: the editions write every HTML attribute with
+    # double quotes, whereas the lineage strip's JS uses single quotes
+    # (e.g. all.href='lineage.html'). Restricting to double quotes rewrites the real
+    # nav link without ever touching that JS; exact value + closing quote so
+    # #anchors / suffixes are never matched. The strip's fetch('lineage.json') is
+    # left to .catch->hide. (paper.html was a retired redirect stub, never rewritten.)
+    # Series-level nav ONLY escapes to the live root. lineage.html has no per-chapter
+    # copy (chapters/<tag>/lineage.html 404s), so it must point ../../ at the live series.
+    # index/dossier/verify.html are LEFT BARE on purpose: each frozen chapter ships its
+    # own sealed siblings in chapters/<tag>/, and a reader inside the DOI'd snapshot must
+    # stay inside it when moving between its own editions — never be silently walked into
+    # the mutable live draft. Bare hrefs already resolve to those siblings.
+    reps.append(('href="lineage.html"', 'href="../../lineage.html"'))
 
     counts = {}
     for old, new in reps:
