@@ -1,6 +1,6 @@
-# YOUR PLAIN-LANGUAGE TITLE
+# @@TITLE@@
 
-> YOUR SURVEY ABSTRACT.
+> @@ABSTRACT@@.
 
 ## Working draft
 

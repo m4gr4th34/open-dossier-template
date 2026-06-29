@@ -1,10 +1,10 @@
-An Open Dossier · **NNN** · self-explaining edition · survey · v1.0
+An Open Dossier · **NNN** · self-explaining edition · survey · @@VERSION@@
 
-# YOUR PLAIN-LANGUAGE TITLE
+# @@TITLE@@
 
-*YOUR NAME — YOUR AFFILIATION*
+*@@NAME@@ — @@AFFILIATION@@*
 
-YOUR SURVEY ABSTRACT. This dossier surveys [field]: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: **Don't trust this paper — run it.**
+@@ABSTRACT@@. This dossier surveys @@FIELD@@: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: **Don't trust this paper — run it.**
 
 ## Avenues
 
@@ -81,6 +81,6 @@ Pull the landscape together: which avenues are solid, which are live bets, which
 
 ## References
 
-- **Journal 'YY** — REPLACE — Author et al. (Year). REPLACE — what this source demonstrated, in plain language, and why it matters to this survey. *Journal Vol, Page (Year)*
+- **Journal 'YY** — @@CITE-WHO@@. @@CITE-WHAT@@ *@@CITE-SRC@@*
 
-- **Journal 'YY** — REPLACE — Author et al. (Year). REPLACE. *Journal Vol, Page (Year)*
+- **Journal 'YY** — @@CITE-WHO@@. @@CITE-WHAT@@ *@@CITE-SRC@@*
