@@ -70,7 +70,11 @@ jobs:
 
           # Commit & push ONLY the reskin outputs, by explicit path. The nothing-to-commit guard
           # means an input change that produces identical bytes (or an empty lineage) is a clean no-op.
-          git add live/
+          # Stage only regenerated back-catalog views, by path (never -A). Empty lineage
+          # => render wrote no live/ dir => nothing to stage; the diff guard below no-ops.
+          if [ -d live ]; then
+            git add live/
+          fi
           if git diff --cached --quiet; then
             echo "live/ already current — nothing to regenerate."
             exit 0
