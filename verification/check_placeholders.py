@@ -27,18 +27,20 @@ This script reads no numbers and is independent of verify_numbers.py.
 """
 import json
 import os
+import re
 import sys
 
 # Fill-in sentinels that must not survive into a released publication surface.
 SENTINELS = [
-    "DESCRIBE YOUR USE",
     "PLACEHOLDER",
     "TODO-AFTER-FIRST-RELEASE",
     "YOURUSER",
     "YOURREPO",
-    "YOUR NAME",
     "NNN",
 ]
+
+# The uniform @@...@@ content fill-in convention (editions + config), matched by regex.
+PLACEHOLDER_RE = re.compile(r"@@[A-Z0-9 _-]+@@")
 
 # Author-facing publication surfaces (what a reader/citer actually sees).
 SURFACES = [
@@ -119,6 +121,8 @@ def scan():
                 for sentinel in SENTINELS:
                     if sentinel in line:
                         hits.append((path, lineno, sentinel, line.strip()))
+                for m in PLACEHOLDER_RE.finditer(line):
+                    hits.append((path, lineno, m.group(0), line.strip()))
     return hits
 
 
