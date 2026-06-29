@@ -481,7 +481,7 @@ label. Close on the line you want to leave the reader with.</p>
 // KEY: {who:"Author(s) (Year)", what:"What they showed, 2 sentences, plain language.", src:"Journal Vol, Page"}
 const CITES = Object.assign(
   { demo: {who:"This is a citation chip", what:"Tap any chip like this one and you get the source plus a two-sentence plain-language summary of what it actually showed \u2014 instead of a bare [7] sending you down a rabbit hole.", src:"You never leave the page."} },
-  JSON.parse(document.getElementById('cites-data').textContent)
+  (document.getElementById('cites-data') ? JSON.parse(document.getElementById('cites-data').textContent) : {})
 );
 // one shared toggle behavior for terms and citations
 function closeCard(btn){ const c = btn._card; if(c){ c.remove(); btn._card = null; btn.setAttribute('aria-expanded','false'); } }
@@ -593,6 +593,7 @@ function renderLandscapeError(){
 // console verdict; still load AVENUES/RULES so the Run button works, but DON'T re-render the
 // cards or let a fetch failure (file://) overwrite the baked floor.
 const baked = !!document.querySelector('#av-grid[data-baked]');
+if (document.getElementById('av-grid')) {
 fetch('avenues.json').then(r=>r.json()).then(d=>{
   AVENUES = Array.isArray(d.avenues) ? d.avenues : [];
   RULES   = d.checks || {};
@@ -625,6 +626,7 @@ runBtn.addEventListener('click', () => {
     }
   });
 });
+}
 </script>
 <script>
 fetch('provenance.json').then(r=>r.json()).then(p=>{
