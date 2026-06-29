@@ -61,10 +61,16 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   const active = front.active || 'index.html';   // optional; sealed/old sources default to index
 
   // --- source: body + cites slots ---
-  function readSlot(name) {
+  function readSlot(name, fallback) {
     const re = new RegExp('<!--slot:' + name + '-->\\n([\\s\\S]*?)\\n<!--/slot:' + name + '-->');
     const m = source.match(re);
-    if (!m) die('source: missing <!--slot:' + name + '--> ... <!--/slot:' + name + '--> block');
+    if (!m) {
+      // Optional slot: a 2-arg call supplying a fallback renders without the block
+      // (a future {{head_extra}}/{{foot}} on a source that omits it). A 1-arg call
+      // (body/cites) passes fallback=undefined and still die()s — those stay required.
+      if (fallback !== undefined) return fallback;
+      die('source: missing <!--slot:' + name + '--> ... <!--/slot:' + name + '--> block');
+    }
     return m[1];
   }
   let body = readSlot('body');
