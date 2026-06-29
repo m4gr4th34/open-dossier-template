@@ -188,3 +188,33 @@ rows, manuscript). Always diff before committing; stop and ask on any
 conflict. Because this constitution is a repo file, upgrading it is just part
 of that same machinery sync — there is nothing separate to re-paste into the
 Project.
+
+## gstack
+Personal, global install of [gstack](https://github.com/garrytan/gstack) (MIT,
+Garry Tan) at `~/.claude/skills/gstack` — a developer toolbelt, NOT part of this
+dossier's machinery or doctrine. This is a **personal install only**: team mode
+is OFF, nothing was committed to this repo, and none of gstack's enforcement
+(the "require gstack" CLAUDE.md block, PreToolUse gates) is active. The doctrine
+above is unchanged and overrides anything a gstack skill might suggest; gstack
+skills get no vote on claim labels, the ledger, or the verify gates.
+
+**Routing note:** use **/browse** for all web browsing.
+
+**Available skills** (`~/.claude/skills/gstack/...` for file paths):
+- Inspect & ship code: `/qa`, `/qa-only`, `/review`, `/codex`, `/investigate`,
+  `/ship`, `/land-and-deploy`, `/health`, `/retro`, `/learn`
+- Plan & spec: `/spec`, `/autoplan`, `/office-hours`, `/plan-eng-review`,
+  `/plan-devex-review`, `/plan-design-review`, `/plan-ceo-review`, `/plan-tune`,
+  `/pair-agent`, `/skillify`
+- Web & docs: `/browse`, `/scrape`, `/diagram`, `/make-pdf`, `/document-generate`,
+  `/document-release`, `/landing-report`
+- Design: `/design-consultation`, `/design-html`, `/design-review`,
+  `/design-shotgun`, `/devex-review`
+- iOS: `/ios-qa`, `/ios-fix`, `/ios-clean`, `/ios-sync`, `/ios-design-review`
+- Context & upkeep: `/context-save`, `/context-restore`, `/freeze`, `/unfreeze`,
+  `/guard`, `/careful`, `/canary`, `/cso`, `/gstack-upgrade`, `/setup-deploy`,
+  `/setup-browser-cookies`, `/benchmark`, `/benchmark-models`
+
+Run `/gstack-upgrade` to update. To later opt into team mode (which WOULD edit
+this CLAUDE.md and the repo), that is a deliberate, separate decision — not done
+here.
