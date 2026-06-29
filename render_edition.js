@@ -33,6 +33,11 @@ const ROOT = __dirname;
 const SKIN = path.join(ROOT, 'skin', 'edition.html');
 const SOURCE = path.join(ROOT, 'editions', 'index.source.html');
 const OUT = path.join(ROOT, 'index.html');
+// The editions this template renders + gates. One entry today (the front door);
+// dossier/verify join as additional entries when they come under the skin.
+// Single-sourced here because verify_edition.js already imports from this module —
+// the writer (below) and the gate (there) loop the SAME list, so they can't drift.
+const EDITIONS = [{ source: SOURCE, out: OUT }];
 
 function die(msg) { process.stderr.write('render_edition: ' + msg + '\n'); process.exit(1); }
 const sub = (hay, token, value, label) => {
@@ -137,9 +142,11 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
 }
 
 if (require.main === module) {
-  const html = renderEdition();
-  fs.writeFileSync(OUT, html);
-  process.stdout.write('render_edition: wrote ' + path.relative(ROOT, OUT) + ' (' + html.length + ' bytes)\n');
+  for (const ed of EDITIONS) {
+    const html = renderEdition(SKIN, ed.source);
+    fs.writeFileSync(ed.out, html);
+    process.stdout.write('render_edition: wrote ' + path.relative(ROOT, ed.out) + ' (' + html.length + ' bytes)\n');
+  }
 }
 
-module.exports = { renderEdition };
+module.exports = { renderEdition, EDITIONS };
