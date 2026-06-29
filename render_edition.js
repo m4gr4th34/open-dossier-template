@@ -35,13 +35,15 @@ const SOURCE = path.join(ROOT, 'editions', 'index.source.html');
 const OUT = path.join(ROOT, 'index.html');
 const DOSSIER_SOURCE = path.join(ROOT, 'editions', 'dossier.source.html');
 const DOSSIER_OUT = path.join(ROOT, 'dossier.html');
-// The editions this template renders + gates. index + dossier today; verify joins as a
-// third entry when it comes under the skin.
+const VERIFY_SOURCE = path.join(ROOT, 'editions', 'verify.source.html');
+const VERIFY_OUT = path.join(ROOT, 'verify.html');
+// The editions this template renders + gates: index, dossier, verify (all three under the one skin).
 // Single-sourced here because verify_edition.js already imports from this module —
 // the writer (below) and the gate (there) loop the SAME list, so they can't drift.
 const EDITIONS = [
   { source: SOURCE, out: OUT },
   { source: DOSSIER_SOURCE, out: DOSSIER_OUT },
+  { source: VERIFY_SOURCE, out: VERIFY_OUT },
 ];
 
 function die(msg) { process.stderr.write('render_edition: ' + msg + '\n'); process.exit(1); }
