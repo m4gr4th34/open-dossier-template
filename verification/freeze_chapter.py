@@ -393,6 +393,16 @@ if __name__ == "__main__":
     if len(sys.argv) >= 3 and sys.argv[1] == "--reskin":
         html = sys.stdin.read()
         html, _ = rewire(html)
+        # Reskin views are written to live/<tag>/index.html ONLY — no dossier/verify
+        # sibling is written there. rewire() left those two hrefs bare, which is correct
+        # for the chapters/<tag>/ freeze path (siblings exist there) but would 404 in
+        # live/<tag>/. Retarget them to the chapter's SEALED record under chapters/<tag>/
+        # — the immutable bytes this reading view's banner already cites — so they resolve.
+        # --reskin branch ONLY; rewire() stays shared + bare for the freeze path.
+        # Idempotent: search forms carry no ../../; the replacements do, so a re-run no-ops.
+        for page in ("dossier.html", "verify.html"):
+            html = html.replace('href="' + page + '"',
+                                'href="../../chapters/' + sys.argv[2] + '/' + page + '"')
         html, _ = bake_release_label(html, sys.argv[2])
         sys.stdout.write(html)
         sys.exit(0)
