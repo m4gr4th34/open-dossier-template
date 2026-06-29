@@ -95,14 +95,16 @@ continues, on the same page, as the self-explaining narrative read top to
 bottom. One page, one edition. (`paper.html` is now just a redirect stub that
 forwards to `index.html`, kept so old links and frozen chapters resolve.)
 
-**Generated, never hand-edited.** `index.html` is BUILT from
-`editions/index.source.html` (the skin-free content) + `skin/edition.html` (the
-wrapper) by `npm run render-edition`, which also **bakes the avenue cards + console
+**Generated, never hand-edited.** All three editions (`index.html`, `dossier.html`, and
+`verify.html`) are BUILT from their own `editions/*.source.html` (the skin-free content) +
+the shared `skin/edition.html` (the wrapper) by `npm run render-edition`, manifest-driven
+over all three. For `index.html` the render also **bakes the avenue cards + console
 verdict into static bytes** (`bake_machinery.js`, the HTML twin of the markdown table —
 single-sourced from `avenues.json` + `verify_numbers.py`), so the front door is readable
-with JS OFF (the in-page JS re-renders identically). Edit the SOURCE and re-render; never
-hand-edit `index.html` — CI's edition round-trip gate (`npm run check-edition`)
-fails the build if `index.html` drifts from `render(source, skin)`. See BOUNDARY.md.
+with JS OFF (the in-page JS re-renders identically); `dossier.html` and `verify.html` carry
+no baked machinery. Edit the SOURCE and re-render; never hand-edit any of the three — CI's
+edition round-trip gate (`npm run check-edition`) fails the build if any rendered edition
+drifts from `render(source, skin)`. See BOUNDARY.md.
 
 The same source also projects to **`index.md` + `llms.txt`** (the GENERATED,
 token-efficient, skin-free markdown — avenue table from `avenues.json`, checks from
@@ -285,10 +287,15 @@ assess it) stated alongside with equal prominence.
 `AMENDED · DD MMM YYYY` `.openclaim` blocks at the exact site of the
 amended claim, stating: what changed, what is NOT affected, the issue
 link, and that the archived release stays frozen. Mirror every amendment
-across all surfaces (tex Note added, the index.html self-explaining block +
-console qualifier, dossier.html finding update) in one commit.
+across all surfaces (tex Note added, the editions/index.source.html self-explaining block +
+console qualifier, editions/dossier.source.html finding update, then re-render) in one commit.
 
 ## Surface 3 — The audit trail (`dossier.html`)
+
+**Generated, never hand-edited** (like the front door): author the red-team findings and the
+citation table in `editions/dossier.source.html` slot:body, then run `npm run render-edition`;
+never hand-edit `dossier.html`, which the same edition round-trip gate covers. See the
+front-door note above and BOUNDARY.md.
 
 - Red-team findings from the Phase 4 adversarial pass, each RESOLVED
   (green) or OPEN (amber), ranked by severity, including author
