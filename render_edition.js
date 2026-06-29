@@ -52,12 +52,13 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   if (!fm) die('source: missing <!--edition ... --> frontmatter header');
   const front = {};
   for (const line of fm[1].split('\n')) {
-    const m = line.match(/^(eyebrow|title|byline): ([\s\S]*)$/);
+    const m = line.match(/^(eyebrow|title|byline|active): ([\s\S]*)$/);
     if (m) front[m[1]] = m[2];
   }
   for (const k of ['eyebrow', 'title', 'byline']) {
     if (!(k in front)) die('source: frontmatter missing "' + k + '"');
   }
+  const active = front.active || 'index.html';   // optional; sealed/old sources default to index
 
   // --- source: body + cites slots ---
   function readSlot(name) {
@@ -104,6 +105,16 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   // {{record_note}}: EMPTY for the working draft (no frozen record to point at — byte-identical
   // output), the honest-label banner for a back-catalog re-skin (render_backcatalog.js).
   out = sub(out, '{{record_note}}', recordNote, 'record_note');
+
+  // Active-nav: mark exactly the .cta button whose href === active as primary.
+  // 'none' marks nothing (an edition not in the 4-button nav). A non-'none' active
+  // that matches no nav button is a typo -> die (same disposition as a missing mount).
+  if (active !== 'none') {
+    const navOld = 'class="btn" href="' + active + '"';
+    const navNew = 'class="btn primary" href="' + active + '"';
+    if (out.indexOf(navOld) < 0) die('active: "' + active + '" matches no .cta nav button');
+    out = out.replace(navOld, () => navNew);   // function form: no $-pattern interpretation
+  }
 
   // --- fail loud on any unresolved token leaking into the output ([a-z_]+ also catches record_note) ---
   const leak = out.match(/\{\{[a-z_]+\}\}|<!--mount:|<!--fragment:/);
