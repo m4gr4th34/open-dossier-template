@@ -18,7 +18,7 @@ Every quantitative claim exists in three places and they must always agree:
 
 1. The manuscript prose (`paper/manuscript.tex`)
 2. The Python verifier (`verification/verify_numbers.py`)
-3. The JavaScript console (`index.html`)
+3. The verification console — appears in `index.html`, but generated, never hand-edited (see the Known-limitation note below)
 
 Any edit to a number updates all three in the same commit. When a check
 fails: **fix the paper, never widen the tolerance.** The tolerances in the

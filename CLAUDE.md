@@ -32,7 +32,7 @@ labeled one is not.**
   Before any commit, run `python verification/verify_numbers.py`; if any check
   fails, fix the manuscript or the model — never the tolerance. Any change to a
   number updates every copy in lockstep — the manuscript prose, verify_numbers.py,
-  and the index.html JS console — and all must agree.
+  and the index.html JS console (generated, never hand-edited; data/thresholds live in `avenues.json`, verdict baked from `verify_numbers.py`) — and all must agree.
 - The author reviews by **consistency and reality checks on end results,
   not re-derivation** — stated publicly in the acknowledgments. Surface
   anything that looks inconsistent rather than smoothing it over.
