@@ -140,17 +140,18 @@ verification script, and its claim ledger all live here.
 - NEVER modify anything in timestamps/ — those are cryptographic proofs.
 - File map:
   - index.html        — the paper (GENERATED: edit editions/index.source.html + skin/edition.html, then `npm run render-edition`; never hand-edit — CI's `check-edition` gate enforces it). Self-explaining edition + avenue landscape + verification console, with the cards + console verdict BAKED to static bytes (JS-off readable).
-  - editions/         — skin-free content source (index.source.html) for the front door
+  - editions/         — skin-free content sources: index.source.html / dossier.source.html / verify.source.html (one per edition), each with frontmatter (eyebrow/title/byline/active) + slot:body/foot/cites, plus an OPTIONAL slot:head_extra (per-edition CSS; dossier/verify use it, index omits it via the `''` fallback). Edit THESE, never the rendered *.html.
   - skin/             — the wrapper/skin (edition.html) the source renders into
   - index.md / llms.txt — GENERATED skin-free markdown projection of the source (edit the source, `npm run render-markdown`; never hand-edit — CI's `check-markdown` gate enforces it). llms.txt's chapter index is lineage-driven from lineage.json.
-  - render_edition.js / verify_edition.js   — render index.html from source+skin (incl. baking); CI round-trip gate
+  - render_edition.js / verify_edition.js   — manifest-driven (EDITIONS): render index.html + dossier.html + verify.html each from its editions/*.source.html + skin/edition.html (incl. baking for index); CI `check-edition` round-trip gate covers all three.
   - bake_machinery.js — static-card baker: bakes avenue cards + console verdict into index.html (HTML twin of the md table, single-sourced from avenues.json + verify_numbers.py); called by render_edition
   - render_markdown.js / verify_markdown.js — render index.md+llms.txt from the source; CI projection gate
   - verify_projection.js — content-equivalence gate (prose + floor + machinery legs): every source prose atom AND baked avenue/console machinery present in BOTH index.html and index.md, for the working draft, every sealed chapter under chapters/<tag>/, AND every back-catalog re-skin under live/<tag>/ (vs the chapter's own sealed source + index.md) (CI `check-projection`)
   - render_backcatalog.js / verify_backcatalog.js — re-skin every lineage chapter into live/<tag>/index.html (current skin@HEAD + the chapter's OWN sealed source/avenues.json, with a banner pointing at the frozen record); CI sync gate (`check-backcatalog`). live/ is fully automated: a new chapter is born with its view in the freeze commit (`freeze-chapter.yml` runs the renderer atomically); skin/renderer changes re-skin the existing catalog (`reskin-backcatalog.yml`). Both gate before committing; humans never run it — `npm run render-backcatalog` is a local-preview convenience only.
   - live/<tag>/         — GENERATED current-skin reading view of each frozen chapter (NOT the record; chapters/<tag>/ is the immutable DOI'd record)
   - paper.html        — redirect stub → index.html (legacy link target)
-  - dossier.html      — audit trail (red team, citation audit)
+  - dossier.html      — audit trail: red team, citation audit (GENERATED: edit editions/dossier.source.html + skin/edition.html, then `npm run render-edition`; never hand-edit — CI's `check-edition` gate enforces it).
+  - verify.html       — independent verification: the OpenTimestamps/Bitcoin proof (GENERATED: edit editions/verify.source.html + skin/edition.html, then `npm run render-edition`; never hand-edit — CI's `check-edition` gate enforces it).
   - paper/            — optional LaTeX manuscript scaffold (on-demand legacy export; not shipped)
   - verification/     — verify script, audits, red-team report, format spec (verify_numbers.py takes an optional `--avenues <path>` override; no flag = live root, byte-unchanged). avenues.json is sealed into each frozen chapter so its verdict derives from its OWN data.
   - figures/          — vendored living-figures runtime (interactive SVG via data-figure)
