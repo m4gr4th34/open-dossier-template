@@ -1,11 +1,11 @@
 <!--edition
-eyebrow: An Open Dossier · <b>NNN</b> · self-explaining edition · survey · v1.0
-title: YOUR PLAIN-LANGUAGE TITLE
-byline: YOUR NAME — YOUR AFFILIATION
+eyebrow: An Open Dossier · <b>NNN</b> · self-explaining edition · survey · <<VERSION>>
+title: <<TITLE>>
+byline: <<NAME>> — <<AFFILIATION>>
 active: index.html
 -->
 <!--slot:body-->
-<p class="abstract">YOUR SURVEY ABSTRACT. This dossier surveys [field]: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
+<p class="abstract"><<ABSTRACT>>. This dossier surveys <<FIELD>>: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
 
 <!--mount:howto-->
 
@@ -115,9 +115,10 @@ label. Close on the line you want to leave the reader with.</p>
 <p class="punch">End with the line your readers should carry away.</p>
 <!--/slot:body-->
 <!--slot:cites-->
+<!-- cite fields. who: "Author et al. (Year)". what: plain-language demonstration + why it matters. src: "Journal Vol, Page (Year)". -->
 <script type="application/json" id="cites-data">
-{ "ref1": { "who": "REPLACE — Author et al. (Year)", "what": "REPLACE — what this source demonstrated, in plain language, and why it matters to this survey.", "src": "Journal Vol, Page (Year)" },
-  "ref2": { "who": "REPLACE — Author et al. (Year)", "what": "REPLACE.", "src": "Journal Vol, Page (Year)" } }
+{ "ref1": { "who": "<<CITE-WHO>>", "what": "<<CITE-WHAT>>", "src": "<<CITE-SRC>>" },
+  "ref2": { "who": "<<CITE-WHO>>", "what": "<<CITE-WHAT>>", "src": "<<CITE-SRC>>" } }
 </script>
 <!--/slot:cites-->
 <!--slot:foot-->
@@ -132,7 +133,7 @@ label. Close on the line you want to leave the reader with.</p>
 
 <footer>
   <b>About this edition:</b> this page is the complete survey in self-explaining form — the avenue <a href="#landscape">landscape</a> and the consistency console up top, the narrative below. This live edition is the paper. The <a href="dossier.html">audit trail</a> carries the citation audit and the receipts.
-  <br><br><span class="mono">An Open Dossier · CC BY 4.0 · AI-assistance: DESCRIBE YOUR USE and state your actual review basis · every verification label is true</span>
+  <br><br><span class="mono">An Open Dossier · CC BY 4.0 · AI-assistance: <<AI-USE NOTE>> and state your actual review basis · every verification label is true</span>
 </footer>
 
 <!--/slot:foot-->

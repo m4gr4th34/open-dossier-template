@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DOSSIER NNN — YOUR TITLE (Open Dossier)</title>
-<meta name="description" content="YOUR ONE-LINE DESCRIPTION. A survey that explains itself.">
+<title>DOSSIER NNN — <<TITLE>> (Open Dossier)</title>
+<meta name="description" content="<<DESCRIPTION>>. A survey that explains itself.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -298,7 +298,7 @@
 <body>
 <header>
   <div class="chrome">
-    <div class="eyebrow">An Open Dossier · <b>NNN</b> · self-explaining edition · survey · v1.0</div>
+    <div class="eyebrow">An Open Dossier · <b>NNN</b> · self-explaining edition · survey · <<VERSION>></div>
     <div class="cta">
       <a class="btn primary" href="index.html">The paper</a>
       <a class="btn" href="dossier.html">Audit trail</a>
@@ -312,12 +312,12 @@
       <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
     </div>
     <div class="lineage-strip" id="lineageStrip" aria-label="Lineage"></div>
-    <h1>YOUR PLAIN-LANGUAGE TITLE</h1>
-    <div class="byline">YOUR NAME — YOUR AFFILIATION</div>
+    <h1><<TITLE>></h1>
+    <div class="byline"><<NAME>> — <<AFFILIATION>></div>
   </div>
 </header>
 <div class="wrap">
-  <p class="abstract">YOUR SURVEY ABSTRACT. This dossier surveys [field]: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
+  <p class="abstract"><<ABSTRACT>>. This dossier surveys <<FIELD>>: the live avenues, what each rests on, and where the open questions and forward bets sit. Every card in the landscape below carries an honest status label — established findings asserted, open questions and forecasts labeled as such. End it with: <b>Don't trust this paper — run it.</b></p>
 
   <div class="howto">
     <b>How to read this:</b> the whole survey is on this one page, written to explain itself.
@@ -467,14 +467,15 @@ label. Close on the line you want to leave the reader with.</p>
 
 <footer>
   <b>About this edition:</b> this page is the complete survey in self-explaining form — the avenue <a href="#landscape">landscape</a> and the consistency console up top, the narrative below. This live edition is the paper. The <a href="dossier.html">audit trail</a> carries the citation audit and the receipts.
-  <br><br><span class="mono">An Open Dossier · CC BY 4.0 · AI-assistance: DESCRIBE YOUR USE and state your actual review basis · every verification label is true</span>
+  <br><br><span class="mono">An Open Dossier · CC BY 4.0 · AI-assistance: <<AI-USE NOTE>> and state your actual review basis · every verification label is true</span>
 </footer>
 
 </div>
 
+<!-- cite fields. who: "Author et al. (Year)". what: plain-language demonstration + why it matters. src: "Journal Vol, Page (Year)". -->
 <script type="application/json" id="cites-data">
-{ "ref1": { "who": "REPLACE — Author et al. (Year)", "what": "REPLACE — what this source demonstrated, in plain language, and why it matters to this survey.", "src": "Journal Vol, Page (Year)" },
-  "ref2": { "who": "REPLACE — Author et al. (Year)", "what": "REPLACE.", "src": "Journal Vol, Page (Year)" } }
+{ "ref1": { "who": "<<CITE-WHO>>", "what": "<<CITE-WHAT>>", "src": "<<CITE-SRC>>" },
+  "ref2": { "who": "<<CITE-WHO>>", "what": "<<CITE-WHAT>>", "src": "<<CITE-SRC>>" } }
 </script>
 <script>
 // citation database — add an entry per chip:
