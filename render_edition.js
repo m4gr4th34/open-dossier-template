@@ -82,8 +82,16 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   }
 
   // --- expand the mounts inside the body with the skin fragments ---
-  for (const name of ['howto', 'landscape', 'console']) {
-    body = sub(body, '<!--mount:' + name + '-->', readFragment(name), 'mount:' + name);
+  // Machinery-optional: a source carrying NONE of the three mounts (a future dossier.source /
+  // verify.source) renders without them instead of die()-ing at sub(). All-or-nothing — a source
+  // with ANY mount still expands the full set, so a partial/typo'd source still die()s (sub() here,
+  // the leak check below, or bakeMachinery's shell asserts). Only a genuinely mount-free source skips.
+  const MOUNTS = ['howto', 'landscape', 'console'];
+  const hasMounts = MOUNTS.some(name => body.indexOf('<!--mount:' + name + '-->') >= 0);
+  if (hasMounts) {
+    for (const name of MOUNTS) {
+      body = sub(body, '<!--mount:' + name + '-->', readFragment(name), 'mount:' + name);
+    }
   }
 
   // --- fill the wrapper slots ---
@@ -104,7 +112,7 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   // --- bake the machinery (avenue cards + console verdict) into the static floor,
   //     so the front door ships readable with JS off (the JS ceiling re-renders identically).
   //     machinery null => live root readers (working draft); { avenues, verdict } => sealed data. ---
-  out = bakeMachinery(out, machinery || undefined);
+  if (hasMounts) out = bakeMachinery(out, machinery || undefined);
 
   return out;
 }
