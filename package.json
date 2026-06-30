@@ -13,7 +13,8 @@
     "check-markdown": "node verify_markdown.js",
     "check-projection": "node verify_projection.js",
     "render-backcatalog": "node render_backcatalog.js",
-    "check-backcatalog": "node verify_backcatalog.js"
+    "check-backcatalog": "node verify_backcatalog.js",
+    "test": "node run_tests.js"
   },
   "dependencies": {
     "katex": "0.16.47"
