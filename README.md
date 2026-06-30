@@ -366,6 +366,20 @@ for TAG in $TAGS; do
   git worktree remove --force .backfill-tmp   # ALWAYS clean up, even on failure
 done
 
+# --- REGENERATE derived artifacts from the now-complete lineage (mirrors freeze-chapter.yml):
+#     the per-chapter current-skin reading views (live/<tag>/) AND the lineage-driven markdown
+#     index (llms.txt). Both are regenerate-all and read the finished lineage.json, so they run
+#     ONCE here, after the loop — never inside it. Without these, the backfill would advance
+#     lineage.json but leave live/ missing and llms.txt stale (check-markdown would go red). ---
+npm run render-backcatalog
+npm run render-markdown
+
+# --- GATE-GUARD before review (fail-closed, same as the workflow): never stage a broken
+#     reading view or a stale markdown index. ---
+npm run check-backcatalog
+node verify_projection.js
+npm run check-markdown
+
 # --- REVIEW, then commit explicitly (the ritual does NOT auto-commit) ---
 echo; echo "=== review before committing ==="
 git status
@@ -376,8 +390,8 @@ Review the reconstructed `chapters/` tree and `lineage.json`. When they look rig
 commit explicitly — same diff-gated discipline as everywhere else:
 
 ```bash
-git add chapters/ lineage.json
-git commit -m "freeze(lineage): backfill chapters from past releases"
+git add chapters/ lineage.json live/ llms.txt index.md
+git commit -m "freeze(lineage): backfill chapters from past releases (+ live/ views + llms.txt)"
 git push
 ```
 

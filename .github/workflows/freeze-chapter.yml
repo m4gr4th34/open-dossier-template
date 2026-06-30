@@ -97,18 +97,27 @@ jobs:
           #     (render_backcatalog has no single-chapter mode; all-or-nothing is fine here.) ---
           npm run render-backcatalog
 
+          # --- regenerate the lineage-driven markdown index (llms.txt) so it reflects the chapter
+          #     just appended to lineage.json. render-markdown rewrites llms.txt + index.md from
+          #     source+lineage; only llms.txt actually changes on a freeze (index.md is source-driven),
+          #     but we regenerate+stage both so the projection can never drift — whatever the renderer
+          #     emits, we commit. Without this, lineage.json advances but llms.txt stays stale and the
+          #     next check-markdown in CI goes red. ---
+          npm run render-markdown
+
           # --- GATE-GUARD (fail-closed, BEFORE any commit): never seal a chapter with a broken
           #     reading view. set -euo pipefail aborts the job here if either gate fails, so the
           #     chapter + live/ are NOT committed — loud, not silent. ---
           npm run check-backcatalog          # the new live/<tag> == what render_backcatalog produces
           node verify_projection.js          # the new live/<tag> carries its sealed prose + machinery
+          npm run check-markdown             # llms.txt's lineage-driven index matches the new lineage.json
 
           # --- commit & push ONLY the freeze outputs + the new reading view, by explicit path ---
-          git add chapters/ lineage.json live/
+          git add chapters/ lineage.json live/ llms.txt index.md
           if git diff --cached --quiet; then
             echo "Nothing to freeze."
           else
-            git commit -m "freeze(lineage): archive chapter ${TAG} + its live/ reading view + register in lineage.json [skip ci]"
+            git commit -m "freeze(lineage): archive chapter ${TAG} + its live/ reading view + register in lineage.json (+ regenerate llms.txt) [skip ci]"
             git pull --rebase origin main   # replay our disjoint commit on top of any concurrent provenance push
             git push
           fi
