@@ -1,4 +1,4 @@
-An Open Dossier · **NNN** · self-explaining edition · survey · @@VERSION@@
+An Open Dossier · **NNN**
 
 # @@TITLE@@
 

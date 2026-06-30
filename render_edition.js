@@ -40,7 +40,8 @@ const VERIFY_OUT = path.join(ROOT, 'verify.html');
 const LINEAGE_SOURCE = path.join(ROOT, 'editions', 'lineage.source.html');
 const LINEAGE_OUT = path.join(ROOT, 'lineage.html');
 // The editions this template renders + gates: index, dossier, verify, lineage (all under the one skin).
-// lineage renders with chrome: index (no provenance bar / lineage strip) and is machinery-free
+// lineage renders with chrome: index (keeps the universal provenance bar, edition-aware as the
+// chapter index; drops only the trinity-only lineage header-strip) and is machinery-free
 // (no mounts -> no bake), exactly like dossier/verify but for the series-level chapter index.
 // Single-sourced here because verify_edition.js already imports from this module —
 // the writer (below) and the gate (there) loop the SAME list, so they can't drift.
@@ -76,10 +77,12 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
     if (!(k in front)) die('source: frontmatter missing "' + k + '"');
   }
   const active = front.active || 'index.html';   // optional; sealed/old sources default to index
-  // chrome: which header/companion chrome the wrapper ships. 'reading' (default) = full
-  // reading-surface chrome (provenance bar + lineage strip + their fetch scripts), for an
-  // archivable edition. 'index' = a navigation/index surface (lineage.html) with no provenance
-  // bar at all. Undeclared -> 'reading', so the trinity render byte-identically. Unknown -> die.
+  // chrome: which companion chrome the wrapper ships ALONGSIDE the universal provenance bar (the
+  // bar is on every edition). 'reading' (default) = also ship the lineage header-strip + its fetch
+  // script, for a reading edition. 'index' = a navigation/index surface (lineage.html): the
+  // provenance bar stays (rendered edition-aware: the chapter index + concept DOI), but the
+  // header-strip is dropped, since lineage shows its own full chapter list. Undeclared -> 'reading',
+  // so the trinity render byte-identically. Unknown -> die.
   const chrome = front.chrome || 'reading';
   if (chrome !== 'reading' && chrome !== 'index') {
     die('source: chrome must be "reading" or "index" (got ' + JSON.stringify(chrome) + ')');
@@ -88,7 +91,7 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   // an edition whose provenance bar contains a pv-item linking to itself. When set, that one
   // self-pointing anchor is degraded at render to a non-link "this page" span (a link to the
   // page you're on is a false affordance). Undeclared -> '' -> no degrade (index/dossier have no
-  // self-pointing pv-item; lineage has chrome:index so no bar at all). The general fix asked by
+  // self-pointing pv-item; lineage's bar points its DOI slot at the concept DOI, not a self-link). The general fix asked by
   // ROADMAP item 3: keyed on the page's own identity, not special-cased to verify.
   const self = front.self || '';
 
@@ -145,6 +148,9 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   // {{record_note}}: EMPTY for the working draft (no frozen record to point at — byte-identical
   // output), the honest-label banner for a back-catalog re-skin (render_backcatalog.js).
   out = sub(out, '{{record_note}}', recordNote, 'record_note');
+  // Surface which edition this is, so the universal provenance bar can render
+  // edition-aware content (lineage = the chapter index; trinity = this release).
+  out = out.replace('<body>', '<body data-chrome="' + chrome + '">');
 
   // Active-nav: mark exactly the .cta button whose href === active as primary.
   // 'none' marks nothing (an edition not in the 4-button nav). A non-'none' active
@@ -178,19 +184,25 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
     });
   }
 
-  // --- resolve the reading-chrome regions (<!--chrome-reading-->...<!--/chrome-reading-->).
-  //     'reading' (trinity default): strip ONLY the marker lines, keeping the chrome -> output is
-  //     byte-identical to a marker-free wrapper. 'index' (lineage): strip the whole region,
-  //     markers included, so a navigation surface ships with no provenance bar/strip or their
-  //     scripts. Markers are standalone lines; the line-anchored strip leaves all else untouched. ---
+  // --- resolve the two chrome regions. chrome-bar (the provenance bar) is UNIVERSAL: its markers
+  //     are always stripped, so the bar ships on every edition (kept byte-identical across all
+  //     four -> no nav/bar/eyebrow bounce). chrome-strip (the lineage header-strip) is trinity-
+  //     only: on an 'index' edition (lineage) its whole region is removed, because lineage renders
+  //     its own full chapter list and the header-strip would duplicate it; on the trinity only the
+  //     markers are stripped. Markers are standalone lines; the line-anchored strip leaves all
+  //     else untouched. ---
+  // chrome-bar (provenance bar) is UNIVERSAL — present on every edition, markers always stripped.
+  // chrome-strip (lineage header strip) is trinity-only — content removed on an index edition
+  // (lineage renders its own full chapter list), markers stripped otherwise.
   if (chrome === 'index') {
-    out = out.replace(/^[ \t]*<!--chrome-reading-->\n[\s\S]*?^[ \t]*<!--\/chrome-reading-->\n/gm, '');
+    out = out.replace(/^[ \t]*<!--chrome-strip-->\n[\s\S]*?^[ \t]*<!--\/chrome-strip-->\n/gm, '');
   } else {
-    out = out.replace(/^[ \t]*<!--\/?chrome-reading-->\n/gm, '');
+    out = out.replace(/^[ \t]*<!--\/?chrome-strip-->\n/gm, '');
   }
+  out = out.replace(/^[ \t]*<!--\/?chrome-bar-->\n/gm, '');
 
   // --- fail loud on any unresolved token leaking into the output ([a-z_]+ also catches record_note) ---
-  const leak = out.match(/\{\{[a-z_]+\}\}|<!--mount:|<!--fragment:|<!--\/?chrome-reading-->/);
+  const leak = out.match(/\{\{[a-z_]+\}\}|<!--mount:|<!--fragment:|<!--\/?chrome-(?:bar|strip)-->/);
   if (leak) die('output still contains an unresolved token: ' + JSON.stringify(leak[0]));
 
   // --- bake the machinery (avenue cards + console verdict) into the static floor,
