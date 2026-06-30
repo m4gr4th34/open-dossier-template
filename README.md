@@ -88,8 +88,9 @@ PROJECT-INSTRUCTIONS.md ← back-compat redirect to CLAUDE.md (nothing to fill i
 editions/index.source.html    ← the paper: replace title, abstract, the self-explaining sections, terms & citation chips (avenue cards live in avenues.json)
 editions/dossier.source.html  ← the audit trail: replace red-team findings and citation table
 editions/verify.source.html   ← the verification edition: replace the GitHub repo links (otherwise machinery)
+editions/lineage.source.html  ← the chapter index: replace the GitHub repo links (otherwise machinery)
 skin/edition.html             ← the shared skin all editions render through: repo links, page chrome, per-edition CSS
-index.html                    ← GENERATED with dossier.html, verify.html from the sources + skin; never hand-edit, run `npm run render-edition`
+index.html                    ← GENERATED with dossier.html, verify.html, lineage.html from the sources + skin; never hand-edit, run `npm run render-edition`
 paper.html          ← redirect stub → index.html (nothing to edit)
 verification/
   verify_numbers.py ← replace placeholder check with real ones
@@ -135,7 +136,7 @@ Two repeatable workflows run this template. Each is a single instruction block y
 Birth a new dossier from the template. Paste into the Code tab, editing the number and title:
 
 ```
-Create a new public GitHub repo named dossier-NNN from my template repo m4gr4th34/open-dossier-template, and clone it into this folder. Use the gh CLI (gh repo create m4gr4th34/dossier-NNN --template m4gr4th34/open-dossier-template --public --clone); if gh isn't installed or authenticated, walk me through installing and logging in first. Then do the rename pass: in README.md, CITATION.cff, .zenodo.json, the editions/*.source.html content sources, and skin/edition.html, replace every "open-dossier-template" and "DOSSIER NNN"/"dossier-NNN" placeholder with dossier-NNN and the working title "[YOUR TITLE]", replace the YOURUSER/YOURREPO repo links (in skin/edition.html and editions/verify.source.html, plus the README draft-preview banner) with the new repo's real GitHub Pages path so the draft preview resolves once Pages is enabled, then run `npm run render-edition` so the rendered index.html, dossier.html, and verify.html inherit the new names and links, and set my name and affiliation (Irfan Ali-Khan, Independent Researcher, Saratoga, California) where the author placeholders are. Then enable GitHub Pages on the new repo from branch main, root folder, using gh api. Show me what changed, commit as "Initialize Dossier NNN from template", and push. Then write template-sync.json at the repo root with the template repo URL, the template commit you spawned from (the upstream HEAD sha at spawn time), and today's date, and commit and push it.
+Create a new public GitHub repo named dossier-NNN from my template repo m4gr4th34/open-dossier-template, and clone it into this folder. Use the gh CLI (gh repo create m4gr4th34/dossier-NNN --template m4gr4th34/open-dossier-template --public --clone); if gh isn't installed or authenticated, walk me through installing and logging in first. Then do the rename pass: in README.md, CITATION.cff, .zenodo.json, the editions/*.source.html content sources, and skin/edition.html, replace every "open-dossier-template" and "DOSSIER NNN"/"dossier-NNN" placeholder with dossier-NNN and the working title "[YOUR TITLE]", replace the YOURUSER/YOURREPO repo links (in skin/edition.html, editions/verify.source.html, and editions/lineage.source.html, plus the README draft-preview banner) with the new repo's real GitHub Pages path so the draft preview resolves once Pages is enabled, then run `npm run render-edition` so the rendered index.html, dossier.html, verify.html, and lineage.html inherit the new names and links, and set my name and affiliation (Irfan Ali-Khan, Independent Researcher, Saratoga, California) where the author placeholders are. Then enable GitHub Pages on the new repo from branch main, root folder, using gh api. Show me what changed, commit as "Initialize Dossier NNN from template", and push. Then write template-sync.json at the repo root with the template repo URL, the template commit you spawned from (the upstream HEAD sha at spawn time), and today's date, and commit and push it.
 ```
 
 Two clicks remain that no tool can do for you, both one-time per dossier: the Zenodo toggle (zenodo.org → GitHub → flip the new repo on — do it at birth so the first release auto-DOIs) and, in Claude.ai, creating the matching Project with the repo synced into Files and the dispatcher instructions pasted. (Automating the Zenodo step via their API token is already on the tooling roadmap — a real v2 ticket.)
@@ -214,7 +215,7 @@ to machinery ONLY:
     vocabulary like EXPLORATORY-CONJECTURE and FORECAST — adopting a DEFINITION
     is machinery; relabeling YOUR rows is a migration, see Step 4)
   - AUTHORING.md, DEPLOY.md, GETTING-STARTED.md, GETTING-STARTED-GENERIC.md
-  - editions/verify.source.html + skin/edition.html (the verification edition is entirely machinery; verify.html renders from them)
+  - editions/verify.source.html + editions/lineage.source.html + skin/edition.html (the verification and chapter-index editions are entirely machinery; verify.html and lineage.html render from them)
   - the doctrine/operating sections of CLAUDE.md, PRESERVING its "## Standing
     context" section untouched
   - CSS/JS *machinery* hunks in skin/edition.html and the editions/*.source.html head_extra slots (NOT the rendered index.html/dossier.html; re-render with `npm run render-edition`)
