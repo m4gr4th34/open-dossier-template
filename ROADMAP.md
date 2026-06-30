@@ -58,6 +58,15 @@ format spreads by shipping.
   Proven via a real synthetic freeze in an isolated worktree (`check-markdown` RED post-freeze
   -> GREEN after `render-markdown`). Landed in `b3f8923`.
 
+- **Spawn hygiene: forks don't inherit the showroom** — "Use this template" copies the whole
+  tree, so spawned dossiers were carrying the template's living-figures showroom (six
+  `*-demo.html` + `showcase.html`, ~636K of text the fork never authored) plus a README showcase
+  link the rename pass repointed at a `dossier-NNN/showcase.html` the fork didn't need. The spawn
+  ritual now strips them after rename/render and before Pages goes live, anchored on the visible
+  link text so it survives the rename pass that rewrites the URL. The template keeps its own
+  showroom intact (it *is* the showroom — the demos are its marketing); only forks are stripped,
+  and the sync ritual is named-machinery-only so it never re-introduces them. Landed in `38653c2`.
+
 **Audit-hardened (the honesty gate, proven sound then made self-testing)**
 
 - **Placeholder-honesty gate: injectable + adversarial regression suite** — the gate that enforces
