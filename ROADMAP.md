@@ -80,10 +80,19 @@ format spreads by shipping.
 
 Genuinely deferred — each already has an authoritative inline note; this only points at it.
 
-- **Full check-logic unification** — the survey console's check logic (not its data or
-  thresholds, which are single-sourced via `avenues.json`) is hand-kept in both `buildChecks()`
-  (index.html) and `verify_numbers.py`, so it can drift. Roadmap direction only if the checks
-  proliferate. See AUTHORING.md, "Known limitation (and roadmap)".
+- **Full check-logic unification** — *a considered decision, not pending work.* The survey
+  console's check *logic* is hand-kept in two languages: `buildChecks()` (authored in
+  `skin/edition.html`, rendered into index.html) and `verify_numbers.py`. The check *data* and
+  *thresholds* are already single-sourced via `avenues.json`, so those can't drift; only ~3 lines
+  of derivation (filter forecasts, count signposts, range-check) are mirrored. Unifying that across
+  JS and Python would require codegen or a check-DSL that, for three near-trivial invariants, reads
+  *worse* than the duplication it removes — so it is deliberately left duplicated. This is settled,
+  not awaiting action. It reopens only on a concrete trigger: the checks proliferate past a handful,
+  or any check's logic outgrows one line. At that point the right move is not codegen but a
+  drift-detector test — run both implementations against the same `avenues.json` and assert
+  identical verdicts (cheaper than unification, and `npm test` now gives it a home). Until that
+  trigger fires, add any genuinely new *kind* of check to both sites and put its threshold in
+  `avenues.json`. See AUTHORING.md, "Known limitation (and roadmap)".
 
 - **Zenodo API auto-deposition** — automating the manual Zenodo release step via API token.
   See README.md (noted as a v2 ticket).
