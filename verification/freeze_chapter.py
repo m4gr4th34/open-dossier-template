@@ -393,16 +393,14 @@ if __name__ == "__main__":
     if len(sys.argv) >= 3 and sys.argv[1] == "--reskin":
         html = sys.stdin.read()
         html, _ = rewire(html)
-        # Reskin views are written to live/<tag>/index.html ONLY — no dossier/verify
-        # sibling is written there. rewire() left those two hrefs bare, which is correct
-        # for the chapters/<tag>/ freeze path (siblings exist there) but would 404 in
-        # live/<tag>/. Retarget them to the chapter's SEALED record under chapters/<tag>/
-        # — the immutable bytes this reading view's banner already cites — so they resolve.
-        # --reskin branch ONLY; rewire() stays shared + bare for the freeze path.
-        # Idempotent: search forms carry no ../../; the replacements do, so a re-run no-ops.
-        for page in ("dossier.html", "verify.html"):
-            html = html.replace('href="' + page + '"',
-                                'href="../../chapters/' + sys.argv[2] + '/' + page + '"')
+        # live/<tag>/ now ships the FULL edition set (index/dossier/verify.html) as siblings,
+        # exactly like chapters/<tag>/. So a reskinned edition's dossier/verify nav resolves to
+        # its sibling reskin via the BARE href rewire() already leaves — no retarget. This
+        # COLLAPSES the reskin transform back to (rewire + bake_release_label), byte-identical to
+        # the freeze path's per-edition transform: one transform, no divergence. (Reverses the
+        # earlier index-only retarget, which existed only because live/<tag>/ shipped index alone;
+        # that precondition is gone now that all three editions are reskinned. lineage.html still
+        # escapes ../../ via rewire() — series-level, never a per-chapter sibling.)
         html, _ = bake_release_label(html, sys.argv[2])
         sys.stdout.write(html)
         sys.exit(0)

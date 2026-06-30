@@ -55,7 +55,7 @@ function esc(s) {
 // citation; the record door is the bytes. It must NEVER imply the re-skin IS the record — it
 // points AT it. Styled inline (no skin CSS change) so the EMPTY working-draft slot stays
 // byte-identical; the CSS vars resolve from the rendered :root.
-function recordBanner(ch) {
+function recordBanner(ch, recordFile) {
   const tag = esc(ch.tag);
   const date = ch.released ? esc(ch.released) : 'the release date';
   const vdoi = ch.version_doi || '', cdoi = ch.concept_doi || '';
@@ -75,34 +75,57 @@ function recordBanner(ch) {
     + '<div><b style="color:var(--open)">Reading the current edition.</b> '
     + 'A current-skin reading view of a sealed chapter (released ' + date + ') — not the version of record.</div>'
     + '<div style="margin-top:6px"><b>Cite this chapter:</b> ' + cite + '</div>'
-    + '<div style="margin-top:4px"><a href="../../chapters/' + tag + '/index.html" target="_blank" rel="noopener">View the version of record ↗</a>'
-    + ' <span style="opacity:.85">— the immutable, DOI\'d bytes (chapters/' + tag + '/index.html).</span></div>'
+    + '<div style="margin-top:4px"><a href="../../chapters/' + tag + '/' + recordFile + '" target="_blank" rel="noopener">View the version of record ↗</a>'
+    + ' <span style="opacity:.85">— the immutable, DOI\'d bytes (chapters/' + tag + '/' + recordFile + ').</span></div>'
     + '</div>';
 }
 
-// Render ONE chapter to its re-skinned HTML (in memory; writes NOTHING). Exported so the gate
-// (verify_backcatalog.js) re-derives byte-for-byte. Fail-loud on missing sealed inputs.
+// The editions a chapter reskins, mirroring render_edition.js EDITIONS but for sealed sources.
+// index BAKES machinery (3 mounts) from the chapter's OWN sealed avenues.json; dossier/verify
+// are machinery-free (0 mounts -> bakeMachinery never runs -> no avenues read needed). Each
+// edition's record-banner points at its OWN sealed record (dossier reskin -> dossier record).
+const RESKIN_EDITIONS = [
+  { src: 'index.source.html',   out: 'index.html',   bakes: true  },
+  { src: 'dossier.source.html', out: 'dossier.html', bakes: false },
+  { src: 'verify.source.html',  out: 'verify.html',  bakes: false },
+];
+
+// Render ONE chapter to its three re-skinned editions: returns { 'index.html': html, ... }
+// (in memory; writes NOTHING). Exported so the gate (verify_backcatalog.js) re-derives
+// byte-for-byte. Fail-loud on missing sealed inputs.
 function renderChapter(ch) {
   if (!ch || !ch.tag) die('lineage entry missing "tag": ' + JSON.stringify(ch));
   const tag = ch.tag;
   const chDir = path.join(ROOT, 'chapters', tag);
-  const source = path.join(chDir, 'editions', 'index.source.html');
-  const chAvenues = path.join(chDir, 'avenues.json');
-  for (const [label, p] of [['content source', source], ['avenues.json', chAvenues]]) {
-    if (!fs.existsSync(p)) {
-      die('chapter ' + tag + ': missing sealed ' + label + ' (' + path.relative(ROOT, p)
-        + ') — re-freeze the chapter (5b-ii-2a seals avenues.json into chapters/<tag>/).');
+  const editionsDir = path.join(chDir, 'editions');
+  const out = {};
+  for (const ed of RESKIN_EDITIONS) {
+    const source = path.join(editionsDir, ed.src);
+    if (!fs.existsSync(source)) {
+      die('chapter ' + tag + ': missing sealed source ' + path.relative(ROOT, source)
+        + ' — re-freeze the chapter (CAPTURE_VERBATIM seals all edition sources).');
     }
+    // machinery ONLY for the baking edition (index): cards via readAvenues(sealed avenues.json),
+    // verdict via verify_numbers.py --avenues <sealed>. dossier/verify (no mounts) skip baking
+    // entirely, so they need no avenues read.
+    let machinery = null;
+    if (ed.bakes) {
+      const chAvenues = path.join(chDir, 'avenues.json');
+      if (!fs.existsSync(chAvenues)) {
+        die('chapter ' + tag + ': missing sealed avenues.json (' + path.relative(ROOT, chAvenues)
+          + ') — re-freeze the chapter (seals avenues.json into chapters/<tag>/).');
+      }
+      machinery = { avenues: readAvenues(chAvenues).avenues, verdict: runVerifier(chAvenues) };
+    }
+    let html = renderEdition(SKIN, source, machinery, recordBanner(ch, ed.out));
+    // outward-rewire (../../) + release-label bake — the SAME transform freeze applies, reused
+    // from freeze_chapter.py --reskin (now collapsed to rewire+label; sibling-bare nav). One
+    // implementation, so the reading view's chrome matches the record's.
+    html = execFileSync('python3', ['verification/freeze_chapter.py', '--reskin', tag],
+      { cwd: ROOT, input: html, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    out[ed.out] = html;
   }
-  // machinery from the chapter's OWN sealed avenues.json: cards via readAvenues(sealed),
-  // verdict via verify_numbers.py --avenues <sealed> — ONE sealed file, so cards and verdict agree.
-  const machinery = { avenues: readAvenues(chAvenues).avenues, verdict: runVerifier(chAvenues) };
-  let html = renderEdition(SKIN, source, machinery, recordBanner(ch));
-  // outward-rewire (../../) + release-label bake — the SAME transform freeze applies, reused
-  // (not re-implemented) from freeze_chapter.py so the reading view's chrome matches the record's.
-  html = execFileSync('python3', ['verification/freeze_chapter.py', '--reskin', tag],
-    { cwd: ROOT, input: html, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  return html;
+  return out;
 }
 
 // lineage.json -> the ordered chapters array (empty when rootless / missing).
@@ -121,12 +144,14 @@ function renderAll() {
   }
   const written = [];
   for (const ch of chapters) {
-    const html = renderChapter(ch);
+    const editions = renderChapter(ch);                 // { 'index.html': html, 'dossier.html': html, ... }
     const outDir = path.join(LIVE, ch.tag);
     fs.mkdirSync(outDir, { recursive: true });
-    const out = path.join(outDir, 'index.html');
-    fs.writeFileSync(out, html);
-    written.push(path.relative(ROOT, out));
+    for (const [filename, html] of Object.entries(editions)) {
+      const out = path.join(outDir, filename);
+      fs.writeFileSync(out, html);
+      written.push(path.relative(ROOT, out));
+    }
   }
   return written;
 }

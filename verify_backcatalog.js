@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 'use strict';
 /*
- * verify_backcatalog.js — gate: every committed live/<tag>/index.html equals what
+ * verify_backcatalog.js — gate: every committed live/<tag>/*.html equals what
  * render_backcatalog.js would produce for that chapter RIGHT NOW.
  *
- * The back-catalog re-skins are GENERATED (live/<tag>/index.html = re-skin of the chapter's
- * sealed source in skin@HEAD, machinery baked from its sealed avenues.json). This is the
+ * The back-catalog re-skins are GENERATED (live/<tag>/*.html = re-skin of the chapter's sealed
+ * sources in skin@HEAD; index's machinery baked from its sealed avenues.json). This is the
  * render_backcatalog twin of verify_edition's round-trip gate: it regenerates each chapter in
  * memory and asserts byte-equality with the committed file, so a stale live/ (skin advanced but
  * the back-catalog wasn't re-rendered) goes red instead of shipping an out-of-date reading view.
@@ -34,19 +34,21 @@ if (!chapters.length) {
 let checked = 0;
 for (const ch of chapters) {
   if (!ch.tag) fail('lineage entry missing "tag": ' + JSON.stringify(ch));
-  const out = path.join(ROOT, 'live', ch.tag, 'index.html');
-  if (!fs.existsSync(out)) {
-    fail('live/' + ch.tag + '/index.html missing — run npm run render-backcatalog');
+  const editions = renderChapter(ch);       // { 'index.html': html, ... } re-derived in memory (fail-loud on missing sealed inputs)
+  for (const [filename, expected] of Object.entries(editions)) {
+    const out = path.join(ROOT, 'live', ch.tag, filename);
+    if (!fs.existsSync(out)) {
+      fail('live/' + ch.tag + '/' + filename + ' missing — run npm run render-backcatalog');
+    }
+    const committed = fs.readFileSync(out, 'utf8');
+    if (committed !== expected) {
+      fail('live/' + ch.tag + '/' + filename + ' out of sync (' + committed.length + ' committed vs '
+        + expected.length + ' rendered bytes) — run npm run render-backcatalog');
+    }
+    checked++;
   }
-  const committed = fs.readFileSync(out, 'utf8');
-  const expected = renderChapter(ch);       // re-derive in memory (fail-loud on missing sealed inputs)
-  if (committed !== expected) {
-    fail('live/' + ch.tag + ' out of sync (' + committed.length + ' committed vs '
-      + expected.length + ' rendered bytes) — run npm run render-backcatalog');
-  }
-  checked++;
 }
 
 process.stdout.write('verify_backcatalog: ' + checked
-  + ' chapter(s) in sync (live/<tag>/index.html == render_backcatalog output)\n');
+  + ' edition(s) in sync (live/<tag>/*.html == render_backcatalog output)\n');
 process.exit(0);

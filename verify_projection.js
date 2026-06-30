@@ -153,6 +153,13 @@ function extractAtoms(sourcePath) {
 //   chapter's OWN sealed source + index.md (baseDir = chapters/<tag>/), so a re-skin that lost
 //   or altered prose/machinery vs its frozen record bites here.
 function checkLocation(baseDir, label, htmlPath) {
+  // Projection is index-scoped by design. It guards the content-equivalence triangle
+  // (source prose+machinery == live HTML == markdown projection), which only the index edition
+  // has: index alone carries baked machinery and a markdown twin (index.md). dossier/verify are
+  // machinery-free with no .md projection, so there is nothing to triangulate — their correct
+  // gate is verify_backcatalog's byte-for-byte round-trip (live/<tag>/*.html == render_backcatalog
+  // output), not projection. Extending projection to them would invent a check with no second
+  // representation to compare against.
   const atoms = extractAtoms(path.join(baseDir, 'editions', 'index.source.html'));
   if (!atoms.length) die('[' + label + '] no content atoms extracted — almost certainly an extraction bug, not an empty paper.');
 
