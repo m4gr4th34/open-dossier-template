@@ -11,8 +11,9 @@ than restating it, so the detail can't drift out of sync.
 ## Shipped
 
 The three machinery follow-ons that once had no home but this file — all now delivered
-and gate-protected. Kept here (rather than erased into the git log) because a roadmap that
-shows its parked work getting executed is itself the argument: the format spreads by
+and gate-protected — plus a defect found and fixed while proving them. Kept here (rather
+than erased into the git log) because a roadmap that shows its parked work getting executed,
+and its proof process catching real bugs, is itself the argument: the format spreads by
 shipping.
 
 - **Multi-edition back-catalog reskin** — `render_backcatalog.js` now re-skins all three
@@ -42,6 +43,18 @@ shipping.
   field that names an edition's own output filename — the general, frontmatter-keyed mechanism
   the original note asked for, not a verify special-case. Landed in `f695234`.
 
+- **Freeze -> derived-artifact sync (found while proving the reskin, fixed same session).**
+  The freeze path advanced `lineage.json` without regenerating the artifacts derived from it,
+  so the first real release would have turned `check-markdown` red in CI (the lineage-driven
+  `llms.txt` lists chapters the committed file lacked) — and the README backfill ritual had the
+  same gap plus a second one: it never ran `render-backcatalog`, so a backfill left `live/`
+  missing entirely. Closed on both surfaces: `freeze-chapter.yml` now runs `render-markdown`
+  after the freeze, gates it `check-markdown` fail-closed alongside the existing guards, and
+  stages `llms.txt`/`index.md` atomically with the chapter; the backfill ritual now runs both
+  `render-backcatalog` and `render-markdown` once after its loop, gated before the review.
+  Proven via a real synthetic freeze in an isolated worktree (`check-markdown` RED post-freeze
+  -> GREEN after `render-markdown`). Landed in `b3f8923`.
+
 ## Still parked
 
 Genuinely deferred — each already has an authoritative inline note; this only points at it.
@@ -56,19 +69,8 @@ Genuinely deferred — each already has an authoritative inline note; this only 
 
 ## Surfaced in the reskin work (resume-context preserved)
 
-Two things found while proving the multi-edition reskin — neither caused by it, both
-pre-existing — captured here so they aren't lost.
-
-- **Freeze -> `llms.txt` markdown-sync gap (a real defect, fix around first release).**
-  `llms.txt`'s chapter index is lineage-driven, but `freeze-chapter.yml` appends to
-  `lineage.json` without regenerating `llms.txt`. On a repo with no chapters this is invisible
-  (the index reads "No chapters frozen yet."); on the **first real release** a fresh
-  `render-markdown` would emit a chapter line the committed `llms.txt` lacks, turning
-  `check-markdown` red in CI. Adoption-relevant (it would bite a stranger's first sealed
-  chapter). Likely fix: have the freeze workflow run `npm run render-markdown` and commit the
-  regenerated `llms.txt`/`index.md` alongside `chapters/`+`lineage.json`, gated before push --
-  the same atomic-commit discipline the workflow already uses for `live/`. Found via the
-  worktree fixture freeze during the reskin proof.
+One thing found while proving the multi-edition reskin — not caused by it, pre-existing —
+captured here so it isn't lost.
 
 - **404-quieting on frozen / reskinned pages (optional polish).** A frozen or reskinned
   `chrome: reading` edition still runs its `provenance.json` / `lineage.json` / `avenues.json`
