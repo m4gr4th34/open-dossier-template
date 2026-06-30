@@ -1,0 +1,202 @@
+<!--edition
+eyebrow: An Open Dossier · <b>NNN</b> · Lineage
+title: The lineage
+byline: Every chapter of this dossier — each a sealed, DOI'd release, readable in full. The work as it grew.
+active: lineage.html
+chrome: index
+-->
+<!--slot:head_extra-->
+
+  /* ===== lineage list — reuses the ol.phases numbered-card idiom ===== */
+  .intro{color:var(--ink2); max-width:64ch; margin:22px 0 0; font-size:15px}
+  ol.lineage{list-style:none;counter-reset:ch;margin:30px 0 10px;padding:0}
+  ol.lineage li{
+    counter-increment:ch; position:relative;
+    background:linear-gradient(180deg,#ffffff,#f4f8f7);
+    border:1px solid var(--line); border-radius:var(--r-lg);
+    box-shadow:var(--shadow-soft);
+    padding:22px 24px 22px 70px; margin:0 0 16px;
+  }
+  ol.lineage li::before{
+    content:counter(ch); position:absolute; left:22px; top:20px;
+    font-family:var(--serif); font-size:30px; font-weight:500;
+    color:var(--violet); line-height:1;
+  }
+  .ch-title{font-family:var(--serif); font-weight:600; font-size:21px;
+    margin:0 0 6px; color:var(--ink);}
+  .ch-title .tag{font-family:var(--mono); font-size:12px; font-weight:500;
+    color:var(--ink2); margin-left:8px;}
+  .ch-summary{color:var(--ink2); margin:0 0 12px; line-height:1.55;}
+  .ch-meta{font-family:var(--mono); font-size:12.5px; color:var(--ink2);
+    display:flex; gap:18px; flex-wrap:wrap; align-items:center;}
+  .ch-meta a{color:var(--teal);}
+  .ch-read{font-family:var(--mono); font-size:13px; font-weight:500;}
+  /* visible keyboard focus for non-nav links — the in-card chapter links and
+     the load-failure note (the cloned .btn:focus-visible only covers nav buttons) */
+  ol.lineage a:focus-visible,.lineage-loaderr a:focus-visible{
+    outline:3px solid var(--coral); outline-offset:2px; border-radius:2px;}
+  /* working-draft head — the live, unreleased tip (not a sealed chapter) */
+  ol.lineage li.draft-head{ counter-increment:none;           /* claims no chapter number */
+    border-style:dashed; border-color:var(--coral); }
+  ol.lineage li.draft-head::before{ content:'\25CB'; color:var(--coral);
+    font-family:var(--serif); font-size:26px; }
+  .ch-draft-badge{ display:inline-block; font-family:var(--mono); font-size:11px;
+    color:var(--coral); border:1px solid var(--coral-soft); border-radius:var(--r-pill);
+    padding:2px 9px; margin-left:8px; vertical-align:middle; }
+  .lineage-loaderr{ font-family:var(--mono); font-size:12.5px; color:var(--ink2); margin:4px 0 0; }
+  .lineage-loaderr a{ color:var(--teal); }
+<!--/slot:head_extra-->
+<!--slot:body-->
+<main>
+  <p class="intro">The timeline reads oldest to newest — Chapter 1 first, each a sealed, DOI-bearing release. The working draft is the living frontier at the foot of the list: the current editions, which become the next chapter when sealed.</p>
+  <ol class="lineage" id="lineage"></ol>
+</main>
+<!--/slot:body-->
+<!--slot:cites-->
+<!-- lineage carries no citation chips; an empty cites map satisfies the required slot + the wrapper's JSON.parse. -->
+<script type="application/json" id="cites-data">
+{}
+</script>
+<!--/slot:cites-->
+<!--slot:foot-->
+<footer>
+  <a href="index.html">← Back to the paper</a> &nbsp;·&nbsp;
+  Open Dossier format · CC BY 4.0 (paper) / MIT (code)
+</footer>
+
+<script>
+// Renders lineage.json into the chapter list, oldest to newest: the sealed
+// chapters come first (Chapter 1 at the top), then a synthetic WORKING-DRAFT
+// frontier entry (the live, unreleased tip — never stored in lineage.json)
+// sits at the FOOT, built with createElement/textContent so titles/summaries
+// can never inject markup. The working draft ALWAYS shows (a brand-new dossier
+// IS a working draft); a load failure still shows it and appends a small note.
+// No sealed chapter is marked "current" — the working-draft frontier is the
+// current, in-progress thing now.
+(function(){
+  var ol = document.getElementById('lineage');
+
+  function draftHead(){
+    var li = document.createElement('li');
+    li.className = 'draft-head';
+
+    var title = document.createElement('div');
+    title.className = 'ch-title';
+    title.appendChild(document.createTextNode('Working draft'));
+    var badge = document.createElement('span');
+    badge.className = 'ch-draft-badge';
+    badge.textContent = 'in progress · unreleased';
+    title.appendChild(badge);
+    li.appendChild(title);
+
+    var sum = document.createElement('p');
+    sum.className = 'ch-summary';
+    sum.textContent = 'The living frontier — the current editions, ahead of the latest sealed release. Becomes the next chapter, with its own number and DOI, when sealed.';
+    li.appendChild(sum);
+
+    var meta = document.createElement('div');
+    meta.className = 'ch-meta';
+    var read = document.createElement('a');
+    read.className = 'ch-read';
+    read.href = 'index.html';            // live front door (self-explaining edition)
+    read.textContent = 'Read the working draft →';
+    meta.appendChild(read);              // one clean read door (the landscape is now part of the front door)
+    li.appendChild(meta);
+    return li;
+  }
+
+  function sealed(c){
+    var li = document.createElement('li');   // NOT marked 'current' — the draft head is current
+
+    var title = document.createElement('div');
+    title.className = 'ch-title';
+    title.appendChild(document.createTextNode(c.title || c.tag || ('Chapter ' + c.n)));
+    if (c.tag){
+      var tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = c.tag;
+      title.appendChild(tag);
+    }
+    li.appendChild(title);
+
+    if (c.summary){
+      var sum = document.createElement('p');
+      sum.className = 'ch-summary';
+      sum.textContent = c.summary;
+      li.appendChild(sum);
+    }
+
+    var meta = document.createElement('div');
+    meta.className = 'ch-meta';
+    if (c.released){
+      var rel = document.createElement('span');
+      rel.textContent = 'Released ' + c.released;
+      meta.appendChild(rel);
+    }
+    // DOI: cite the VERSION doi (pins this exact chapter); fall back to concept
+    // (all-versions); when both exist, add a small secondary concept pointer.
+    var vdoi = c.version_doi || '', cdoi = c.concept_doi || '';
+    if (vdoi){
+      var doi = document.createElement('a');
+      doi.href = 'https://doi.org/' + vdoi;
+      doi.target = '_blank'; doi.rel = 'noopener';
+      doi.textContent = 'DOI: ' + vdoi + ' ↗';
+      meta.appendChild(doi);
+      if (cdoi && cdoi !== vdoi){
+        var allv = document.createElement('a');
+        allv.href = 'https://doi.org/' + cdoi;
+        allv.target = '_blank'; allv.rel = 'noopener';
+        allv.textContent = 'all versions ↗';
+        meta.appendChild(allv);
+      }
+    } else if (cdoi){
+      var cdoiEl = document.createElement('a');
+      cdoiEl.href = 'https://doi.org/' + cdoi;
+      cdoiEl.target = '_blank'; cdoiEl.rel = 'noopener';
+      cdoiEl.textContent = 'DOI (all versions): ' + cdoi + ' ↗';
+      meta.appendChild(cdoiEl);
+    }
+    // TWO doors per chapter: the PRIMARY read door is the current-skin re-skin (live/<tag>/),
+    // the RECORD door is the frozen, DOI'd bytes (chapters/<tag>/, via c.path) the DOI cites.
+    var read = document.createElement('a');
+    read.className = 'ch-read';
+    read.href = 'live/' + (c.tag || '') + '/index.html';   // current-skin reading view
+    read.textContent = 'Read (current edition) →';
+    meta.appendChild(read);
+    var record = document.createElement('a');
+    record.href = (c.path || '') + 'index.html';           // the immutable record — the DOI'd bytes
+    record.target = '_blank'; record.rel = 'noopener';
+    record.textContent = 'Version of record ↗';
+    meta.appendChild(record);
+
+    li.appendChild(meta);
+    return li;
+  }
+
+  function loadNote(){
+    var p = document.createElement('p');
+    p.className = 'lineage-loaderr';
+    p.appendChild(document.createTextNode('Sealed chapters couldn’t be loaded here — '));
+    var a = document.createElement('a');
+    a.href = 'https://github.com/YOURUSER/YOURREPO/releases';
+    a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = 'view releases on the repository →';
+    p.appendChild(a);
+    return p;
+  }
+
+  function render(chs){
+    chs.forEach(function(c){ ol.appendChild(sealed(c)); });  // sealed chapters oldest-first: Ch1..ChN, counter 1..N top-down
+    ol.appendChild(draftHead());                             // the living frontier — ALWAYS at the foot, no number
+  }
+
+  fetch('lineage.json').then(function(r){ return r.json(); }).then(function(d){
+    var chs = (d && d.chapters ? d.chapters : []).slice().sort(function(a, b){ return a.n - b.n; });
+    render(chs);                                  // zero sealed -> draft head alone, no void
+  }).catch(function(){
+    render([]);                                   // load failure: still show the working draft
+    if (ol && ol.parentNode) ol.parentNode.insertBefore(loadNote(), ol.nextSibling);
+  });
+})();
+</script>
+<!--/slot:foot-->

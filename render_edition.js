@@ -37,13 +37,18 @@ const DOSSIER_SOURCE = path.join(ROOT, 'editions', 'dossier.source.html');
 const DOSSIER_OUT = path.join(ROOT, 'dossier.html');
 const VERIFY_SOURCE = path.join(ROOT, 'editions', 'verify.source.html');
 const VERIFY_OUT = path.join(ROOT, 'verify.html');
-// The editions this template renders + gates: index, dossier, verify (all three under the one skin).
+const LINEAGE_SOURCE = path.join(ROOT, 'editions', 'lineage.source.html');
+const LINEAGE_OUT = path.join(ROOT, 'lineage.html');
+// The editions this template renders + gates: index, dossier, verify, lineage (all under the one skin).
+// lineage renders with chrome: index (no provenance bar / lineage strip) and is machinery-free
+// (no mounts -> no bake), exactly like dossier/verify but for the series-level chapter index.
 // Single-sourced here because verify_edition.js already imports from this module —
 // the writer (below) and the gate (there) loop the SAME list, so they can't drift.
 const EDITIONS = [
   { source: SOURCE, out: OUT },
   { source: DOSSIER_SOURCE, out: DOSSIER_OUT },
   { source: VERIFY_SOURCE, out: VERIFY_OUT },
+  { source: LINEAGE_SOURCE, out: LINEAGE_OUT },
 ];
 
 function die(msg) { process.stderr.write('render_edition: ' + msg + '\n'); process.exit(1); }
