@@ -69,7 +69,7 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   if (!fm) die('source: missing <!--edition ... --> frontmatter header');
   const front = {};
   for (const line of fm[1].split('\n')) {
-    const m = line.match(/^(eyebrow|title|byline|active|chrome): ([\s\S]*)$/);
+    const m = line.match(/^(eyebrow|title|byline|active|chrome|self): ([\s\S]*)$/);
     if (m) front[m[1]] = m[2];
   }
   for (const k of ['eyebrow', 'title', 'byline']) {
@@ -84,6 +84,13 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   if (chrome !== 'reading' && chrome !== 'index') {
     die('source: chrome must be "reading" or "index" (got ' + JSON.stringify(chrome) + ')');
   }
+  // self: this edition's own output filename (e.g. 'verify.html'). Optional — declared ONLY by
+  // an edition whose provenance bar contains a pv-item linking to itself. When set, that one
+  // self-pointing anchor is degraded at render to a non-link "this page" span (a link to the
+  // page you're on is a false affordance). Undeclared -> '' -> no degrade (index/dossier have no
+  // self-pointing pv-item; lineage has chrome:index so no bar at all). The general fix asked by
+  // ROADMAP item 3: keyed on the page's own identity, not special-cased to verify.
+  const self = front.self || '';
 
   // --- source: body + cites slots ---
   function readSlot(name, fallback) {
@@ -147,6 +154,28 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
     const navNew = 'class="btn primary" href="' + active + '"';
     if (out.indexOf(navOld) < 0) die('active: "' + active + '" matches no .cta nav button');
     out = out.replace(navOld, () => navNew);   // function form: no $-pattern interpretation
+  }
+
+  // --- provenance self-link degrade: an <a class="pv-item" href="SELF"> that points at the
+  //     page being rendered is rewritten to a non-link <span class="pv-item pv-here"> with a
+  //     locative "this page" value (no href/target/rel, no up-arrow (U+2197) — a non-link must not wear a
+  //     navigation affordance). Fail-loud: when `self` is declared it MUST match exactly one such
+  //     anchor (zero = a no-op that only looks done; two = a corrupted bar). Editions without a
+  //     self-pointing pv-item leave `self` empty and skip this entirely. ---
+  if (self) {
+    const reSelf = new RegExp(
+      '<a class="pv-item" href="' + self.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
+      '"[^>]*>([\\s\\S]*?)<\\/a>', 'g');
+    const matches = out.match(reSelf);
+    if (!matches) die('self: "' + self + '" matches no self-linking pv-item anchor (nothing to degrade)');
+    if (matches.length > 1) die('self: "' + self + '" matches ' + matches.length + ' pv-item anchors (expected exactly 1)');
+    out = out.replace(reSelf, (m, inner) => {
+      // keep the inner pv-k/pv-v structure; replace the value text with the locative "this page".
+      const degraded = inner.replace(
+        /<span class="pv-v">[\s\S]*?<\/span>/,
+        '<span class="pv-v">this page</span>');
+      return '<span class="pv-item pv-here">' + degraded + '</span>';
+    });
   }
 
   // --- resolve the reading-chrome regions (<!--chrome-reading-->...<!--/chrome-reading-->).
