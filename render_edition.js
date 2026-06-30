@@ -64,13 +64,21 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   if (!fm) die('source: missing <!--edition ... --> frontmatter header');
   const front = {};
   for (const line of fm[1].split('\n')) {
-    const m = line.match(/^(eyebrow|title|byline|active): ([\s\S]*)$/);
+    const m = line.match(/^(eyebrow|title|byline|active|chrome): ([\s\S]*)$/);
     if (m) front[m[1]] = m[2];
   }
   for (const k of ['eyebrow', 'title', 'byline']) {
     if (!(k in front)) die('source: frontmatter missing "' + k + '"');
   }
   const active = front.active || 'index.html';   // optional; sealed/old sources default to index
+  // chrome: which header/companion chrome the wrapper ships. 'reading' (default) = full
+  // reading-surface chrome (provenance bar + lineage strip + their fetch scripts), for an
+  // archivable edition. 'index' = a navigation/index surface (lineage.html) with no provenance
+  // bar at all. Undeclared -> 'reading', so the trinity render byte-identically. Unknown -> die.
+  const chrome = front.chrome || 'reading';
+  if (chrome !== 'reading' && chrome !== 'index') {
+    die('source: chrome must be "reading" or "index" (got ' + JSON.stringify(chrome) + ')');
+  }
 
   // --- source: body + cites slots ---
   function readSlot(name, fallback) {
@@ -136,8 +144,19 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
     out = out.replace(navOld, () => navNew);   // function form: no $-pattern interpretation
   }
 
+  // --- resolve the reading-chrome regions (<!--chrome-reading-->...<!--/chrome-reading-->).
+  //     'reading' (trinity default): strip ONLY the marker lines, keeping the chrome -> output is
+  //     byte-identical to a marker-free wrapper. 'index' (lineage): strip the whole region,
+  //     markers included, so a navigation surface ships with no provenance bar/strip or their
+  //     scripts. Markers are standalone lines; the line-anchored strip leaves all else untouched. ---
+  if (chrome === 'index') {
+    out = out.replace(/^[ \t]*<!--chrome-reading-->\n[\s\S]*?^[ \t]*<!--\/chrome-reading-->\n/gm, '');
+  } else {
+    out = out.replace(/^[ \t]*<!--\/?chrome-reading-->\n/gm, '');
+  }
+
   // --- fail loud on any unresolved token leaking into the output ([a-z_]+ also catches record_note) ---
-  const leak = out.match(/\{\{[a-z_]+\}\}|<!--mount:|<!--fragment:/);
+  const leak = out.match(/\{\{[a-z_]+\}\}|<!--mount:|<!--fragment:|<!--\/?chrome-reading-->/);
   if (leak) die('output still contains an unresolved token: ' + JSON.stringify(leak[0]));
 
   // --- bake the machinery (avenue cards + console verdict) into the static floor,

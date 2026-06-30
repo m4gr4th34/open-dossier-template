@@ -305,6 +305,7 @@
       <a class="btn" href="lineage.html">Chapters</a>
       <a class="btn" href="https://github.com/YOURUSER/YOURREPO">Source</a>
     </div>
+    <!--chrome-reading-->
     <div class="provenance" role="contentinfo" aria-label="Provenance and verification">
       <span class="pv-item"><span class="pv-k">Reading</span><span class="pv-v" id="pv-state">live tip</span></span>
       <a class="pv-item" id="pv-doi" href="#" target="_blank" rel="noopener"><span class="pv-k">Archived DOI</span><span class="pv-v" id="pv-doi-v">loading… ↗</span></a>
@@ -312,6 +313,7 @@
       <a class="pv-item" href="https://github.com/YOURUSER/YOURREPO" target="_blank" rel="noopener"><span class="pv-k">Source</span><span class="pv-v">full history ↗</span></a>
     </div>
     <div class="lineage-strip" id="lineageStrip" aria-label="Lineage"></div>
+    <!--/chrome-reading-->
     <h1>{{title}}</h1>
     <div class="byline">{{byline}}</div>
   </div>
@@ -474,6 +476,7 @@ runBtn.addEventListener('click', () => {
 });
 }
 </script>
+<!--chrome-reading-->
 <script>
 fetch('provenance.json').then(r=>r.json()).then(p=>{
   const d=document.getElementById('pv-doi'), v=document.getElementById('pv-doi-v');
@@ -487,6 +490,7 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
 }).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository \u2197';
   document.getElementById('pv-doi').href='https://github.com/YOURUSER/YOURREPO';});
 </script>
+<!--/chrome-reading-->
 <div class="lbx" id="lbx" role="dialog" aria-modal="true" aria-label="Figure, full size" aria-hidden="true">
   <img id="lbx-img" alt="">
 </div>
@@ -525,6 +529,7 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
   });
 })();
 </script>
+<!--chrome-reading-->
 <script>
 // Lineage strip — mirrors the provenance fetch shape against lineage.json.
 // ANCESTORS-ONLY / OUTWARD: links the latest SEALED chapter + "view all", never a
@@ -563,6 +568,7 @@ fetch('lineage.json').then(function(r){return r.json();}).then(function(d){
   strip.classList.add('show');
 }).catch(function(){ /* hide: strip stays display:none (standalone or load failure) */ });
 </script>
+<!--/chrome-reading-->
 </body>
 </html>
 <!--fragment:howto-->
