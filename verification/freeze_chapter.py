@@ -277,6 +277,7 @@ def main():
     ap.add_argument("--released", required=True, help="YYYY-MM-DD")
     ap.add_argument("--version-doi", dest="version_doi", default="")
     ap.add_argument("--concept-doi", dest="concept_doi", default="")
+    ap.add_argument("--doi-archived", dest="doi_archived", default="")
     ap.add_argument("--source-dir", dest="source_dir", default=REPO_ROOT)
     args = ap.parse_args()
 
@@ -358,6 +359,12 @@ def main():
         "concept_doi": args.concept_doi,
         "path": "chapters/" + tag + "/",
     }
+    # Sparse: only a chapter that DELIBERATELY declared no DOI (provenance doi_archived:false)
+    # carries this key. A DOI'd chapter (or any pre-feature chapter) omits it entirely, so its
+    # lineage entry is byte-identical to before. The string "false" arrives from the workflow's
+    # jq read; convert to a real JSON boolean so lineage.source.html's `=== false` strict check fires.
+    if args.doi_archived == "false":
+        entry["doi_archived"] = False
     lineage["chapters"].append(entry)
     lineage["chapters"].sort(key=lambda c: int(c.get("n", 0)))
     write_lineage(lineage)

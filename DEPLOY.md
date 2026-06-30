@@ -83,6 +83,15 @@ auto-timestamp workflow updates only release_tag and the release date in
 provenance.json. The provenance bar and verify.html read provenance.json
 automatically.
 
+Releasing a chapter **without** a DOI — to preserve thinking between archival results without
+minting a DOI for every milestone — is a first-class option. Set `version_doi` and `concept_doi`
+to `""` (empty, not the `TODO` placeholder) and add `"doi_archived": false` to provenance.json.
+The OpenTimestamps anchor still seals the release on the Bitcoin blockchain (DOI and timestamp are
+independent), and the honesty gate passes — an empty DOI is honest absence, only a leftover
+placeholder fails. The provenance bar and lineage then show "not DOI-archived / preserved via
+OpenTimestamps" instead of implying a DOI is coming. (If you activated the optional LaTeX export,
+clear its footer DOI too.)
+
 ## Maintenance notes
 - OpenTimestamps proofs mature over hours; `ots upgrade
   timestamps/*.ots` later folds in the Bitcoin block attestation.

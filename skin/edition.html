@@ -480,7 +480,10 @@ runBtn.addEventListener('click', () => {
 <script>
 fetch('provenance.json').then(r=>r.json()).then(p=>{
   const d=document.getElementById('pv-doi'), v=document.getElementById('pv-doi-v');
-  if(!p.version_doi || p.version_doi.indexOf('TODO')===0){
+  if(p.doi_archived===false){
+    v.textContent='not DOI-archived \u2197';
+    d.href='verify.html';
+  } else if(!p.version_doi || p.version_doi.indexOf('TODO')===0){
     v.textContent='DOI after first release';
     d.href='https://github.com/YOURUSER/YOURREPO';
   } else {

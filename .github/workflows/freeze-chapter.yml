@@ -84,12 +84,13 @@ jobs:
           case "$CONCEPT_DOI" in TODO*) CONCEPT_DOI="" ;; esac   # placeholder -> empty
           VERSION_DOI="$(jq -r '.version_doi // ""' provenance.json 2>/dev/null || echo "")"
           case "$VERSION_DOI" in TODO*) VERSION_DOI="" ;; esac   # placeholder -> empty
+          DOI_ARCHIVED="$(jq -r '.doi_archived // ""' provenance.json 2>/dev/null || echo "")"   # "false" iff deliberately no-DOI; else ""
 
           # --- run the shared freeze (gate / write-once / dup all enforced inside);
           #     a non-zero exit aborts the workflow before any push. ---
           python3 verification/freeze_chapter.py \
             --tag "$TAG" --title "$TITLE" --summary "$SUMMARY" \
-            --released "$RELEASED" --version-doi "$VERSION_DOI" --concept-doi "$CONCEPT_DOI"
+            --released "$RELEASED" --version-doi "$VERSION_DOI" --concept-doi "$CONCEPT_DOI" --doi-archived "$DOI_ARCHIVED"
 
           # --- generate the new chapter's CURRENT-skin reading view (live/<tag>/) ATOMICALLY, so
           #     the chapter is born WITH its reading view in ONE commit. Regenerate-all is

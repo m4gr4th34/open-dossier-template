@@ -448,6 +448,11 @@
       cdoiEl.target = '_blank'; cdoiEl.rel = 'noopener';
       cdoiEl.textContent = 'DOI (all versions): ' + cdoi + ' ↗';
       meta.appendChild(cdoiEl);
+    } else if (c.doi_archived === false){
+      var nodoi = document.createElement('span');
+      nodoi.className = 'chapter-nodoi';
+      nodoi.textContent = 'Preserved via OpenTimestamps — not DOI-archived';
+      meta.appendChild(nodoi);
     }
     // TWO doors per chapter: the PRIMARY read door is the current-skin re-skin (live/<tag>/),
     // the RECORD door is the frozen, DOI'd bytes (chapters/<tag>/, via c.path) the DOI cites.
