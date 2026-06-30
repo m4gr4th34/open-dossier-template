@@ -10,11 +10,14 @@ than restating it, so the detail can't drift out of sync.
 
 ## Shipped
 
-The three machinery follow-ons that once had no home but this file — all now delivered
-and gate-protected — plus a defect found and fixed while proving them. Kept here (rather
-than erased into the git log) because a roadmap that shows its parked work getting executed,
-and its proof process catching real bugs, is itself the argument: the format spreads by
-shipping.
+The machinery follow-ons that once had no home but this file — delivered and gate-protected —
+a defect found and fixed while proving them, and, after an adversarial audit proved the format's
+highest-stakes gate sound, that gate hardened with committed self-test machinery. Kept here
+(rather than erased into the git log) because a roadmap that shows its parked work executed, its
+proof process catching real bugs, and its own gates proven sound is itself the argument: the
+format spreads by shipping.
+
+**Delivered + fixed**
 
 - **Multi-edition back-catalog reskin** — `render_backcatalog.js` now re-skins all three
   editions of every frozen chapter (`live/<tag>/{index,dossier,verify}.html`), not index
@@ -54,6 +57,24 @@ shipping.
   `render-backcatalog` and `render-markdown` once after its loop, gated before the review.
   Proven via a real synthetic freeze in an isolated worktree (`check-markdown` RED post-freeze
   -> GREEN after `render-markdown`). Landed in `b3f8923`.
+
+**Audit-hardened (the honesty gate, proven sound then made self-testing)**
+
+- **Placeholder-honesty gate: injectable + adversarial regression suite** — the gate that enforces
+  "every label true" is the format's highest-stakes check; one falsely-labeled claim kills its
+  credibility. An adversarial audit proved it sound (every release path with a surviving placeholder
+  fails closed; the OR-latch resists single-signal reversal; a clean released dossier still passes),
+  and that proof is now committed as re-runnable machinery: the gate was made dependency-injectable
+  (defaulted params, the no-arg CI invocation byte-identical to before) and a hermetic 26-check suite
+  (`verification/check_placeholders.test.py`) re-proves the 8 attacks plus the predicates in isolation,
+  against tmpdir fixtures with zero repo mutation. The format's "executable, not asserted" doctrine
+  applied to its own gate. Landed in `7d936c4`.
+
+- **Discovery-based test runner (`npm test`)** — the author-local tests had no single entry point, a
+  discoverability gap for anyone adopting the template. `run_tests.js` discovers every
+  `*.test.{js,py}` by recursive walk, dispatches by runtime, and aggregates by exit code; a new test
+  registers by naming convention alone, no list to drift. Author-local, not CI-wired, matching the
+  repo's test doctrine. Landed in `ab02cc2`.
 
 ## Still parked
 

@@ -35,6 +35,26 @@ that list and refresh. If it still doesn't appear, don't worry — you only need
 it ON before your first release, so you can return and do this at the publish
 step.
 
+## Pre-flight — before you publish, prove it green locally
+Catch problems on your machine, not via a red build after you push. Before Step 6:
+
+- **Run the tests:** `npm test` — discovers and runs the template's self-tests (the figure
+  primitives, the honesty gate's own adversarial suite). Always green on an unmodified template;
+  if you've changed machinery, this is where a regression surfaces. Author-local — CI runs the
+  gates directly, this is your convenience check.
+- **Run the gates the way CI will:** `node verify_edition.js && node verify_markdown.js &&
+  node verify_projection.js && python3 verification/verify_numbers.py` — the same checks
+  `verify-claims` runs on every push, on bare Node (no install). Green here means green in CI.
+- **Final honesty check, after you remove the draft-preview banner (Step 6):** `python3
+  verification/check_placeholders.py`. While the banner is present this only warns (drafts are
+  allowed to be drafty); the moment the banner is gone it fails on any surviving placeholder on a
+  publication surface. So run it as your *last* step before tagging — once you've removed the
+  banner — to confirm nothing's left unfilled. (This mirrors exactly what CI enforces; the local
+  run just lets you see it first.)
+
+If you're porting template machinery rather than publishing fresh, the same pre-flight applies —
+see the Rituals section of the template README for the spawn, sync, and backfill blocks.
+
 ## Step 6 — Publish: tag a release
 Releases → Create a new release → tag v1.0.0 → publish. Automatically:
 Zenodo mints your DOI; the auto-timestamp workflow anchors the release
