@@ -67,6 +67,20 @@ format spreads by shipping.
   showroom intact (it *is* the showroom — the demos are its marketing); only forks are stripped,
   and the sync ritual is named-machinery-only so it never re-introduces them. Landed in `38653c2`.
 
+- **First-class no-DOI chapter mode** — a chapter can be released timestamp-only, without a DOI,
+  to preserve and version thinking between archival results without minting a DOI for every
+  milestone. The release is still cryptographically sealed: OpenTimestamps anchors it on the
+  Bitcoin blockchain regardless of Zenodo (DOI and timestamp are independent). It's declared by an
+  explicit `"doi_archived": false` in `provenance.json` — a positive declaration, not inferred
+  from an empty field, which disambiguates "no DOI by design" from "DOI not yet" (the two were
+  previously indistinguishable, both rendering "DOI after first release"). Labeled honestly at
+  every surface: the provenance bar and lineage show "not DOI-archived -> preserved via
+  OpenTimestamps" instead of implying a DOI is coming, and the declaration is carried through
+  freeze into the sealed lineage entry. Strictly backward-compatible — all branches use strict
+  `=== false`, so every existing chapter (absent field) falls through to current behavior,
+  byte-identical at runtime; the field is gate-inert and survives the release writer. The "every
+  label true" doctrine now covers the no-DOI case. Landed in `2645348`.
+
 **Audit-hardened (the honesty gate, proven sound then made self-testing)**
 
 - **Placeholder-honesty gate: injectable + adversarial regression suite** — the gate that enforces
