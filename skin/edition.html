@@ -59,6 +59,7 @@
   .eyebrow b{color:var(--coral)}
   h1{font-family:var(--serif);font-weight:800;font-size:clamp(27px,4.6vw,44px);line-height:1.12;margin:.4em 0 .25em;letter-spacing:-.014em}
   .byline{font-family:var(--serif);font-style:italic;color:var(--ink2)}
+  .byline-updated{font-family:var(--mono);font-style:normal;font-size:12.5px;color:var(--ink2);letter-spacing:.01em}
   .howto{background:var(--card);border:1.5px solid var(--ink);padding:14px 16px;font-size:15px;margin:18px 0 8px}
   .howto .mono{font-family:var(--mono);font-size:13px}
   h2{font-family:var(--serif);font-weight:600;font-size:27px;margin:48px 0 6px;line-height:1.2}
@@ -299,6 +300,10 @@
   .row .nums{flex:0 0 auto;color:var(--ink2)}
   .tally{margin-top:10px;padding-top:10px;border-top:2px solid var(--ink);font-weight:600}
   @media(max-width:560px){.row{flex-wrap:wrap}.row .nums{width:100%;padding-left:46px}}{{head_extra}}
+  /* Chrome width is UNIVERSAL and skin-owned: this rule is injected AFTER the head_extra slot so no
+     edition's head_extra can widen the nav/provenance/eyebrow chrome (an edition may set its own
+     .wrap body width, but the chrome stays identical on every page -> no cross-edition shift). */
+  .chrome{max-width:820px}
 </style>
 </head>
 <body>
@@ -323,7 +328,7 @@
     <div class="lineage-strip" id="lineageStrip" aria-label="Lineage"></div>
     <!--/chrome-strip-->
     <h1>{{title}}</h1>
-    <div class="byline">{{byline}}</div>
+    <div class="byline" id="byline">{{byline}}</div>
   </div>
 </header>
 <div class="wrap">{{record_note}}
@@ -508,6 +513,23 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
   }
   document.getElementById('pv-state').textContent =
     isIndex ? 'the chapter index' : 'release '+p.release_tag+' (+ live edits)';
+  // Byline "last updated" date: appended client-side (never baked -> HTML stays deterministic for
+  // check-edition). Only on author/meta bylines (index + dossier) -- NOT lineage (chapter index,
+  // not a dated edition) and NOT verify (its byline is an aphorism). p.updated is the working
+  // "last worked on" date (render-stamped); real-date-gated so the YYYY-MM-DD placeholder never shows.
+  (function(){
+    if (isIndex) return;                          // lineage: no date on the series subtitle
+    var path = location.pathname;
+    if (/verify\.html$/.test(path)) return;       // verify: byline is an aphorism, no date
+    var dt = p.updated;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dt) || dt === 'YYYY-MM-DD') return;  // real-date gate
+    var by = document.getElementById('byline');
+    if (!by) return;
+    var span = document.createElement('span');
+    span.className = 'byline-updated';
+    span.textContent = ' \u00b7 updated ' + dt;   // " · updated 2026-06-30"
+    by.appendChild(span);
+  })();
 }).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository \u2197';
   document.getElementById('pv-doi').href='https://github.com/YOURUSER/YOURREPO';});
 </script>

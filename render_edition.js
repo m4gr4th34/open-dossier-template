@@ -214,6 +214,26 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
 }
 
 if (require.main === module) {
+  // Stamp the working-edition "last updated" date into provenance.json (author-local only;
+  // never in CI -- this block doesn't run under check-edition, which calls renderEdition()
+  // directly). Read-modify-write a SINGLE key so release_tag/dois/released are preserved, exactly
+  // as auto-timestamp.yml's jq does. The date is read CLIENT-SIDE from provenance.json by the
+  // byline script, so it never enters the HTML -> renderEdition() stays pure, check-edition stays
+  // deterministic. Date is derived (today at render), never authored -> cannot drift.
+  try {
+    const PROV = path.resolve(process.cwd(), 'provenance.json');
+    if (fs.existsSync(PROV)) {
+      const prov = JSON.parse(fs.readFileSync(PROV, 'utf8'));
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+      if (prov.updated !== today) {
+        prov.updated = today;
+        fs.writeFileSync(PROV, JSON.stringify(prov, null, 2) + '\n');
+        console.log('  provenance.updated -> ' + today);
+      }
+    }
+  } catch (e) {
+    console.error('  warn: could not stamp provenance.updated (' + e.message + ')');
+  }
   for (const ed of EDITIONS) {
     const html = renderEdition(SKIN, ed.source);
     fs.writeFileSync(ed.out, html);
