@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.5.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe)
+  var FIGURES_RUNTIME_VERSION = "0.6.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -161,6 +161,11 @@
   // -------------------------------------------------------------------------
   var posterEmitters = {};
   function registerPoster(type, fn) { posterEmitters[type] = fn; }
+  // Live-renderer registry — the sibling of posterEmitters. A module registers its
+  // interactive renderX under the SAME type key its spec uses, so the lightbox (and
+  // any consumer) can reach ANY figure type by data, with no hardcoded per-type list.
+  var renderers = {};
+  function registerRenderer(type, fn) { renderers[type] = fn; }
   function dedupPoster(container) {
     if (container && container.querySelector) {
       var baked = container.querySelector("[data-poster]");
@@ -185,6 +190,8 @@
     escTxt: escTxt,
     posterEmitters: posterEmitters,
     registerPoster: registerPoster,
+    renderers: renderers,
+    registerRenderer: registerRenderer,
     dedupPoster: dedupPoster
   };
 
@@ -306,22 +313,25 @@
     if (!root || !root.document) return;
     var doc = root.document, STYLE_ID = "lf-lightbox-style", OVERLAY_ID = "lf-lightbox";
 
-    // type -> renderX fn name: "cosmic" -> renderCosmicZoom, else render<Cap(type)>.
-    var TYPE_FN = {
-      orrery: "renderOrrery", galaxy: "renderGalaxy", cosmic: "renderCosmicZoom",
-      localgroup: "renderLocalGroup", cosmicweb: "renderCosmicWeb",
-      observableuniverse: "renderObservableUniverse"
-    };
-
     function specOf(host) {
       var raw = host.getAttribute("data-figure");
       if (!raw) return null;
       try { return JSON.parse(raw); } catch (e) { return null; }
     }
+    // Resolve a figure type to its live renderer, in order:
+    //   1. API.renderers[type]        -- the registry (registerRenderer; the durable path)
+    //   2. API["render" + Cap(type)]  -- the render<Cap(type)> convention (generic fallback:
+    //      "qc-phasespace" -> "renderQcPhasespace"; camel-case each segment split on non-alphanumerics).
+    // No hardcoded per-type map -- any registered OR convention-named type gets a trigger.
+    function capType(t) {
+      return t.split(/[^A-Za-z0-9]+/).filter(Boolean).map(function (s) {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+      }).join("");
+    }
     function renderFnFor(spec, host) {
-      var t = (spec && spec.type) || host.getAttribute("data-figure-type") || "";
-      var name = TYPE_FN[t];
-      var fn = name && API[name];
+      var t = (spec && spec.type) || (host && host.getAttribute("data-figure-type")) || "";
+      if (!t) return null;
+      var fn = (API.renderers && API.renderers[t]) || API["render" + capType(t)];
       return (typeof fn === "function") ? fn : null;
     }
 
@@ -339,11 +349,13 @@
         "#" + OVERLAY_ID + " .lf-lightbox-close{position:absolute;top:16px;right:20px;" +
           "font:600 13px/1 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.35);" +
           "border:1.5px solid rgba(255,255,255,.5);border-radius:8px;padding:8px 12px;cursor:pointer;}" +
-        ".lf-expand{position:absolute;top:10px;right:10px;z-index:3;" +
-          "font:600 11px/1 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.35);" +
-          "border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:5px 8px;cursor:zoom-in;" +
-          "opacity:.75;transition:opacity .15s ease;}" +
-        ".lf-expand:hover,.lf-expand:focus-visible{opacity:1;outline:2px solid #fff;outline-offset:1px;}";
+        ".lf-expand{position:absolute;top:10px;right:10px;z-index:6;" +
+          "font:600 11px/1 ui-monospace,Menlo,monospace;color:#fff;" +
+          "background:rgba(15,20,24,.92);border:1px solid rgba(255,255,255,.75);" +
+          "border-radius:6px;padding:6px 9px;cursor:zoom-in;opacity:1;" +
+          "box-shadow:0 1px 6px rgba(0,0,0,.4);transition:background .15s ease,transform .12s ease;}" +
+        ".lf-expand:hover,.lf-expand:focus-visible{background:rgba(30,40,48,.98);transform:translateY(-1px);" +
+          "outline:2px solid #fff;outline-offset:1px;}";
       (doc.head || doc.documentElement).appendChild(st);
     }
 
@@ -372,9 +384,10 @@
       (doc.body || doc.documentElement).appendChild(overlay);
     }
 
-    function open(host) {
-      var spec = specOf(host); if (!spec) return;
-      var fn = renderFnFor(spec, host); if (!fn) return;
+    // Mount a spec into the top-hosted overlay -- the shared core: BOTH a local open and a
+    // breakout message land here. No host needed; dispatch is purely by spec.type.
+    function openSpec(spec) {
+      var fn = renderFnFor(spec); if (!fn) return;
       buildOverlay();
       lastFocus = doc.activeElement;
       // fresh container each open; controls stay ON (it's the live, interactive copy)
@@ -385,6 +398,19 @@
       overlay.setAttribute("aria-hidden", "false");
       closeBtn.focus();
       doc.addEventListener("keydown", onKey, true);
+    }
+    function open(host) {
+      var spec = specOf(host); if (!spec) return;
+      // CHILD role: an iframed figure hands its spec UP to the top document, which hosts a
+      // full-viewport overlay (escapes the iframe cap). Same-origin is the live path; if top is
+      // unreachable (cross-origin throws) or we ARE the top (not iframed), fall back to a local overlay.
+      try {
+        if (root.top && root.top !== root.self) {
+          root.top.postMessage({ source: "lf-lightbox", type: "open", spec: spec }, "*");
+          return;
+        }
+      } catch (e) { /* cross-origin or blocked -> local fallback below */ }
+      openSpec(spec);
     }
     function close() {
       if (!overlay) return;
@@ -441,6 +467,15 @@
         }).observe(doc.documentElement, { childList: true, subtree: true });
       }
     }
+    // HOST role: any document that loads figures.js also listens for breakout messages from
+    // child iframes and mounts them into ITS OWN top-level overlay (the same openSpec path).
+    // So the showcase, loading figures.js at top level, hosts full-viewport overlays for the
+    // figures living in its iframes.
+    root.addEventListener("message", function (ev) {
+      var d = ev.data;
+      if (!d || d.source !== "lf-lightbox" || d.type !== "open" || !d.spec) return;
+      openSpec(d.spec);
+    });
     if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot);
     else boot();
   })();

@@ -493,4 +493,5 @@
   }
 
   DossierFigures.renderCosmicWeb = renderCosmicWeb;
+  DossierFigures.registerRenderer("cosmicweb", renderCosmicWeb);   // live-renderer registry (the lightbox dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);

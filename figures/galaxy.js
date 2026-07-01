@@ -512,4 +512,5 @@
   DossierFigures.renderGalaxy = renderGalaxy;
   DossierFigures.renderGalaxyPosterSVG = renderGalaxyPosterSVG;   // back-compat (direct callers)
   DossierFigures.registerPoster("galaxy", renderGalaxyPosterSVG); // registry (the sealer dispatches by spec.type)
+  DossierFigures.registerRenderer("galaxy", renderGalaxy);        // live-renderer registry (the lightbox dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);

@@ -551,4 +551,5 @@
   DossierFigures.renderOrrery = renderOrrery;
   DossierFigures.renderOrreryPosterSVG = renderOrreryPosterSVG;   // back-compat (direct callers)
   DossierFigures.registerPoster("orrery", renderOrreryPosterSVG); // registry (the sealer dispatches by spec.type)
+  DossierFigures.registerRenderer("orrery", renderOrrery);        // live-renderer registry (the lightbox dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);

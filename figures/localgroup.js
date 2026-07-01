@@ -430,4 +430,5 @@
   }
 
   DossierFigures.renderLocalGroup = renderLocalGroup;
+  DossierFigures.registerRenderer("localgroup", renderLocalGroup);   // live-renderer registry (the lightbox dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);

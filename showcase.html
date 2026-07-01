@@ -248,5 +248,19 @@
     permanent. Built by the dossier's own runtime; sealed posters render with JavaScript off.</div>
 </footer>
 </div>
+<!-- Load the runtime AND every render module at top level so this page HOSTS full-viewport lightbox
+     breakouts from its figure iframes: each iframe posts its spec up, and this top document mounts it
+     into a full-browser overlay. figures.js owns the overlay + message listener; the render modules
+     populate the renderer registry so the host can actually render ANY breakout spec (without them
+     the host would receive the message but have no renderer to mount). Same load order the demo pages
+     use (runtime first, composer last). The showcase has no inline figure of its own, so these add
+     only the host role, not a local trigger. -->
+<script src="figures/figures.js"></script>
+<script src="figures/orrery.js"></script>
+<script src="figures/galaxy.js"></script>
+<script src="figures/localgroup.js"></script>
+<script src="figures/cosmicweb.js"></script>
+<script src="figures/observableuniverse.js"></script>
+<script src="figures/cosmiczoom.js"></script>
 </body>
 </html>

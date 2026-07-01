@@ -417,4 +417,5 @@
   DossierFigures.renderCosmicZoom = renderCosmicZoom;
   DossierFigures.renderCosmicZoomPosterSVG = renderCosmicZoomPosterSVG;   // back-compat (direct callers)
   DossierFigures.registerPoster("cosmic", renderCosmicZoomPosterSVG);     // registry (the sealer dispatches by spec.type)
+  DossierFigures.registerRenderer("cosmic", renderCosmicZoom);            // live-renderer registry (the lightbox dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);

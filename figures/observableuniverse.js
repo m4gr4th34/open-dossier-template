@@ -377,4 +377,5 @@
   }
 
   DossierFigures.renderObservableUniverse = renderObservableUniverse;
+  DossierFigures.registerRenderer("observableuniverse", renderObservableUniverse);   // live-renderer registry (the lightbox dispatches by spec.type)
 })(typeof window !== "undefined" ? window : null);
