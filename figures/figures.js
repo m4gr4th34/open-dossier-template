@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.3.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe)
+  var FIGURES_RUNTIME_VERSION = "0.4.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged)
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -214,6 +214,8 @@
   //   JS-off floor shows at authored size (archival; accepted). Node sealer:
   //   guarded on document/ResizeObserver -> a no-op. Opt one <text> OUT with
   //   class "lf-scale-with-art".
+  //   Tiers: text.lf-tick ~11px / .lf-axis ~13px / .lf-callout ~15px set --lf-text-size;
+  //   unclassed (incl. .lf-label) uses the 13px default. All counter-scaled to px.
   // -------------------------------------------------------------------------
   (function initTextFit() {
     if (!root || !root.document || typeof root.ResizeObserver !== "function") return;
@@ -225,7 +227,10 @@
       st.id = STYLE_ID;
       st.textContent =
         ".lf-svg text:not(.lf-scale-with-art){" +
-        "font-size:calc(var(--lf-text-factor,1) * var(--lf-text-size,13px));}";
+        "font-size:calc(var(--lf-text-factor,1) * var(--lf-text-size,13px));}" +
+        ".lf-svg text.lf-tick{--lf-text-size:11px;}" +
+        ".lf-svg text.lf-axis{--lf-text-size:13px;}" +
+        ".lf-svg text.lf-callout{--lf-text-size:15px;}";
       (doc.head || doc.documentElement).appendChild(st);
     }
 

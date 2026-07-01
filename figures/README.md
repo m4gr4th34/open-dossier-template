@@ -168,6 +168,25 @@ these `figures/` script-srcs to the shared root `../../figures/` automatically �
 `rewire_script_src` in `freeze_chapter.py`; the standalone demo pages are
 deliberately outside the freeze set.)
 
+## Text tiers (annotation legibility)
+
+Living-figure `<svg>` text is counter-scaled by the runtime to render at a
+fixed reading size regardless of display width (see the text-fit note in
+`figures.js`). Author label text with a **tier class**, never a raw
+`font-size` — the runtime owns the size, so a figure cannot ship sub-legible
+or over-large labels:
+
+| class | rendered | use |
+|---|---|---|
+| `lf-tick` | ~11px | axis tick numbers, dense scales |
+| *(none)* / `lf-label` / `lf-axis` | ~13px | body labels, names, legends, axis titles |
+| `lf-callout` | ~15px | the one annotation that must stand out |
+
+Rendered px is constant across widths (counter-scaled). Tier px live in one
+place — the injected style in `figures.js` — so the format's label hierarchy
+tunes centrally. Opt a single `<text>` OUT of counter-scaling with class
+`lf-scale-with-art` (rare — only when a label must ride the art's zoom).
+
 ## Sealing the floor (`render-figures`, author-local)
 
 A living figure has a **live ceiling** (JS-on: the interactive runtime renders
