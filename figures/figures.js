@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.6.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger
+  var FIGURES_RUNTIME_VERSION = "0.7.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating)
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -341,11 +341,31 @@
       st.id = STYLE_ID;
       st.textContent =
         "#" + OVERLAY_ID + "{position:fixed;inset:0;z-index:10001;display:none;" +
-          "align-items:center;justify-content:center;background:rgba(23,38,44,.82);" +
-          "padding:24px;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}" +
+          "align-items:center;justify-content:center;background:#0d1117;" +
+          "padding:24px;}" +
         "#" + OVERLAY_ID + ".open{display:flex;}" +
         "#" + OVERLAY_ID + " .lf-lightbox-stage{width:min(1200px,94vw);max-height:92vh;}" +
         "#" + OVERLAY_ID + " .lf-lightbox-stage .lf-svg{max-height:82vh;}" +
+        // Control-bar CSS shipped by the runtime, scoped to the overlay -- a breakout host (e.g. the
+        // showcase top doc) may lack the demos' .lf-controls styles, so the mounted controls would
+        // otherwise fall back to native browser chrome. Concrete values (not var tokens) so it works
+        // on any host. Only affects broken-out figures; the demos keep their own inline control CSS.
+        "#lf-lightbox .lf-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;" +
+          "margin-top:12px;font:12.5px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#586a6f;}" +
+        "#lf-lightbox .lf-btn{font:600 12.5px/1 ui-monospace,Menlo,Consolas,monospace;" +
+          "padding:7px 12px;border:1.5px solid #17262c;background:#fff;color:#17262c;" +
+          "border-radius:10px;cursor:pointer;-webkit-appearance:none;appearance:none;}" +
+        "#lf-lightbox .lf-btn:hover{box-shadow:0 2px 12px rgba(23,38,44,.12);}" +
+        "#lf-lightbox .lf-region{border-color:#0c8f86;color:#0c8f86;}" +
+        "#lf-lightbox .lf-play{border-color:#0c8f86;background:#0c8f86;color:#fff;}" +
+        "#lf-lightbox .lf-field{display:flex;align-items:center;gap:7px;letter-spacing:.06em;" +
+          "text-transform:uppercase;font-size:11px;}" +
+        "#lf-lightbox .lf-range{accent-color:#0c8f86;cursor:pointer;}" +
+        "#lf-lightbox .lf-readout{margin-left:auto;font-size:11.5px;color:#586a6f;white-space:nowrap;}" +
+        "#lf-lightbox .lf-cosmic{cursor:default;}" +
+        // lf-fallback: the "runtime not found" message; can't appear in a breakout (the renderer IS
+        // the runtime), covered for completeness so the whole emitted control family is host-independent.
+        "#lf-lightbox .lf-fallback{font:12.5px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#cf5d36;}" +
         "#" + OVERLAY_ID + " .lf-lightbox-close{position:absolute;top:16px;right:20px;" +
           "font:600 13px/1 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.35);" +
           "border:1.5px solid rgba(255,255,255,.5);border-radius:8px;padding:8px 12px;cursor:pointer;}" +

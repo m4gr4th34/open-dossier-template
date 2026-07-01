@@ -297,8 +297,8 @@
     zWrap.appendChild(doc.createTextNode("Cosmic zoom"));
     var zIn = doc.createElement("input");
     zIn.type = "range"; zIn.min = "0"; zIn.max = "1"; zIn.step = "0.0005";
-    zIn.value = String(sliderM); zIn.className = "lf-range";
-    zIn.addEventListener("input", function () { masterJump = null; journeyPlaying = false; playBtn.textContent = playLabel(); sliderM = clamp01(parseFloat(zIn.value)); });
+    zIn.value = String(1 - sliderM); zIn.className = "lf-range";   // presentation flip: right = zoom IN (internal sliderM unchanged; wheel already scroll-up=in)
+    zIn.addEventListener("input", function () { masterJump = null; journeyPlaying = false; playBtn.textContent = playLabel(); sliderM = clamp01(1 - parseFloat(zIn.value)); });
     zWrap.appendChild(zIn); bar.appendChild(zWrap);
 
     function jumpTo(scaleAUtarget) { masterJump = { from: sliderM, to: clamp01(logZoom.scaleToSlider(scaleAUtarget, MLO, MHI)), p: 0, dur: 1.4 }; journeyPlaying = false; playBtn.textContent = playLabel(); }
@@ -313,7 +313,7 @@
     var readout = doc.createElement("span"); readout.className = "lf-readout";
     bar.appendChild(readout);
 
-    function syncMaster() { zIn.value = String(sliderM); }
+    function syncMaster() { zIn.value = String(1 - sliderM); }   // presentation flip (see input wiring)
     function fmtScale(aAU) {
       if (aAU < AU_PER_LY) {
         if (aAU < 1) return aAU.toFixed(3) + " AU";
@@ -362,6 +362,7 @@
     var JR = num(seam.journeyRate, 0.05);   // slider units / second (Powers-of-Ten travel)
     var perf = (root.performance && root.performance.now) ? root.performance : Date;
     var last = perf.now(), lastDriven = null;
+    var lfVisible = true, lfRunning = false;   // visibility gate: off-screen -> stop the rAF tick (real CPU savings)
     function tick(now) {
       var dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (masterJump) {
@@ -375,9 +376,16 @@
         syncMaster();
       }
       if (sliderM !== lastDriven) { driveChildren(); crossfade(); updateVoid(); updateReadout(); lastDriven = sliderM; }
-      root.requestAnimationFrame(tick);
+      if (lfVisible) root.requestAnimationFrame(tick); else lfRunning = false;   // stop rescheduling when off-screen
     }
-    root.requestAnimationFrame(tick);
+    // Resume from the FROZEN sliderM (no jump): reset the clock so dt is one frame, not the paused span.
+    function lfResume() { if (!lfRunning) { lfRunning = true; last = perf.now(); root.requestAnimationFrame(tick); } }
+    lfRunning = true; root.requestAnimationFrame(tick);
+    // Visibility gate (child-side IntersectionObserver fires on parent-scroll, even inside an iframe).
+    // Node-safe: renderX is browser-only; absent IO -> figure just always animates. Children carry their own gates.
+    if (root.IntersectionObserver) {
+      new root.IntersectionObserver(function (es) { lfVisible = es[0].isIntersecting; if (lfVisible) lfResume(); }, { root: null, threshold: 0 }).observe(container);
+    }
 
     return {
       runtimeVersion: DossierFigures.FIGURES_RUNTIME_VERSION,

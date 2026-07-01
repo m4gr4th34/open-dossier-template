@@ -390,8 +390,8 @@
       zoomWrap.appendChild(doc.createTextNode("Zoom"));
       zoomInput = doc.createElement("input");
       zoomInput.type = "range"; zoomInput.min = "0"; zoomInput.max = "1"; zoomInput.step = "0.001";
-      zoomInput.value = String(slider); zoomInput.className = "lf-range";
-      zoomInput.addEventListener("input", function () { jump = null; slider = clamp01(parseFloat(zoomInput.value)); viewDirty = true; });
+      zoomInput.value = String(1 - slider); zoomInput.className = "lf-range";   // presentation flip: right = zoom IN (internal slider unchanged)
+      zoomInput.addEventListener("input", function () { jump = null; slider = clamp01(1 - parseFloat(zoomInput.value)); viewDirty = true; });
       zoomWrap.appendChild(zoomInput);
       controls.appendChild(zoomWrap);
 
@@ -421,13 +421,13 @@
       controls.appendChild(readout);
     }
 
-    function syncZoomInput() { if (zoomInput) zoomInput.value = String(slider); }
+    function syncZoomInput() { if (zoomInput) zoomInput.value = String(1 - slider); }   // presentation flip (see input wiring)
 
     // --- interaction: scroll-to-zoom + drag-to-pan ----------------------
     svg.addEventListener("wheel", function (ev) {
       ev.preventDefault();
       jump = null;
-      slider = clamp01(slider + (ev.deltaY < 0 ? 0.05 : -0.05));
+      slider = clamp01(slider + (ev.deltaY < 0 ? -0.05 : 0.05));   // scroll-up = zoom IN (agrees with the flipped slider)
       syncZoomInput(); viewDirty = true;
     }, { passive: false });
 
@@ -466,6 +466,7 @@
     // --- animation loop --------------------------------------------------
     var perf = (root.performance && root.performance.now) ? root.performance : Date;
     var last = perf.now();
+    var lfVisible = true, lfRunning = false;   // visibility gate: off-screen -> stop the rAF loop (real CPU savings)
     function frame(now) {
       var dt = Math.min(0.05, (now - last) / 1000); last = now;
 
@@ -490,9 +491,16 @@
       if (readout) readout.textContent = "scale " + scaleAU().toFixed(scaleAU() < 10 ? 2 : 0) +
         " AU · t " + t.toFixed(1) + " yr · play-speed " + spd.toFixed(2) + " yr/s";
 
-      root.requestAnimationFrame(frame);
+      if (lfVisible) root.requestAnimationFrame(frame); else lfRunning = false;   // stop rescheduling when off-screen
     }
-    root.requestAnimationFrame(frame);
+    // Resume from the FROZEN t/slider (no jump): reset the clock so dt is one frame, not the paused span.
+    function lfResume() { if (!lfRunning) { lfRunning = true; last = perf.now(); root.requestAnimationFrame(frame); } }
+    lfRunning = true; root.requestAnimationFrame(frame);
+    // Visibility gate (child-side IntersectionObserver fires on parent-scroll, even inside an iframe).
+    // Node-safe: renderX is browser-only; absent IO -> figure just always animates.
+    if (root.IntersectionObserver) {
+      new root.IntersectionObserver(function (es) { lfVisible = es[0].isIntersecting; if (lfVisible) lfResume(); }, { root: null, threshold: 0 }).observe(svg);
+    }
 
     // small handle for tests / external control
     return {
