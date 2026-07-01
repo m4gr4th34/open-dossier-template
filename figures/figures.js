@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.4.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged)
+  var FIGURES_RUNTIME_VERSION = "0.5.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe)
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -273,6 +273,174 @@
       }
     }
 
+    if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot);
+    else boot();
+  })();
+
+  // -------------------------------------------------------------------------
+  // LIGHTBOX — tap a living figure to open it large, LIVE. Browser-only + Node-safe.
+  //
+  //   Living figures render as inline <svg.lf-svg>, so the skin's image lightbox
+  //   (which binds `figure img`) never sees them. Give them their own: because a
+  //   figure stores a GENERATOR not output, "open large" is just re-mounting the
+  //   same spec into a fresh full-viewport container via its renderX(container,
+  //   spec) — fully live (slider + play come along), not a static blow-up (the
+  //   sealed floor already IS the static version). Self-contained in the runtime:
+  //   it injects its own style + overlay and wires triggers on load, so every
+  //   dossier and every future edition inherits it on sync with zero page/skin
+  //   edits — same pattern as the text-fit self-init above.
+  //
+  //   Re-mount FRESH (opens at the figure's default view; the inline instance
+  //   underneath is untouched). renderX appends without clearing, so we mount into
+  //   a NEW empty div each open and discard it on close — never re-call renderX on
+  //   a live container. The figure's <figure data-figure> host carries the spec +
+  //   a data-figure-type (or spec.type); we dispatch to DossierFigures["render" +
+  //   Cap(type)]. Node-safe: guarded on document; the sealer never sees this.
+  //
+  //   Mirrors the skin lightbox (aria-modal dialog, Escape, backdrop-click,
+  //   focus save/restore) and ADDS what it lacks: a real focus trap (Tab loops
+  //   inside the overlay's live controls) and stopPropagation on the figure stage
+  //   (clicking the figure's own slider must not close the overlay).
+  // -------------------------------------------------------------------------
+  (function initLightbox() {
+    if (!root || !root.document) return;
+    var doc = root.document, STYLE_ID = "lf-lightbox-style", OVERLAY_ID = "lf-lightbox";
+
+    // type -> renderX fn name: "cosmic" -> renderCosmicZoom, else render<Cap(type)>.
+    var TYPE_FN = {
+      orrery: "renderOrrery", galaxy: "renderGalaxy", cosmic: "renderCosmicZoom",
+      localgroup: "renderLocalGroup", cosmicweb: "renderCosmicWeb",
+      observableuniverse: "renderObservableUniverse"
+    };
+
+    function specOf(host) {
+      var raw = host.getAttribute("data-figure");
+      if (!raw) return null;
+      try { return JSON.parse(raw); } catch (e) { return null; }
+    }
+    function renderFnFor(spec, host) {
+      var t = (spec && spec.type) || host.getAttribute("data-figure-type") || "";
+      var name = TYPE_FN[t];
+      var fn = name && API[name];
+      return (typeof fn === "function") ? fn : null;
+    }
+
+    function injectStyle() {
+      if (doc.getElementById(STYLE_ID)) return;
+      var st = doc.createElement("style");
+      st.id = STYLE_ID;
+      st.textContent =
+        "#" + OVERLAY_ID + "{position:fixed;inset:0;z-index:10001;display:none;" +
+          "align-items:center;justify-content:center;background:rgba(23,38,44,.82);" +
+          "padding:24px;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}" +
+        "#" + OVERLAY_ID + ".open{display:flex;}" +
+        "#" + OVERLAY_ID + " .lf-lightbox-stage{width:min(1200px,94vw);max-height:92vh;}" +
+        "#" + OVERLAY_ID + " .lf-lightbox-stage .lf-svg{max-height:82vh;}" +
+        "#" + OVERLAY_ID + " .lf-lightbox-close{position:absolute;top:16px;right:20px;" +
+          "font:600 13px/1 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.35);" +
+          "border:1.5px solid rgba(255,255,255,.5);border-radius:8px;padding:8px 12px;cursor:pointer;}" +
+        ".lf-expand{position:absolute;top:10px;right:10px;z-index:3;" +
+          "font:600 11px/1 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.35);" +
+          "border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:5px 8px;cursor:zoom-in;" +
+          "opacity:.75;transition:opacity .15s ease;}" +
+        ".lf-expand:hover,.lf-expand:focus-visible{opacity:1;outline:2px solid #fff;outline-offset:1px;}";
+      (doc.head || doc.documentElement).appendChild(st);
+    }
+
+    var overlay, stageWrap, closeBtn, lastFocus = null, mounted = null;
+
+    function buildOverlay() {
+      if (overlay) return;
+      overlay = doc.createElement("div");
+      overlay.id = OVERLAY_ID;
+      overlay.setAttribute("role", "dialog");
+      overlay.setAttribute("aria-modal", "true");
+      overlay.setAttribute("aria-label", "Figure, full size");
+      overlay.setAttribute("aria-hidden", "true");
+      closeBtn = doc.createElement("button");
+      closeBtn.className = "lf-lightbox-close";
+      closeBtn.type = "button";
+      closeBtn.textContent = "Close \u2715";
+      closeBtn.addEventListener("click", close);
+      stageWrap = doc.createElement("div");
+      stageWrap.className = "lf-lightbox-stage";
+      // clicks INSIDE the live figure must not bubble to the backdrop-close
+      stageWrap.addEventListener("click", function (e) { e.stopPropagation(); });
+      overlay.appendChild(closeBtn);
+      overlay.appendChild(stageWrap);
+      overlay.addEventListener("click", close);   // backdrop
+      (doc.body || doc.documentElement).appendChild(overlay);
+    }
+
+    function open(host) {
+      var spec = specOf(host); if (!spec) return;
+      var fn = renderFnFor(spec, host); if (!fn) return;
+      buildOverlay();
+      lastFocus = doc.activeElement;
+      // fresh container each open; controls stay ON (it's the live, interactive copy)
+      mounted = doc.createElement("div");
+      stageWrap.appendChild(mounted);
+      try { fn(mounted, spec); } catch (e) { close(); return; }
+      overlay.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+      closeBtn.focus();
+      doc.addEventListener("keydown", onKey, true);
+    }
+    function close() {
+      if (!overlay) return;
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+      if (mounted && mounted.parentNode) mounted.parentNode.removeChild(mounted);  // discard the live copy
+      mounted = null;
+      doc.removeEventListener("keydown", onKey, true);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    function onKey(e) {
+      if (e.key === "Escape") { e.preventDefault(); close(); return; }
+      if (e.key === "Tab") {                                   // focus trap
+        var f = overlay.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+        if (!f.length) { e.preventDefault(); closeBtn.focus(); return; }
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && doc.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && doc.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+
+    // Add an "expand" trigger to each living-figure host that has a dispatchable spec.
+    function wire(host) {
+      if (!host || host.__lfLightbox) return;
+      var spec = specOf(host); if (!spec) return;
+      if (!renderFnFor(spec, host)) return;      // no live renderer -> no trigger
+      host.__lfLightbox = true;
+      if (getComputedStyle(host).position === "static") host.style.position = "relative";
+      var btn = doc.createElement("button");
+      btn.className = "lf-expand";
+      btn.type = "button";
+      btn.textContent = "\u21F1 expand";
+      btn.setAttribute("aria-label", "Open figure full size");
+      btn.addEventListener("click", function (e) { e.stopPropagation(); open(host); });
+      host.appendChild(btn);
+    }
+    function scan(node) {
+      if (!node || node.nodeType !== 1) return;
+      if (node.matches && node.matches(".living-figure[data-figure]")) wire(node);
+      if (node.querySelectorAll) {
+        var list = node.querySelectorAll(".living-figure[data-figure]");
+        for (var i = 0; i < list.length; i++) wire(list[i]);
+      }
+    }
+    function boot() {
+      injectStyle();
+      scan(doc.documentElement);
+      if (typeof root.MutationObserver === "function") {
+        new root.MutationObserver(function (muts) {
+          for (var i = 0; i < muts.length; i++) {
+            var added = muts[i].addedNodes;
+            for (var j = 0; j < added.length; j++) scan(added[j]);
+          }
+        }).observe(doc.documentElement, { childList: true, subtree: true });
+      }
+    }
     if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot);
     else boot();
   })();
