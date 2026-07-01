@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.2.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact)
+  var FIGURES_RUNTIME_VERSION = "0.3.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe)
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -194,4 +194,81 @@
   if (typeof root !== "undefined" && root) {
     root.DossierFigures = API; // browser global
   }
+
+  // -------------------------------------------------------------------------
+  // TEXT-FIT — annotation legibility at the scaffold, browser-only + Node-safe.
+  //
+  //   A living-figure <svg> uses viewBox + width:100%, so ALL geometry — text
+  //   included — scales by (clientWidth / viewBoxWidth). The SAME figure renders
+  //   labels bigger on a wide page, smaller in a narrow column (authored "12" ~=
+  //   14px on the 1000px showcase, ~9-11px in an 820px paper column). Labels are
+  //   ANNOTATIONS (ticks, names, readouts) that should read at a fixed size like
+  //   any UI text, NOT ride the art's zoom. SVG has no native non-scaling text
+  //   (unlike vector-effect for strokes), so cancel the scale here: a
+  //   ResizeObserver writes --lf-text-factor = viewBoxW/clientW on each .lf-svg,
+  //   and an injected rule sizes figure text as calc(var(--lf-text-factor) *
+  //   target). rendered = authored * (clientW/viewBoxW) * factor = target, at ANY
+  //   width. The rule outranks inline font-size="..." presentation attrs, so EVERY
+  //   figure (live ceiling + JS-on floor) is fixed with zero page/module edits,
+  //   and it travels with the vendored runtime — every dossier inherits it on sync.
+  //   JS-off floor shows at authored size (archival; accepted). Node sealer:
+  //   guarded on document/ResizeObserver -> a no-op. Opt one <text> OUT with
+  //   class "lf-scale-with-art".
+  // -------------------------------------------------------------------------
+  (function initTextFit() {
+    if (!root || !root.document || typeof root.ResizeObserver !== "function") return;
+    var doc = root.document, STYLE_ID = "lf-textfit-style";
+
+    function injectStyle() {
+      if (doc.getElementById(STYLE_ID)) return;
+      var st = doc.createElement("style");
+      st.id = STYLE_ID;
+      st.textContent =
+        ".lf-svg text:not(.lf-scale-with-art){" +
+        "font-size:calc(var(--lf-text-factor,1) * var(--lf-text-size,13px));}";
+      (doc.head || doc.documentElement).appendChild(st);
+    }
+
+    function setFactor(svg) {
+      var vb = (svg.getAttribute("viewBox") || "").split(/[\s,]+/);
+      var vbw = parseFloat(vb[2]) || 0;
+      var cw = svg.clientWidth || (svg.getBoundingClientRect && svg.getBoundingClientRect().width) || 0;
+      if (vbw > 0 && cw > 0) svg.style.setProperty("--lf-text-factor", vbw / cw);
+    }
+
+    var ro = new root.ResizeObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) setFactor(entries[i].target);
+    });
+
+    function observe(svg) {
+      if (!svg || svg.__lfTextFit) return;
+      svg.__lfTextFit = true;
+      setFactor(svg);            // set once now to avoid a first-paint flash
+      ro.observe(svg);
+    }
+    function scan(node) {
+      if (!node || node.nodeType !== 1) return;
+      if (node.matches && node.matches("svg.lf-svg")) observe(node);
+      if (node.querySelectorAll) {
+        var list = node.querySelectorAll("svg.lf-svg");
+        for (var i = 0; i < list.length; i++) observe(list[i]);
+      }
+    }
+
+    function boot() {
+      injectStyle();
+      scan(doc.documentElement);
+      if (typeof root.MutationObserver === "function") {
+        new root.MutationObserver(function (muts) {
+          for (var i = 0; i < muts.length; i++) {
+            var added = muts[i].addedNodes;
+            for (var j = 0; j < added.length; j++) scan(added[j]);
+          }
+        }).observe(doc.documentElement, { childList: true, subtree: true });
+      }
+    }
+
+    if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot);
+    else boot();
+  })();
 })(typeof window !== "undefined" ? window : null);
