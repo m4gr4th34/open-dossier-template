@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.8.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating); 0.8.0: registerRenderer is the sole lightbox dispatch contract — drop the initialism-fragile render<Cap(type)> fallback, warn (not silently skip) on an unregistered figure type, document registerRenderer as a required adoption step
+  var FIGURES_RUNTIME_VERSION = "0.9.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating); 0.8.0: registerRenderer is the sole lightbox dispatch contract — drop the initialism-fragile render<Cap(type)> fallback, warn (not silently skip) on an unregistered figure type, document registerRenderer as a required adoption step; 0.9.0: adaptive lightbox mat (figure declares data-figure.stage; overlay derives a luminance-separated backdrop, dark-default so astronomy is unchanged) + reserved-header expand trigger (docked in a reserved top band, never over figure content)
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -330,6 +330,41 @@
       return (typeof fn === "function") ? fn : null;
     }
 
+    // ---- adaptive lightbox mat (0.9.0) ----
+    // The overlay mats the live figure. A figure's visible field is a HOST CSS gradient the runtime
+    // cannot sample (getComputedStyle(svg).backgroundColor is transparent), so the figure DECLARES its
+    // backdrop via spec.stage and the overlay derives a luminance-separated mat: a light figure gets a
+    // slightly darker mat, a dark figure a slightly lighter one, so it reads as sitting ON a stage
+    // rather than marooned. No stage -> DEFAULT_MAT (today's dark), so astronomy is byte-unchanged.
+    // Pure + Node-safe (string math only; never touches the DOM).
+    var DEFAULT_MAT = "#0d1117";
+    function parseHex(hex) {
+      if (typeof hex !== "string") return null;
+      var m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.replace(/^\s+|\s+$/g, ""));
+      if (!m) return null;
+      var h = m[1];
+      if (h.length === 3) h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2);
+      return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+    }
+    function clamp255(n) { n = Math.round(n); return n < 0 ? 0 : (n > 255 ? 255 : n); }
+    function hex2(n) { var s = clamp255(n).toString(16); return s.length === 1 ? "0" + s : s; }
+    // Relative luminance, standard Rec.709 coefficients, per-channel 0-255 (no gamma decode -- this is
+    // only a light/dark branch threshold, not a contrast computation): L = (0.2126R + 0.7152G + 0.0722B)/255.
+    function luminance(c) { return (0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b) / 255; }
+    function deriveMat(stageHex) {
+      var c = parseHex(stageHex);
+      if (!c) return DEFAULT_MAT;            // unparseable -> safe dark default
+      var L = luminance(c), f, r, g, b;
+      if (L >= 0.5) {                        // light stage -> slightly darker mat (mix ~4.5% toward black)
+        f = 0.045;
+        r = c.r * (1 - f); g = c.g * (1 - f); b = c.b * (1 - f);
+      } else {                               // dark stage  -> slightly lighter mat (mix ~4% toward white)
+        f = 0.04;
+        r = c.r + (255 - c.r) * f; g = c.g + (255 - c.g) * f; b = c.b + (255 - c.b) * f;
+      }
+      return "#" + hex2(r) + hex2(g) + hex2(b);
+    }
+
     function injectStyle() {
       if (doc.getElementById(STYLE_ID)) return;
       var st = doc.createElement("style");
@@ -364,7 +399,7 @@
         "#" + OVERLAY_ID + " .lf-lightbox-close{position:absolute;top:16px;right:20px;" +
           "font:600 13px/1 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.35);" +
           "border:1.5px solid rgba(255,255,255,.5);border-radius:8px;padding:8px 12px;cursor:pointer;}" +
-        ".lf-expand{position:absolute;top:10px;right:10px;z-index:6;" +
+        ".lf-expand{position:absolute;top:8px;right:14px;z-index:6;" +
           "font:600 11px/1 ui-monospace,Menlo,monospace;color:#fff;" +
           "background:rgba(15,20,24,.92);border:1px solid rgba(255,255,255,.75);" +
           "border-radius:6px;padding:6px 9px;cursor:zoom-in;opacity:1;" +
@@ -404,6 +439,11 @@
     function openSpec(spec) {
       var fn = renderFnFor(spec); if (!fn) return;
       buildOverlay();
+      // Adaptive mat: derive the backdrop from the figure's declared stage. No stage -> today's dark
+      // (#0d1117), so every astronomy figure is byte-unchanged. The CSS default on #lf-lightbox stays
+      // as the pre-spec fallback; this inline set wins for an opened figure.
+      var stage = spec && typeof spec.stage === "string" ? spec.stage : null;
+      overlay.style.background = stage ? deriveMat(stage) : DEFAULT_MAT;
       lastFocus = doc.activeElement;
       // fresh container each open; controls stay ON (it's the live, interactive copy)
       mounted = doc.createElement("div");
@@ -464,6 +504,13 @@
       }
       host.__lfLightbox = true;
       if (getComputedStyle(host).position === "static") host.style.position = "relative";
+      // Reserve a header band for the trigger so the chip never sits over figure content. A tappable
+      // chip can't fit the host's top padding without straddling the card or covering the canvas, so
+      // ADD ~20px to whatever padding-top the host already has (additive -> any host padding composes).
+      // Only wired hosts (a dispatchable spec) are touched; type-less/unwired figures keep their layout.
+      var cs = root.getComputedStyle(host);
+      var pt = parseFloat(cs.paddingTop) || 0;
+      host.style.paddingTop = (pt + 20) + "px";
       var btn = doc.createElement("button");
       btn.className = "lf-expand";
       btn.type = "button";

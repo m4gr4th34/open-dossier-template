@@ -208,6 +208,9 @@ living figure only when the result has dynamics worth exploring.
   `DossierFigures.registerRenderer("<type>", fn)` for its figures to get the click-to-open
   lightbox — the lightbox dispatches through that registry **only** (no name-based fallback),
   and a declared-but-unregistered type gets no lightbox plus a console warning.
+- If your figure sits on a **light background** (e.g. a chart on a light card), set the optional
+  top-level `"stage":"#rrggbb"` to that card color so the lightbox mats it correctly (the overlay
+  derives a luminance-separated backdrop); omit it and the mat defaults to the dark astronomy field.
 - After writing or editing any `data-figure`, run `npm run render-figures` (or
   `node render_figures.js <page.html>`). It auto-loads the runtime + every figure
   module and **dispatches by `type`** through the poster registry, baking a

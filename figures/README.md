@@ -46,6 +46,16 @@ The renderer **reads** the attribute, renders **into** the element, and **leaves
 `render_figures.js` (mirroring `render_math.js`), bakes committed static SVG into
 the element so readers need no JavaScript — see **Sealing the floor** below.
 
+### Optional top-level field — `"stage"` (lightbox backdrop)
+
+`"stage": "#rrggbb"` (optional) — the figure's backdrop color for the full-screen
+lightbox. The overlay derives a luminance-separated mat from it (a light figure gets
+a light mat, a dark figure a dark one) so the figure reads as sitting on a stage, not
+marooned on a void. Omit it and the mat defaults to the dark field used by the
+astronomy figures — set it when your figure is light (e.g. a chart on a light card:
+`"stage":"#f3f6f5"`). The figure's own visible field is host CSS the runtime can't
+sample, which is why the color is declared here rather than detected.
+
 ### Spec schema — zoom-orrery (`renderOrrery`)
 
 ```jsonc
