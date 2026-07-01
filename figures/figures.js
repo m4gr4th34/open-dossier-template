@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.7.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating)
+  var FIGURES_RUNTIME_VERSION = "0.8.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating); 0.8.0: registerRenderer is the sole lightbox dispatch contract — drop the initialism-fragile render<Cap(type)> fallback, warn (not silently skip) on an unregistered figure type, document registerRenderer as a required adoption step
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -318,20 +318,15 @@
       if (!raw) return null;
       try { return JSON.parse(raw); } catch (e) { return null; }
     }
-    // Resolve a figure type to its live renderer, in order:
-    //   1. API.renderers[type]        -- the registry (registerRenderer; the durable path)
-    //   2. API["render" + Cap(type)]  -- the render<Cap(type)> convention (generic fallback:
-    //      "qc-phasespace" -> "renderQcPhasespace"; camel-case each segment split on non-alphanumerics).
-    // No hardcoded per-type map -- any registered OR convention-named type gets a trigger.
-    function capType(t) {
-      return t.split(/[^A-Za-z0-9]+/).filter(Boolean).map(function (s) {
-        return s.charAt(0).toUpperCase() + s.slice(1);
-      }).join("");
-    }
+    // Resolve a figure type to its live renderer through the registry ONLY: a module registers its
+    // renderer with DossierFigures.registerRenderer("<type>", fn) under the exact spec.type string.
+    // No name-based fallback -- an earlier render<Cap(type)> convention title-cased each segment
+    // ("qc-frontier" -> "renderQcFrontier"), which could never match an initialism-cased renderer
+    // (renderQCFrontier / renderMLModel), silently dropping the lightbox. The registry is exact, so
+    // the fn name is the author's to choose; it just has to be registered under the type string.
     function renderFnFor(spec, host) {
       var t = (spec && spec.type) || (host && host.getAttribute("data-figure-type")) || "";
-      if (!t) return null;
-      var fn = (API.renderers && API.renderers[t]) || API["render" + capType(t)];
+      var fn = t && API.renderers[t];
       return (typeof fn === "function") ? fn : null;
     }
 
@@ -456,7 +451,17 @@
     function wire(host) {
       if (!host || host.__lfLightbox) return;
       var spec = specOf(host); if (!spec) return;
-      if (!renderFnFor(spec, host)) return;      // no live renderer -> no trigger
+      if (!renderFnFor(spec, host)) {
+        // A declared-but-unregistered type is almost always a forgotten registerRenderer, not intent.
+        // Warn (once per host -- wire runs once per host) naming the type + the fix, instead of a
+        // silent drop. A spec with NO type at all stays a silent skip; console guarded for Node-safety.
+        var t = (spec && spec.type) || host.getAttribute("data-figure-type") || "";
+        if (t && root.console && root.console.warn) {
+          root.console.warn('[figures] no live renderer registered for figure type "' + t +
+            '" -- call DossierFigures.registerRenderer("' + t + '", <yourRenderFn>) so the lightbox can open it.');
+        }
+        return;   // still no trigger, but now the author is TOLD why
+      }
       host.__lfLightbox = true;
       if (getComputedStyle(host).position === "static") host.style.position = "relative";
       var btn = doc.createElement("button");

@@ -204,7 +204,10 @@ living figure only when the result has dynamics worth exploring.
   **`figures/README.md`**; author against them there and do not restate them in the
   page. (The engine is domain-agnostic: a non-astronomy project registers its OWN
   type without touching the sealer — see *Adopting the engine for a new figure type*
-  in `figures/README.md`.)
+  in `figures/README.md`.) A new figure type's module must also call
+  `DossierFigures.registerRenderer("<type>", fn)` for its figures to get the click-to-open
+  lightbox — the lightbox dispatches through that registry **only** (no name-based fallback),
+  and a declared-but-unregistered type gets no lightbox plus a console warning.
 - After writing or editing any `data-figure`, run `npm run render-figures` (or
   `node render_figures.js <page.html>`). It auto-loads the runtime + every figure
   module and **dispatches by `type`** through the poster registry, baking a

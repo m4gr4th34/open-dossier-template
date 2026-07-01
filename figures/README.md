@@ -10,7 +10,7 @@ stays untouched).
 
 | File | Role |
 |---|---|
-| `figures.js` | The **domain-agnostic** runtime floor (v0.2.0+) — general primitives every figure composes (`el` / `ease` / `logZoom` / `scaleAwareTime` / `seededScatter` / `mulberry32` / `r2` / `escAttr` / `escTxt`) **plus the figure-type registry** (`registerPoster(type, fn)` / `posterEmitters` / `dedupPoster`). No domain physics. Exposes `window.DossierFigures`; pinned by `FIGURES_RUNTIME_VERSION`. |
+| `figures.js` | The **domain-agnostic** runtime floor (v0.2.0+) — general primitives every figure composes (`el` / `ease` / `logZoom` / `scaleAwareTime` / `seededScatter` / `mulberry32` / `r2` / `escAttr` / `escTxt`) **plus the figure-type registry** (`registerPoster(type, fn)` / `posterEmitters` / `dedupPoster`) and the **live-renderer registry** (`registerRenderer(type, fn)` / `renderers`) that the lightbox dispatches through — a figure type gets a click-to-open lightbox once its module registers its live renderer. No domain physics. Exposes `window.DossierFigures`; pinned by `FIGURES_RUNTIME_VERSION`. |
 | `figures.test.js` | Author-local Node test for the general primitives (`node figures/figures.test.js`). Never run by CI. |
 | `orrery.js` | A render module that **composes** the primitives into a Keplerian zoom-orrery. Extends `DossierFigures` with `renderOrrery(container, spec)`. |
 | `galaxy.js` | A render module that **composes** the primitives into a procedural spiral galaxy (statistical structure, ~10-order zoom, per-scale cull). Extends `DossierFigures` with `renderGalaxy(container, spec)`. |
@@ -278,9 +278,15 @@ add its own figure type **without forking the template machinery** (no edit to
 2. **Register the emitter:** `DossierFigures.registerPoster("your-type", render<YourType>PosterSVG)`.
    (A **live-ceiling-only** figure — no JS-off floor — simply registers *nothing*; the
    sealer copies it through unchanged.)
-3. **Declare the type:** add `"type":"your-type"` as a top-level key in the figure's
+3. **Register the live renderer (required for the lightbox):**
+   `DossierFigures.registerRenderer("your-type", renderYourType)`. The lightbox resolves the
+   renderer through this registry **only** — there is no name-based fallback, so the fn name is
+   yours to choose (e.g. `renderQCFrontier` for type `"qc-frontier"`); just register it under the
+   exact `type` string your `data-figure` uses. A declared-but-unregistered type gets no lightbox
+   and a console warning naming the missing `registerRenderer` call.
+4. **Declare the type:** add `"type":"your-type"` as a top-level key in the figure's
    `data-figure` spec.
-4. **Drop the module in `figures/`.** The sealer auto-loads it and dispatches by
+5. **Drop the module in `figures/`.** The sealer auto-loads it and dispatches by
    `type`; `npm run render-figures` seals it. Nothing else to touch.
 
 **Honest scope — what the engine does and does NOT yet ship.** The engine provides
