@@ -120,6 +120,12 @@ Genuinely deferred — each already has an authoritative inline note; this only 
 - **Zenodo API auto-deposition** — automating the manual Zenodo release step via API token.
   See README.md (noted as a v2 ticket).
 
+- **Cite-completeness gate** (deferred; doctrine holds it for now). Per-card check: each cites-data
+  entry has non-empty who/what/src and src matches a DOI/arXiv pattern — a straightforward
+  JSON/regex checker. Cross-chapter check (harder, needs lineage machinery): a ref used in a
+  chapter has its full card in that chapter, no back-reference. Land only if review-enforced
+  doctrine shows drift. See the CITE label in CLAUDE.md.
+
 ## Surfaced in the reskin work (resume-context preserved)
 
 One thing found while proving the multi-edition reskin — not caused by it, pre-existing —

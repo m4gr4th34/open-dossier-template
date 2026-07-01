@@ -161,7 +161,12 @@ teenager read the expansion and continue without confusion?
 - `what`: TWO sentences, plain language — what that source actually
   showed, and why it matters to this paper. This is the anti-rabbit-hole:
   the reader never needs to leave the page to know why a citation exists.
-- `src`: journal, volume, page.
+- `src`: journal, volume, page, and a resolvable id (DOI or arXiv) — the permanent handle, not
+  just a description.
+Re-state every cite card fresh in each chapter the work appears in — full identity plus the
+plain-language summary, re-written to foreground what matters *here*. Never point back to an
+earlier chapter's card ("see Chapter N"): each chapter is sealed and read alone, so it must carry
+its own sources in full. (This is doctrine — see the CITE label in CLAUDE.md.)
 Keep the demo chip in the how-to box — it teaches the interaction in the
 reader's first ten seconds.
 

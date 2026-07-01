@@ -37,6 +37,9 @@ labeled one is not.**
   not re-derivation** — stated publicly in the acknowledgments. Surface
   anything that looks inconsistent rather than smoothing it over.
 - One falsely-labeled claim kills the format's credibility. Guard it.
+- **Every chapter is readable in full.** No load-bearing content — a citation, a claim, a
+  definition — back-references an earlier chapter ("see Chapter N"). A sealed, independently-DOI'd
+  chapter carries its own meaning, because a reader may land on it alone. Guard it.
 - **OPEN-CAVEATED** — a claim that is established, but only under an explicitly
   stated restriction. The gap is one of verification WORK, not truth: the
   result holds within its stated scope, and closing the caveat (extending the
@@ -91,7 +94,7 @@ labeled one is not.**
   only in a clearly-walled "reported anomalies" register, visibly separated from the
   physics. Its function is to inform which questions to ask; it gets no vote on any
   claim's verification status.
-  Boundaries: vs. CITE — CITE means a real, evidentiary source supports the claim.
+  Boundaries: vs. CITE — CITE means a real, evidentiary source supports the claim (see the CITE requirements below).
   This means the source explicitly does not meet that bar; the non-evidentiary
   provenance is the whole point. vs. OPEN-UNVERIFIED — OPEN-UNVERIFIED is the
   author's own asserted claim, merely unchecked. This is someone else's reported
@@ -105,6 +108,18 @@ labeled one is not.**
   non-scientific nature stated, and the mundane candidate (e.g. uncharacterized RF
   interference, or that no instrumented measurement exists to assess it) stated
   alongside with equal prominence.
+- **CITE** — a real, evidentiary source supports the claim, presented so the reader never needs to
+  leave the page or hunt another chapter to know what it is or what it showed.
+  Admissibility requirements (all mandatory): (1) full identity — authors, venue, year, and a
+  resolvable id (DOI or arXiv); (2) a one-to-two-sentence plain-language summary of what the work
+  actually showed and why it matters here; (3) both are re-stated fresh in every chapter the work
+  appears in — never "see Chapter N," never a back-reference. This is the citation-level application
+  of *every chapter is readable in full*: a sealed, independently-DOI'd chapter must carry the full
+  identity and meaning of its own sources, because a reader may land on it alone.
+  Boundaries: vs. REPORTED — CITE is evidentiary (primary or triangulated); REPORTED is an
+  interested-party claim, cited for provenance not proof. Worked example: a chapter reusing a source
+  from an earlier chapter re-writes that source's full cite card in place — same identity, a summary
+  foregrounding what matters *here* — rather than pointing back.
 - **FORECAST** (a claim TYPE, not a status) — a labeled author estimate
   (subjective probability/judgment) with stated reasoning and a mandatory dated,
   falsifiable signpost; it has no executable check, so its verifier IS the
