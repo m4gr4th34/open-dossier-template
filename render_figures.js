@@ -15,7 +15,7 @@
  * to the ceiling).
  *
  * Usage:
- *   node render_figures.js                 # defaults to figure-demo.html
+ *   node render_figures.js                 # defaults to orrery-demo.html
  *   node render_figures.js a.html b.html
  *   npm run render-figures
  *
@@ -165,7 +165,7 @@ function renderHtml(html) {
 
 function main() {
   var args = process.argv.slice(2);
-  var files = args.length ? args : ["figure-demo.html"];
+  var files = args.length ? args : ["orrery-demo.html"];
   var grandFig = 0, grandErr = 0, changed = 0;
 
   for (var n = 0; n < files.length; n++) {

@@ -194,7 +194,7 @@ into the `<figure>`) and a **sealed floor** (JS-off: a static `<svg>` baked into
 the figure). `render_figures.js` bakes the floor:
 
 ```sh
-node render_figures.js                 # defaults to figure-demo.html
+node render_figures.js                 # defaults to orrery-demo.html
 node render_figures.js a.html b.html
 npm run render-figures
 ```
