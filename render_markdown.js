@@ -206,10 +206,17 @@ function renderMarkdown() {
   }
 
   function renderFigure(html) {
-    const alt = (html.match(/<img[^>]*\balt="([^"]*)"/) || [])[1] || 'untitled';
+    // A living figure (data-figure) has no <img>; its descriptor is the sealed poster's aria-label.
+    // Its caption is the baked <figcaption class="lf-caption"> (single-sourced from spec.caption).
+    // Static image figures keep the <img alt> path. Both project the SAME *(figure: label — caption)*
+    // form, so a captioned living figure in an edition page stays content-equivalent under verify_projection.
+    const living = /\bdata-figure=/.test(html);
+    const label = living
+      ? ((html.match(/<svg[^>]*\baria-label="([^"]*)"/) || [])[1] || 'living figure')
+      : ((html.match(/<img[^>]*\balt="([^"]*)"/) || [])[1] || 'untitled');
     const cap = (html.match(/<figcaption[^>]*>([\s\S]*?)<\/figcaption>/) || [])[1] || '';
     const capMd = collapseWs(inlineToMd(cap));
-    return '*(figure: ' + decodeEntities(alt) + (capMd ? ' — ' + capMd : '') + ')*';
+    return '*(figure: ' + decodeEntities(label) + (capMd ? ' — ' + capMd : '') + ')*';
   }
 
   function renderBlock(blk) {

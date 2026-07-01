@@ -72,6 +72,15 @@ function decodeEntities(s) {
     .replace(/&#0*39;|&apos;/g, "'").replace(/&amp;/g, "&");
 }
 
+// Encode the predefined entities for baking a spec string into HTML (the inverse of
+// decodeEntities; the live overlay uses textContent, but the sealer builds strings, so
+// spec.caption must be escaped here). &amp; FIRST so it doesn't double-encode the others.
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 // The data-figure attribute value (as authored, still entity-encoded), or null.
 function getDataFigure(openTag) {
   var m = /\sdata-figure\s*=\s*("([^"]*)"|'([^']*)')/i.exec(openTag);
@@ -136,6 +145,26 @@ function renderHtml(html) {
       disp = posterFor(spec);
     } catch (e) { disp = { poster: "", live: false, error: "data-figure is not valid JSON" }; }
 
+    // Caption single-source: bake <figcaption class="lf-caption"> from spec.caption for ANY figure
+    // with a parseable spec (poster-sealed AND live-only alike), as the LAST child of the <figure>.
+    // The page, the JS-off floor, and the lightbox all render from this ONE field -- prose drift is
+    // unrepresentable. Escaped (the sealer builds strings). Idempotent: strip any prior baked caption
+    // before regenerating (discard-and-regen, mirroring the poster/tier-style strip). No caption ->
+    // bake nothing and strip any stale one.
+    var figcapRe = /\s*<figcaption\b[^>]*\blf-caption\b[\s\S]*?<\/figcaption>/i;
+    var capStr = (spec && typeof spec.caption === "string" && spec.caption) ? spec.caption : "";
+    var capFrag = capStr ? ('\n    <figcaption class="lf-caption">' + escHtml(capStr) + "</figcaption>") : "";
+    // Insert the caption BEFORE the figure's trailing indentation (the whitespace before </figure>),
+    // not after it. This is the idempotency fixpoint: on re-seal, figcapRe's leading \s* then removes
+    // exactly the caption's own "\n    " prefix (restBody ends non-whitespace), leaving rest unchanged.
+    // Appending after the trailing whitespace would let the greedy \s* swallow that indentation on the
+    // SECOND pass, so pass1 != pass2. No caption -> return rest untouched (uncaptioned figures unchanged).
+    function withCaption(rest) {
+      if (!capFrag) return rest;
+      var trail = (rest.match(/\s*$/) || [""])[0];
+      return rest.slice(0, rest.length - trail.length) + capFrag + trail;
+    }
+
     if (disp.poster) {
       // Mark the poster <svg> so the live runtime removes it before appending.
       var tagged = disp.poster.replace(/^<svg /, '<svg data-poster="1" ');
@@ -153,21 +182,26 @@ function renderHtml(html) {
         '.lf-svg .lf-tick{font-size:11px}' +
         '.lf-svg .lf-axis{font-size:13px}' +
         '.lf-svg .lf-callout{font-size:15px}' +
+        '.lf-caption{font:12.5px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#586a6f;margin:10px 14px 0;max-width:78ch;}' +
         '</style>';
-      // New inner = tier <style> + the sealed poster + the existing inner MINUS any prior poster AND
-      // any prior tier <style> (idempotent: regenerating discards both). The figure's OPEN TAG is
-      // preserved verbatim, so data-figure stays the source of truth.
+      // New inner = tier <style> + the sealed poster + the existing inner MINUS any prior poster,
+      // prior tier <style>, AND prior baked caption (idempotent), then the fresh caption LAST. The
+      // figure's OPEN TAG is preserved verbatim, so data-figure stays the source of truth.
       var inner = html.slice(gt + 1, close.start);
       var rest = inner
         .replace(/\s*<svg\b[^>]*\bdata-poster\b[\s\S]*?<\/svg>/i, "")
-        .replace(/\s*<style\b[^>]*\blf-tier-style\b[\s\S]*?<\/style>/i, "");
-      out += html.slice(i, lt) + openTag + "\n    " + tierStyle + "\n    " + tagged + rest + html.slice(close.start, close.end);
+        .replace(/\s*<style\b[^>]*\blf-tier-style\b[\s\S]*?<\/style>/i, "")
+        .replace(figcapRe, "");
+      out += html.slice(i, lt) + openTag + "\n    " + tierStyle + "\n    " + tagged + withCaption(rest) + html.slice(close.start, close.end);
       count++;
     } else if (disp.live) {
-      // type is declared but registers NO poster emitter -> a live-ceiling-only
-      // figure (localgroup / cosmicweb / observableuniverse, or any future live-only
-      // type). Intentional, NOT an error: copy the figure through UNCHANGED.
-      out += html.slice(i, close.end);
+      // type is declared but registers NO poster emitter -> a live-ceiling-only figure (localgroup /
+      // cosmicweb / observableuniverse, or any future live-only type). No poster/tier-style to bake,
+      // but the caption is single-sourced here too: strip any prior baked caption and re-append the
+      // fresh one (no caption -> byte-identical copy-through, so uncaptioned live figures are unchanged).
+      var innerL = html.slice(gt + 1, close.start);
+      var restL = innerL.replace(figcapRe, "");
+      out += html.slice(i, lt) + openTag + withCaption(restL) + html.slice(close.start, close.end);
     } else {
       // type ABSENT, bad JSON, or an emitter that returned empty -> FAIL LOUD.
       errors++;

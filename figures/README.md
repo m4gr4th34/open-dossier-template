@@ -57,9 +57,14 @@ so it reads as sitting on a stage, not marooned on a void. Omit it and both defa
 the dark field used by the astronomy figures — set it when your figure is light (e.g.
 a chart on a light card: `"stage":"#f3f6f5"`).
 
-`"caption": "…"` (optional) — plain text shown under the figure in the expanded view,
-so a reader never has to close the lightbox to read what the figure shows. Rendered as
-`textContent` (never HTML), in a mat-aware color. Keep it to the figure's caption.
+`"caption": "…"` (optional) — plain text, the figure's caption, rendered on **three
+surfaces from this one field**: (1) baked as `<figcaption class="lf-caption">` below
+the figure **in the page** at seal time (`render-figures`), so it is also the (2)
+**JS-off floor** caption; and (3) in the **lightbox** under the expanded figure. Below
+the figure is the convention everywhere. One field, three surfaces — the caption can't
+drift out of sync, because there is only one copy. Escaped when baked (the sealer builds
+strings); `textContent` in the lightbox. Author it in the spec — do **not** hand-write a
+prose caption next to the figure (that recreates the drift this removes).
 
 ### Spec schema — zoom-orrery (`renderOrrery`)
 

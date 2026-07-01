@@ -211,8 +211,11 @@ living figure only when the result has dynamics worth exploring.
 - If your figure sits on a **light background** (e.g. a chart on a light card), set the optional
   top-level `"stage":"#rrggbb"` to that card color: in the lightbox the runtime paints it onto the
   figure's own background and derives a luminance-separated mat from it (omit it and both default to
-  the dark astronomy field). Add an optional `"caption":"…"` (plain text) to show the figure's caption
-  under it in the expanded view, so a reader never closes the lightbox to read what the figure shows.
+  the dark astronomy field). Add an optional `"caption":"…"` (plain text) for the figure's caption:
+  the sealer bakes it as a `<figcaption>` below the figure (page + JS-off floor), and the lightbox
+  shows the same text under the expanded figure — one field, three surfaces. **Author the caption IN
+  THE SPEC; do not hand-write a prose caption next to the figure** — that recreates the drift this
+  single-sourcing removes.
 - After writing or editing any `data-figure`, run `npm run render-figures` (or
   `node render_figures.js <page.html>`). It auto-loads the runtime + every figure
   module and **dispatches by `type`** through the poster registry, baking a
