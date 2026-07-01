@@ -46,15 +46,20 @@ The renderer **reads** the attribute, renders **into** the element, and **leaves
 `render_figures.js` (mirroring `render_math.js`), bakes committed static SVG into
 the element so readers need no JavaScript — see **Sealing the floor** below.
 
-### Optional top-level field — `"stage"` (lightbox backdrop)
+### Optional top-level fields — `"stage"` and `"caption"` (lightbox presentation)
 
 `"stage": "#rrggbb"` (optional) — the figure's backdrop color for the full-screen
-lightbox. The overlay derives a luminance-separated mat from it (a light figure gets
-a light mat, a dark figure a dark one) so the figure reads as sitting on a stage, not
-marooned on a void. Omit it and the mat defaults to the dark field used by the
-astronomy figures — set it when your figure is light (e.g. a chart on a light card:
-`"stage":"#f3f6f5"`). The figure's own visible field is host CSS the runtime can't
-sample, which is why the color is declared here rather than detected.
+lightbox. In the expanded view the runtime **paints this onto the figure's own
+`.lf-svg` background** (the figure carries its field into the overlay, instead of
+relying on host CSS the runtime can't sample) AND derives a luminance-separated mat
+from it for the backdrop — a light figure gets a light mat, a dark figure a dark one,
+so it reads as sitting on a stage, not marooned on a void. Omit it and both default to
+the dark field used by the astronomy figures — set it when your figure is light (e.g.
+a chart on a light card: `"stage":"#f3f6f5"`).
+
+`"caption": "…"` (optional) — plain text shown under the figure in the expanded view,
+so a reader never has to close the lightbox to read what the figure shows. Rendered as
+`textContent` (never HTML), in a mat-aware color. Keep it to the figure's caption.
 
 ### Spec schema — zoom-orrery (`renderOrrery`)
 

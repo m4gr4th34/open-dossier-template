@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.9.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating); 0.8.0: registerRenderer is the sole lightbox dispatch contract — drop the initialism-fragile render<Cap(type)> fallback, warn (not silently skip) on an unregistered figure type, document registerRenderer as a required adoption step; 0.9.0: adaptive lightbox mat (figure declares data-figure.stage; overlay derives a luminance-separated backdrop, dark-default so astronomy is unchanged) + reserved-header expand trigger (docked in a reserved top band, never over figure content)
+  var FIGURES_RUNTIME_VERSION = "0.10.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating); 0.8.0: registerRenderer is the sole lightbox dispatch contract — drop the initialism-fragile render<Cap(type)> fallback, warn (not silently skip) on an unregistered figure type, document registerRenderer as a required adoption step; 0.9.0: adaptive lightbox mat (figure declares data-figure.stage; overlay derives a luminance-separated backdrop, dark-default so astronomy is unchanged) + reserved-header expand trigger (docked in a reserved top band, never over figure content); 0.10.0: presentation mount — the overlay shows the figure AS PUBLISHED: spec.stage now paints the mounted figure's own background (mat derived from it), optional spec.caption renders under the figure, mat-aware Close chip; chip band gets a containment floor (embed-safe); the three live-only demos declare their type
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -364,6 +364,8 @@
       }
       return "#" + hex2(r) + hex2(g) + hex2(b);
     }
+    // Is a resolved mat/color light? (drives the mat-aware Close chip + caption color in the overlay.)
+    function isLightHex(hex) { var c = parseHex(hex); return !!c && luminance(c) >= 0.5; }
 
     function injectStyle() {
       if (doc.getElementById(STYLE_ID)) return;
@@ -399,6 +401,10 @@
         "#" + OVERLAY_ID + " .lf-lightbox-close{position:absolute;top:16px;right:20px;" +
           "font:600 13px/1 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.35);" +
           "border:1.5px solid rgba(255,255,255,.5);border-radius:8px;padding:8px 12px;cursor:pointer;}" +
+        // Caption travels with the figure (spec.caption). Color is set inline at open time (mat-aware);
+        // font/spacing only here. Lives in the stage, under the mounted figure.
+        "#lf-lightbox .lf-lightbox-caption{font:12.5px/1.5 ui-monospace,Menlo,Consolas,monospace;" +
+          "margin:10px 4px 0;max-width:78ch;}" +
         ".lf-expand{position:absolute;top:8px;right:14px;z-index:6;" +
           "font:600 11px/1 ui-monospace,Menlo,monospace;color:#fff;" +
           "background:rgba(15,20,24,.92);border:1px solid rgba(255,255,255,.75);" +
@@ -409,7 +415,23 @@
       (doc.head || doc.documentElement).appendChild(st);
     }
 
-    var overlay, stageWrap, closeBtn, lastFocus = null, mounted = null;
+    var overlay, stageWrap, closeBtn, lastFocus = null, mounted = null, caption = null;
+
+    // Mat-aware Close chip: the one dark-assuming control. Light mat -> ink-on-white; dark mat ->
+    // clear the inline overrides so the injected CSS dark default shows through. Clearing (not
+    // re-setting) means repeated opens with different stages never leak styles.
+    function setCloseTheme(light) {
+      if (!closeBtn) return;
+      if (light) {
+        closeBtn.style.color = "#17262c";
+        closeBtn.style.background = "rgba(255,255,255,.9)";
+        closeBtn.style.border = "1px solid rgba(23,38,44,.35)";
+      } else {
+        closeBtn.style.color = "";
+        closeBtn.style.background = "";
+        closeBtn.style.border = "";
+      }
+    }
 
     function buildOverlay() {
       if (overlay) return;
@@ -439,16 +461,36 @@
     function openSpec(spec) {
       var fn = renderFnFor(spec); if (!fn) return;
       buildOverlay();
-      // Adaptive mat: derive the backdrop from the figure's declared stage. No stage -> today's dark
-      // (#0d1117), so every astronomy figure is byte-unchanged. The CSS default on #lf-lightbox stays
-      // as the pre-spec fallback; this inline set wins for an opened figure.
+      // Presentation mount: show the figure AS PUBLISHED. spec.stage is the figure's declared backdrop;
+      // the overlay mat is DERIVED from it (0.9.0), and the figure now paints its OWN field with it too
+      // (below, after mount). No stage -> DEFAULT_MAT dark, so every astronomy figure is byte-unchanged.
       var stage = spec && typeof spec.stage === "string" ? spec.stage : null;
-      overlay.style.background = stage ? deriveMat(stage) : DEFAULT_MAT;
+      var mat = stage ? deriveMat(stage) : DEFAULT_MAT;
+      var lightMat = isLightHex(mat);
+      overlay.style.background = mat;
+      setCloseTheme(lightMat);            // mat-aware Close chip; dark mat clears back to the CSS default
       lastFocus = doc.activeElement;
       // fresh container each open; controls stay ON (it's the live, interactive copy)
       mounted = doc.createElement("div");
       stageWrap.appendChild(mounted);
       try { fn(mounted, spec); } catch (e) { close(); return; }
+      // The figure carries its own field into the overlay: paint the declared stage onto the mounted
+      // .lf-svg layer(s) inline (querySelectorAll -- the cosmic composer mounts several stacked layers).
+      // Inline beats the host's .lf-svg gradient; no module code sets an .lf-svg background to fight it.
+      // No stage -> untouched, so the figure keeps whatever the host CSS gives it (today's behavior).
+      if (stage) {
+        var svgs = mounted.querySelectorAll("svg.lf-svg");
+        for (var i = 0; i < svgs.length; i++) svgs[i].style.background = stage;
+      }
+      // Optional caption travels with the figure -- rendered under it so a reader never closes the
+      // lightbox to read what the figure shows. textContent (never innerHTML); color is mat-aware.
+      if (spec && typeof spec.caption === "string" && spec.caption) {
+        caption = doc.createElement("p");
+        caption.className = "lf-lightbox-caption";
+        caption.textContent = spec.caption;
+        caption.style.color = lightMat ? "#17262c" : "#c9d4d2";
+        stageWrap.appendChild(caption);
+      }
       overlay.classList.add("open");
       overlay.setAttribute("aria-hidden", "false");
       closeBtn.focus();
@@ -473,6 +515,9 @@
       overlay.setAttribute("aria-hidden", "true");
       if (mounted && mounted.parentNode) mounted.parentNode.removeChild(mounted);  // discard the live copy
       mounted = null;
+      if (caption && caption.parentNode) caption.parentNode.removeChild(caption);  // discard the caption
+      caption = null;
+      setCloseTheme(false);                                                         // reset chip to dark default
       doc.removeEventListener("keydown", onKey, true);
       if (lastFocus && lastFocus.focus) lastFocus.focus();
     }
@@ -506,11 +551,14 @@
       if (getComputedStyle(host).position === "static") host.style.position = "relative";
       // Reserve a header band for the trigger so the chip never sits over figure content. A tappable
       // chip can't fit the host's top padding without straddling the card or covering the canvas, so
-      // ADD ~20px to whatever padding-top the host already has (additive -> any host padding composes).
+      // ADD ~20px to whatever padding-top the host already has (additive -> any host padding composes),
+      // with a FLOOR of 34px: embed mode (?embed=1) strips host padding to 0, where pt+20=20 left a
+      // 20px band under a 25px chip (chip spans 33px) -> 13px canvas overlap on every showcase card.
+      // max(pt+20, 34) contains the chip in embed; standalone (14+20=34) is unchanged.
       // Only wired hosts (a dispatchable spec) are touched; type-less/unwired figures keep their layout.
       var cs = root.getComputedStyle(host);
       var pt = parseFloat(cs.paddingTop) || 0;
-      host.style.paddingTop = (pt + 20) + "px";
+      host.style.paddingTop = Math.max(pt + 20, 34) + "px";
       var btn = doc.createElement("button");
       btn.className = "lf-expand";
       btn.type = "button";
