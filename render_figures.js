@@ -139,12 +139,29 @@ function renderHtml(html) {
     if (disp.poster) {
       // Mark the poster <svg> so the live runtime removes it before appending.
       var tagged = disp.poster.replace(/^<svg /, '<svg data-poster="1" ');
-      // New inner = the sealed poster + the existing inner MINUS any prior poster
-      // (idempotent: regenerating discards the old <svg data-poster>). The figure's
-      // OPEN TAG is preserved verbatim, so data-figure stays the source of truth.
+      // The JS-OFF floor needs a static size source: the tier sizing (.lf-tick/.lf-axis/.lf-callout)
+      // is otherwise INJECTED by the runtime and so exists only when JS runs. Bake a static tier
+      // stylesheet as a SIBLING of the poster (NOT inside it -- the live renderer removes [data-poster]
+      // but leaves this <style>, so it persists into the JS-on path). WITHOUT the counter-scale calc:
+      // the floor renders at true tier sizes (11/13/15). Specificity is engineered so the runtime's
+      // injected rule wins when JS is on: the injected `.lf-svg text:not(.lf-scale-with-art)` scores
+      // (0,2,1); the baked tier selectors are class-only `.lf-svg .lf-tick` -> (0,2,0), a notch below,
+      // so injected's counter-scaled calc overrides live; JS-off, the tier (0,2,0) still beats the
+      // baked default `.lf-svg text` (0,1,1). Idempotent: strip any prior lf-tier <style> (like the poster).
+      var tierStyle = '<style class="lf-tier-style">' +
+        '.lf-svg text{font-size:13px}' +
+        '.lf-svg .lf-tick{font-size:11px}' +
+        '.lf-svg .lf-axis{font-size:13px}' +
+        '.lf-svg .lf-callout{font-size:15px}' +
+        '</style>';
+      // New inner = tier <style> + the sealed poster + the existing inner MINUS any prior poster AND
+      // any prior tier <style> (idempotent: regenerating discards both). The figure's OPEN TAG is
+      // preserved verbatim, so data-figure stays the source of truth.
       var inner = html.slice(gt + 1, close.start);
-      var rest = inner.replace(/\s*<svg\b[^>]*\bdata-poster\b[\s\S]*?<\/svg>/i, "");
-      out += html.slice(i, lt) + openTag + "\n    " + tagged + rest + html.slice(close.start, close.end);
+      var rest = inner
+        .replace(/\s*<svg\b[^>]*\bdata-poster\b[\s\S]*?<\/svg>/i, "")
+        .replace(/\s*<style\b[^>]*\blf-tier-style\b[\s\S]*?<\/style>/i, "");
+      out += html.slice(i, lt) + openTag + "\n    " + tierStyle + "\n    " + tagged + rest + html.slice(close.start, close.end);
       count++;
     } else if (disp.live) {
       // type is declared but registers NO poster emitter -> a live-ceiling-only

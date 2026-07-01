@@ -326,7 +326,7 @@
       var path = el("path", { "class": "lf-orbit", fill: "none", stroke: b.color || "#9aa", "stroke-opacity": 0.32, "stroke-width": 1 });
       gOrbits.appendChild(path);
       var dot = el("circle", { r: num(b.r, 3), fill: b.color || "#ddd", "class": "lf-planet" });
-      var label = el("text", { "class": "lf-label", "font-size": 10, fill: "var(--lf-label, #5a6b70)", dx: num(b.r, 3) + 3, dy: 3 });
+      var label = el("text", { "class": "lf-label lf-axis", fill: "var(--lf-label, #5a6b70)", dx: num(b.r, 3) + 3, dy: 3 });
       label.appendChild(doc.createTextNode(b.name || ""));
       gBodies.appendChild(dot);
       gBodies.appendChild(label);
@@ -548,7 +548,7 @@
     s += '<g class="lf-bodies">';
     f.planets.forEach(function (p) {
       s += '<circle class="lf-planet" cx="' + r2(p.cx) + '" cy="' + r2(p.cy) + '" r="' + r2(p.r) + '" fill="' + escAttr(p.color) + '"></circle>';
-      s += '<text class="lf-label" font-size="10" fill="var(--lf-label, #5a6b70)" dx="' + r2(p.r + 3) + '" dy="3" x="' + r2(p.cx) + '" y="' + r2(p.cy) + '">' + escTxt(p.name) + '</text>';
+      s += '<text class="lf-label lf-axis" fill="var(--lf-label, #5a6b70)" dx="' + r2(p.r + 3) + '" dy="3" x="' + r2(p.cx) + '" y="' + r2(p.cy) + '">' + escTxt(p.name) + '</text>';
     });
     s += '<circle r="16" fill="url(#lf-sun-glow)" cx="' + r2(f.sun.cx) + '" cy="' + r2(f.sun.cy) + '"></circle>';
     s += '<circle r="5" fill="#ffd98a" cx="' + r2(f.sun.cx) + '" cy="' + r2(f.sun.cy) + '"></circle>';

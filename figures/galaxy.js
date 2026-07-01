@@ -205,7 +205,7 @@
     s += '<g class="lf-youarehere">';
     s += '<circle r="9" fill="none" stroke="#ff7a59" stroke-width="1.4" stroke-opacity="0.9" cx="' + r2(f.marker.x) + '" cy="' + r2(f.marker.y) + '"></circle>';
     s += '<circle r="2.2" fill="#ffd2c4" cx="' + r2(f.marker.x) + '" cy="' + r2(f.marker.y) + '"></circle>';
-    s += '<text class="lf-label" font-size="11" fill="#ffb9a6" dx="13" dy="4" x="' + r2(f.marker.x) + '" y="' + r2(f.marker.y) + '">' + escTxt(f.marker.label) + '</text>';
+    s += '<text class="lf-label lf-callout" fill="#ffb9a6" dx="13" dy="4" x="' + r2(f.marker.x) + '" y="' + r2(f.marker.y) + '">' + escTxt(f.marker.label) + '</text>';
     s += '</g></svg>';
     return s;
   }
@@ -308,7 +308,7 @@
     var sunBase = [sunR * Math.cos(sunTh), sunR * Math.sin(sunTh)];
     var markRing = el("circle", { r: 9, fill: "none", stroke: "#ff7a59", "stroke-width": 1.4, "stroke-opacity": 0.9 });
     var markDot  = el("circle", { r: 2.2, fill: "#ffd2c4" });
-    var markLbl  = el("text", { "class": "lf-label", "font-size": 11, fill: "#ffb9a6", dx: 13, dy: 4 });
+    var markLbl  = el("text", { "class": "lf-label lf-callout", fill: "#ffb9a6", dx: 13, dy: 4 });
     markLbl.appendChild(doc.createTextNode(sun.label || "You are here"));
     gMark.appendChild(markRing); gMark.appendChild(markDot); gMark.appendChild(markLbl);
 

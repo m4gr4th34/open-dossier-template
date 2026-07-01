@@ -101,5 +101,35 @@ check("ease(0.5) ≈ 0.5", approx(F.ease(0.5), 0.5, 1e-9));
 // --- el() — DOM-only, skipped -------------------------------------------------
 console.log("\nel(tag, attrs): SKIPPED (DOM-only; covered when wired into a page)");
 
+// --- 6) fail-closed gate: NO raw font-size in the six figure modules ----------
+// Modules must size text via tier CLASSES (lf-tick / lf-axis / lf-callout), never
+// an inline font-size -- the tier sizing is the single source (injected live by
+// figures.js, baked static into the poster floor by render_figures.js). This gate
+// makes raw font-size UNREPRESENTABLE: a new module carrying "font-size": or
+// font-size=" fails loud (file + line). figures.js is DELIBERATELY excluded -- it
+// owns the injected tier CSS and a code comment that would false-positive. Both
+// emit syntaxes are scanned: the live el() attr key ("font-size":) and the
+// poster-string SVG attribute (font-size=").
+console.log("\nno raw font-size in modules (tier-class gate):");
+(function () {
+  var fs = require("fs"), path = require("path");
+  var mods = ["orrery", "galaxy", "cosmiczoom", "localgroup", "cosmicweb", "observableuniverse"];
+  var re = /"font-size"\s*:|font-size="/;
+  var hits = [];
+  mods.forEach(function (m) {
+    var lines = fs.readFileSync(path.join(__dirname, m + ".js"), "utf8").split("\n");
+    for (var i = 0; i < lines.length; i++) {
+      if (re.test(lines[i])) hits.push(m + ".js:" + (i + 1) + "  " + lines[i].trim().slice(0, 80));
+    }
+  });
+  if (hits.length) {
+    console.log("  FAIL  raw font-size in a module -- use a tier class (lf-tick/lf-axis/lf-callout):");
+    hits.forEach(function (h) { console.log("        " + h); });
+    fails += hits.length;
+  } else {
+    check("zero raw font-size across the six modules (both emit paths)", true);
+  }
+})();
+
 console.log("\n" + (fails ? fails + " FAILURE(S)" : "all primitives passed") + ".");
 process.exit(fails ? 1 : 0);

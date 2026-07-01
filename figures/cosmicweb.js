@@ -269,7 +269,7 @@
       var big = c.kind === "supercluster" || c.kind === "attractor";
       var g = el("g", {});
       var dot = el("circle", { r: big ? 4.2 : 3, fill: big ? "#e7d6ff" : "#cdd8ff", "fill-opacity": 0.95 });
-      var lbl = el("text", { "class": "lf-label", "font-size": big ? 11 : 9.5, fill: "#cdb8ff",
+      var lbl = el("text", { "class": "lf-label lf-axis", fill: "#cdb8ff",
         dx: big ? 9 : 6, dy: 3.5 });
       lbl.appendChild(doc.createTextNode((c.name || "cluster") + " · " + num(c.mly, 0) + " Mly"));
       g.appendChild(dot); g.appendChild(lbl);
@@ -283,7 +283,7 @@
     var markGlow = el("circle", { r: 20, fill: "url(#lf-cw-glow)" }); gFil.appendChild(markGlow);
     var markRing = el("circle", { r: 9, fill: "none", stroke: "#ff7a59", "stroke-width": 1.4, "stroke-opacity": 0.9 });
     var markDot  = el("circle", { r: 3, fill: "#ffd2c4" });
-    var markLbl  = el("text", { "class": "lf-label", "font-size": 11, fill: "#ffb9a6", dx: 13, dy: 4 });
+    var markLbl  = el("text", { "class": "lf-label lf-callout", fill: "#ffb9a6", dx: 13, dy: 4 });
     markLbl.appendChild(doc.createTextNode(lg.label || "Local Group — you are here"));
     gMark.appendChild(markRing); gMark.appendChild(markDot); gMark.appendChild(markLbl);
 

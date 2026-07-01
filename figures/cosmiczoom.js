@@ -255,7 +255,7 @@
     var voidNodes = catalog.map(function (st, i) {
       var g = el("g", {});
       var dot = el("circle", { r: 2.6, fill: "#ffe6b0", "fill-opacity": 0.95 });
-      var lbl = el("text", { "class": "lf-label", "font-size": 10.5, fill: "#cfe0ff", dx: 7, dy: 3.5 });
+      var lbl = el("text", { "class": "lf-label lf-tick", fill: "#cfe0ff", dx: 7, dy: 3.5 });
       lbl.appendChild(doc.createTextNode((st.name || "star") + " · " + num(st.ly, 5) + " ly"));
       g.appendChild(dot); g.appendChild(lbl);
       voidSvg.appendChild(g);

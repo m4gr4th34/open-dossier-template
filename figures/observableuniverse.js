@@ -205,7 +205,7 @@
     // --- the observable-horizon ring (the CMB / last-scattering surface) --
     var cmbHaze = el("circle", { fill: "url(#lf-cmb)" });
     var horizonRing = el("circle", { fill: "none", stroke: "#d2966a", "stroke-width": 1.2, "stroke-opacity": 0.55 });
-    var horizonLbl = el("text", { "class": "lf-label", "font-size": 10.5, fill: "#e0b896",
+    var horizonLbl = el("text", { "class": "lf-label lf-tick", fill: "#e0b896",
       "text-anchor": "middle" });
     horizonLbl.appendChild(doc.createTextNode(hz.label || DEFAULT_HORIZON_LABEL));
     gHorizon.appendChild(cmbHaze); gHorizon.appendChild(horizonRing); gHorizon.appendChild(horizonLbl);
@@ -213,12 +213,21 @@
     // --- "you are here" — centred, NO focus pull (isotropy; we are the observer) --
     var markRing = el("circle", { r: 7, fill: "none", stroke: "#ff7a59", "stroke-width": 1.3, "stroke-opacity": 0.9, cx: cx, cy: cy });
     var markDot  = el("circle", { r: 2.6, fill: "#ffd2c4", cx: cx, cy: cy });
-    var markLbl  = el("text", { "class": "lf-label", "font-size": 10.5, fill: "#ffb9a6", dx: 11, dy: 3.5, x: cx, y: cy });
-    markLbl.appendChild(doc.createTextNode(hz.markerLabel || DEFAULT_MARKER_LABEL));
+    // Split the fused marker on " · ": the identity ("you are here") is the callout; the
+    // isotropy note ("the view is the same in every direction") drops to its own tick line
+    // below, so the long note no longer rides the callout size and clip the right edge.
+    var markerParts = (hz.markerLabel || DEFAULT_MARKER_LABEL).split(" · ");
+    var markLbl  = el("text", { "class": "lf-label lf-callout", fill: "#ffb9a6", dx: 11, dy: 3.5, x: cx, y: cy });
+    markLbl.appendChild(doc.createTextNode(markerParts[0]));
     gMark.appendChild(markRing); gMark.appendChild(markDot); gMark.appendChild(markLbl);
+    if (markerParts.length > 1) {
+      var markSub = el("text", { "class": "lf-label lf-tick", fill: "#ffb9a6", "fill-opacity": 0.85, dx: 11, dy: 19, x: cx, y: cy });
+      markSub.appendChild(doc.createTextNode(markerParts.slice(1).join(" · ")));
+      gMark.appendChild(markSub);
+    }
 
     // --- the honest note (always visible — the thesis of the ending) ------
-    var noteTxt = el("text", { "class": "lf-label", "font-size": 9.5, fill: "#8fa0bf", x: 14, y: H - 14 });
+    var noteTxt = el("text", { "class": "lf-label lf-tick", fill: "#8fa0bf", x: 18, y: H - 18 });
     noteTxt.appendChild(doc.createTextNode(hz.note || DEFAULT_HORIZON_NOTE));
     gNote.appendChild(noteTxt);
 

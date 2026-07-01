@@ -217,7 +217,7 @@
       var spiral = m.kind === "spiral";
       var g = el("g", {});
       var dot = el("circle", { r: spiral ? 4.5 : 2.4, fill: spiral ? "#cdd8ff" : "#9aa7c0", "fill-opacity": 0.95 });
-      var lbl = el("text", { "class": "lf-label", "font-size": spiral ? 11 : 9.5, fill: "#bcd0ff",
+      var lbl = el("text", { "class": "lf-label lf-axis", fill: "#bcd0ff",
         dx: spiral ? 9 : 6, dy: 3.5 });
       lbl.appendChild(doc.createTextNode((m.name || "galaxy") + " · " + num(m.mly, 0) + " Mly"));
       g.appendChild(dot); g.appendChild(lbl);
@@ -231,7 +231,7 @@
     var markGlow = el("circle", { r: 22, fill: "url(#lf-lg-glow)" }); gGlow.appendChild(markGlow);
     var markRing = el("circle", { r: 9, fill: "none", stroke: "#ff7a59", "stroke-width": 1.4, "stroke-opacity": 0.9 });
     var markDot  = el("circle", { r: 3, fill: "#ffd2c4" });
-    var markLbl  = el("text", { "class": "lf-label", "font-size": 11, fill: "#ffb9a6", dx: 13, dy: 4 });
+    var markLbl  = el("text", { "class": "lf-label lf-callout", fill: "#ffb9a6", dx: 13, dy: 4 });
     markLbl.appendChild(doc.createTextNode(mw.label || "Milky Way — you are here"));
     gMark.appendChild(markRing); gMark.appendChild(markDot); gMark.appendChild(markLbl);
 
