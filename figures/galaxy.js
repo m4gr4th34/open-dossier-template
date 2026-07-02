@@ -475,10 +475,10 @@
     // --- animation loop --------------------------------------------------
     // RIGID slow spin (one galaxyAngle applied to all layers in projection),
     // scale-coupled via scaleAwareTime so the spin reads at every zoom. Star
-    // positions re-cull on viewDirty (interaction) and on a slow throttle while
-    // playing (the galaxy turns slowly, so ~15 Hz re-cull looks continuous and
-    // keeps per-frame DOM writes bounded).
-    var SPIN = 0.018, ROT_MS = 66;
+    // positions re-cull on viewDirty (interaction) and on a throttle while playing
+    // (30 Hz re-cull — measured 2.5ms/batch at default density, the heaviest module;
+    // the other per-node modules run at frame rate, keeping per-frame DOM writes bounded).
+    var SPIN = 0.018, ROT_MS = 33;   // recompute cadence: 30Hz — galaxy's recompute is the heaviest (~2.5ms writes over ~6k nodes + a ~9000-star cull), so it stays at 30Hz while the lighter modules run every frame (0.11.1)
     var perf = (root.performance && root.performance.now) ? root.performance : Date;
     var last = perf.now(), lastRecomp = 0;
     var lfVisible = true, lfRunning = false;   // visibility gate: off-screen -> stop the rAF loop (real CPU savings)

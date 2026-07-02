@@ -461,7 +461,7 @@
     // A very slow RIGID drift (the web barely evolves on human timescales) —
     // scale-coupled via scaleAwareTime so it reads at every zoom. Re-cull on
     // viewDirty (interaction) and on a slow throttle while playing.
-    var SPIN = 0.010, ROT_MS = 66;
+    var SPIN = 0.010, ROT_MS = 16;   // recompute cadence: every frame (60Hz) — foam recompute is ~0.9ms/batch, well under budget; 66ms caused visible 15Hz stepping (0.11.1)
     var perf = (root.performance && root.performance.now) ? root.performance : Date;
     var last = perf.now(), lastRecomp = 0;
     var lfVisible = true, lfRunning = false;   // visibility gate: off-screen -> stop the rAF loop (real CPU savings)

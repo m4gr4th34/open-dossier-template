@@ -351,7 +351,7 @@
     // --- animation loop --------------------------------------------------
     // The universe is not spinning; the drift is near-zero (isotropy means there is
     // nothing to track turning). Re-cull on viewDirty + a slow throttle while playing.
-    var SPIN = 0.006, ROT_MS = 80;
+    var SPIN = 0.006, ROT_MS = 16;   // recompute cadence: every frame (60Hz) — field recompute is ~1.0ms/batch; 80ms caused visible ~12Hz stepping (0.11.1)
     var perf = (root.performance && root.performance.now) ? root.performance : Date;
     var last = perf.now(), lastRecomp = 0;
     var lfVisible = true, lfRunning = false;   // visibility gate: off-screen -> stop the rAF loop (real CPU savings)
