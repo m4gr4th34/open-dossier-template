@@ -248,6 +248,40 @@ living figure only when the result has dynamics worth exploring.
   the `USER/REPO` placeholders is the ordinary fork story — see the README "Use this
   template" steps and DEPLOY.md; there is nothing figure-specific to redo.
 
+**Writing an animated module.** The astronomy modules settled these conventions the hard
+way — measured in a real browser, fixed at the mechanism. Follow them and your figure
+inherits the whole interaction stack (lightbox, handoff, Reset, reduced-motion) for free.
+
+1. **The loop.** One `requestAnimationFrame` loop that re-schedules itself; advance state
+   only while your `playing` flag is set. Never advance by wall-clock assumption — use the
+   rAF timestamp delta (`dt = (now - last) / 1000`, clamped).
+2. **Visibility gate.** Attach an `IntersectionObserver(fn, { root: null })` to your figure
+   and stop re-scheduling the loop when it goes off-screen; resume from the frozen state on
+   re-entry (`lfVisible` / `lfResume` in any spin module). Off-screen figures burning frames
+   is the #1 cause of a janky page — and `root: null` fires on parent-scroll even inside an
+   iframe.
+3. **Reduced motion.** Consult `DossierFigures.prefersReducedMotion()` at your `playing`
+   init and start paused when the reader's OS asks for it; their Play press is the explicit
+   override.
+4. **Cadence — measure before you throttle.** The instinct to throttle expensive per-frame
+   work "to be safe" is how you ship invisible jerkiness: a 66ms recompute throttle reads as
+   prudent and renders as 15Hz stepping inside a 60Hz page — most visible on straight lines
+   and slow rotations. Time your actual write batch first (`performance.now()` around one
+   full recompute at default density). The measured costs here: 79 nodes = 0.2ms, 1400 =
+   0.9ms, 2600 = 1.0ms, 6000 nodes + a 9000-element cull = 2.5ms — against a 16.7ms frame
+   budget. Rule of thumb: a batch under ~2ms runs at frame rate; heavier drops to 30Hz **with
+   the measured number in a comment** (see `ROT_MS` in `galaxy.js`). Keep the throttle as a
+   knob; set its value on evidence. If your figure feels stepped, question the cadence before
+   the hardware.
+5. **The handle.** Return `{getState, setSlider}` (or `setMaster` for a composed figure) and
+   stash it: `container.__lfHandle = handle`. That one line buys state-handoff (expand
+   continues from the reader's current zoom) and Reset (re-derive the published start from the
+   spec).
+6. **Seam safety.** Posters and any composition seams must depend on slider position + spec
+   only — never on animation time (`t` / `angle`). Pausing, gating, and cadence changes must
+   leave sealed bytes untouched: `node render_figures.js <page>` reporting **0 rewritten** is
+   your proof.
+
 **Honest labels inline.** Any OPEN-UNVERIFIED claim gets an `.openclaim`
 amber box AT THE EXACT POINT the claim is made — naming its ledger id and
 posting it as an open challenge with named credit for whoever closes it.
