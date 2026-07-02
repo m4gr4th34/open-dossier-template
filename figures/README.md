@@ -317,7 +317,9 @@ add its own figure type **without forking the template machinery** (no edit to
 4. **Declare the type:** add `"type":"your-type"` as a top-level key in the figure's
    `data-figure` spec.
 5. **Drop the module in `figures/`.** The sealer auto-loads it and dispatches by
-   `type`; `npm run render-figures` seals it. Nothing else to touch.
+   `type`; `npm run render-figures` seals it. Nothing else to touch — and the font-size
+   gate in `figures.test.js` scans every module in `figures/` automatically, so your
+   module is guarded the moment it exists: use tier classes, never raw font-size.
 
 **Honest scope — what the engine does and does NOT yet ship.** The engine provides
 the *sealing architecture* (floor/source/ceiling, the registry, the byte-stable

@@ -101,33 +101,39 @@ check("ease(0.5) ≈ 0.5", approx(F.ease(0.5), 0.5, 1e-9));
 // --- el() — DOM-only, skipped -------------------------------------------------
 console.log("\nel(tag, attrs): SKIPPED (DOM-only; covered when wired into a page)");
 
-// --- 6) fail-closed gate: NO raw font-size in the six figure modules ----------
+// --- 6) fail-closed gate: NO raw font-size in ANY figure module ---------------
 // Modules must size text via tier CLASSES (lf-tick / lf-axis / lf-callout), never
 // an inline font-size -- the tier sizing is the single source (injected live by
 // figures.js, baked static into the poster floor by render_figures.js). This gate
-// makes raw font-size UNREPRESENTABLE: a new module carrying "font-size": or
-// font-size=" fails loud (file + line). figures.js is DELIBERATELY excluded -- it
-// owns the injected tier CSS and a code comment that would false-positive. Both
-// emit syntaxes are scanned: the live el() attr key ("font-size":) and the
-// poster-string SVG attribute (font-size=").
+// makes raw font-size UNREPRESENTABLE: any module carrying "font-size": or
+// font-size=" fails loud (file + line). It SCANS the figures/ directory rather than
+// a hardcoded module list, so an adopter's gate guards exactly the modules that exist
+// in their repo -- additions auto-covered, deletions self-heal, nothing to retarget on
+// sync (same philosophy as the registerPoster/registerRenderer registries). Only
+// figures.js (owns legitimate injected-CSS font-size + a comment that would
+// false-positive) and this test file are excluded. Both emit syntaxes are scanned:
+// the live el() attr key ("font-size":) and the poster-string SVG attribute (font-size=").
 console.log("\nno raw font-size in modules (tier-class gate):");
 (function () {
   var fs = require("fs"), path = require("path");
-  var mods = ["orrery", "galaxy", "cosmiczoom", "localgroup", "cosmicweb", "observableuniverse"];
+  var mods = fs.readdirSync(__dirname).filter(function (f) {
+    return /\.js$/.test(f) && f !== "figures.js" && f !== "figures.test.js";
+  }).sort();
   var re = /"font-size"\s*:|font-size="/;
   var hits = [];
-  mods.forEach(function (m) {
-    var lines = fs.readFileSync(path.join(__dirname, m + ".js"), "utf8").split("\n");
+  mods.forEach(function (f) {
+    var lines = fs.readFileSync(path.join(__dirname, f), "utf8").split("\n");
     for (var i = 0; i < lines.length; i++) {
-      if (re.test(lines[i])) hits.push(m + ".js:" + (i + 1) + "  " + lines[i].trim().slice(0, 80));
+      if (re.test(lines[i])) hits.push(f + ":" + (i + 1) + "  " + lines[i].trim().slice(0, 80));
     }
   });
+  console.log("  scanned " + mods.length + " module(s): " + mods.join(", "));
   if (hits.length) {
     console.log("  FAIL  raw font-size in a module -- use a tier class (lf-tick/lf-axis/lf-callout):");
     hits.forEach(function (h) { console.log("        " + h); });
     fails += hits.length;
   } else {
-    check("zero raw font-size across the six modules (both emit paths)", true);
+    check("zero raw font-size across " + mods.length + " scanned module(s) (both emit paths)", true);
   }
 })();
 
