@@ -208,6 +208,12 @@ living figure only when the result has dynamics worth exploring.
   `DossierFigures.registerRenderer("<type>", fn)` for its figures to get the click-to-open
   lightbox — the lightbox dispatches through that registry **only** (no name-based fallback),
   and a declared-but-unregistered type gets no lightbox plus a console warning.
+- A module whose render returns a `{getState, setSlider}` handle (or `setMaster` for a composed
+  master) and **stashes it on its container** (`container.__lfHandle = handle`) gets **state-handoff
+  and Reset for free**: the lightbox reads `getState()` to open at the reader's current zoom, and the
+  Reset control restores the spec's start view via the setter. No handle → the overlay opens at the
+  published start (graceful). Figures also honor `prefers-reduced-motion` — consult
+  `DossierFigures.prefersReducedMotion()` at your play-state init so the figure starts paused.
 - If your figure sits on a **light background** (e.g. a chart on a light card), set the optional
   top-level `"stage":"#rrggbb"` to that card color: in the lightbox the runtime paints it onto the
   figure's own background and derives a luminance-separated mat from it (omit it and both default to

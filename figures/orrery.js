@@ -248,10 +248,11 @@
     var HI = Math.max(LO * 1.0001, num(zoom.hi, 6000));
     var tm = spec.time || {};
     var baseSpeed = num(tm.baseSpeed, 0.45);
-    var playing = tm.playing !== false;
+    var playing = (tm.playing !== false) && !DossierFigures.prefersReducedMotion();
 
     // RUNTIME: start slider derived from a start SCALE via the inverse map.
     var slider = clamp01(logZoom.scaleToSlider(num(zoom.start, HI * 0.2), LO, HI));
+    var startSlider = slider;   // the PUBLISHED start view (what the sealed poster freezes) — Reset restores it
     var panX = 0, panY = 0, t = 0, viewDirty = true, jump = null;
 
     function scaleAU() { return logZoom.sliderToScale(slider, LO, HI); } // RUNTIME: slider -> AU window
@@ -416,6 +417,19 @@
         controls.appendChild(btn);
       });
 
+      // Reset: re-derive the PUBLISHED start view from the spec (the same frame the sealed poster
+      // freezes). Restores zoom AND play state, re-consulting reduced-motion so Reset returns to the
+      // paused published frame when the reader prefers reduced motion.
+      var resetBtn = doc.createElement("button");
+      resetBtn.type = "button"; resetBtn.className = "lf-btn";
+      resetBtn.textContent = "Reset";
+      resetBtn.addEventListener("click", function () {
+        jump = null; slider = startSlider; syncZoomInput(); viewDirty = true;
+        playing = (tm.playing !== false) && !DossierFigures.prefersReducedMotion();
+        playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play";
+      });
+      controls.appendChild(resetBtn);
+
       readout = doc.createElement("span");
       readout.className = "lf-readout";
       controls.appendChild(readout);
@@ -502,12 +516,15 @@
       new root.IntersectionObserver(function (es) { lfVisible = es[0].isIntersecting; if (lfVisible) lfResume(); }, { root: null, threshold: 0 }).observe(svg);
     }
 
-    // small handle for tests / external control
-    return {
+    // small handle for tests / external control; also stashed on the container so the lightbox can
+    // read the reader's current view (getState) and hand it off to the overlay mount (setSlider).
+    var handle = {
       runtimeVersion: DossierFigures.FIGURES_RUNTIME_VERSION,
       getState: function () { return { slider: slider, scaleAU: scaleAU(), t: t, playSpeed: scaleAwareTime(baseSpeed, scaleAU()), playing: playing }; },
       setSlider: function (v) { jump = null; slider = clamp01(v); syncZoomInput(); viewDirty = true; }
     };
+    container.__lfHandle = handle;
+    return handle;
   }
 
   // -------------------------------------------------------------------------

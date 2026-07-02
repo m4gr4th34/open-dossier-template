@@ -37,7 +37,7 @@
 (function (root) {
   "use strict";
 
-  var FIGURES_RUNTIME_VERSION = "0.10.2";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating); 0.8.0: registerRenderer is the sole lightbox dispatch contract — drop the initialism-fragile render<Cap(type)> fallback, warn (not silently skip) on an unregistered figure type, document registerRenderer as a required adoption step; 0.9.0: adaptive lightbox mat (figure declares data-figure.stage; overlay derives a luminance-separated backdrop, dark-default so astronomy is unchanged) + reserved-header expand trigger (docked in a reserved top band, never over figure content); 0.10.0: presentation mount — the overlay shows the figure AS PUBLISHED: spec.stage now paints the mounted figure's own background (mat derived from it), optional spec.caption renders under the figure, mat-aware Close chip; chip band gets a containment floor (embed-safe); the three live-only demos declare their type; 0.10.1: modules migrated to text tiers (lf-tick/lf-axis/lf-callout by ROLE on both emit paths; zero inline font-size); edge-anchored labels budgeted for the counter-scale factor; the sealed poster carries a static tier stylesheet so the JS-off floor renders at true tier sizes (11/13/15) -- the tier CSS was previously JS-injected only; fail-closed font-size gate in figures.test.js; 0.10.2: caption single-source — the sealer bakes <figcaption> from spec.caption (page + JS-off floor + lightbox all render from one field); controls get a horizontal inset when the host strips side padding (embed hug fix)
+  var FIGURES_RUNTIME_VERSION = "0.11.0";  // 0.2.0: +registry (registerPoster/posterEmitters) + dedupPoster; solveKepler relocated to orrery.js (additive + one relocation; live render back-compat intact); 0.3.0: +self-contained text-fit (annotation labels render at fixed px regardless of display width; browser-only, Node-safe); 0.4.0: +text tiers (lf-tick/lf-axis/lf-callout set --lf-text-size; additive, unclassed text unchanged); 0.5.0: +self-contained live-SVG lightbox (tap a living figure -> re-mount fresh, full-viewport, live; browser-only, Node-safe); 0.6.0: lightbox v2 — registerRenderer registry (reaches any figure type, not just the demos), postMessage breakout (full-viewport overlay from inside iframes), legible trigger; 0.7.0: overlay backdrop solid (no blur veiling the live figure) + self-injected control-bar CSS (controls styled in any breakout host) + zoom slider direction flipped (right = zoom IN; presentation-only, scale byte-identical) + IntersectionObserver visibility gate (off-screen figures stop animating); 0.8.0: registerRenderer is the sole lightbox dispatch contract — drop the initialism-fragile render<Cap(type)> fallback, warn (not silently skip) on an unregistered figure type, document registerRenderer as a required adoption step; 0.9.0: adaptive lightbox mat (figure declares data-figure.stage; overlay derives a luminance-separated backdrop, dark-default so astronomy is unchanged) + reserved-header expand trigger (docked in a reserved top band, never over figure content); 0.10.0: presentation mount — the overlay shows the figure AS PUBLISHED: spec.stage now paints the mounted figure's own background (mat derived from it), optional spec.caption renders under the figure, mat-aware Close chip; chip band gets a containment floor (embed-safe); the three live-only demos declare their type; 0.10.1: modules migrated to text tiers (lf-tick/lf-axis/lf-callout by ROLE on both emit paths; zero inline font-size); edge-anchored labels budgeted for the counter-scale factor; the sealed poster carries a static tier stylesheet so the JS-off floor renders at true tier sizes (11/13/15) -- the tier CSS was previously JS-injected only; fail-closed font-size gate in figures.test.js; 0.10.2: caption single-source — the sealer bakes <figcaption> from spec.caption (page + JS-off floor + lightbox all render from one field); controls get a horizontal inset when the host strips side padding (embed hug fix); 0.11.0: lightbox opens at the reader's current zoom (state-handoff via module handles), figures honor prefers-reduced-motion (start paused), and every figure gets a Reset control that re-derives the published start view from the spec
 
   // (solveKepler — Kepler's-equation solver — was relocated to figures/orrery.js,
   //  its ONLY consumer. A galaxy / cosmic-web / uniform-field figure is statistical
@@ -192,7 +192,12 @@
     registerPoster: registerPoster,
     renderers: renderers,
     registerRenderer: registerRenderer,
-    dedupPoster: dedupPoster
+    dedupPoster: dedupPoster,
+    // Reader accessibility: figures start paused when the OS requests reduced motion. Node-safe
+    // (no matchMedia -> false). Modules AND the Reset control consult this at (re)start.
+    prefersReducedMotion: function () {
+      return !!(root && root.matchMedia && root.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    }
   };
 
   if (typeof module !== "undefined" && module.exports) {
@@ -458,7 +463,7 @@
 
     // Mount a spec into the top-hosted overlay -- the shared core: BOTH a local open and a
     // breakout message land here. No host needed; dispatch is purely by spec.type.
-    function openSpec(spec) {
+    function openSpec(spec, view) {
       var fn = renderFnFor(spec); if (!fn) return;
       buildOverlay();
       // Presentation mount: show the figure AS PUBLISHED. spec.stage is the figure's declared backdrop;
@@ -473,7 +478,15 @@
       // fresh container each open; controls stay ON (it's the live, interactive copy)
       mounted = doc.createElement("div");
       stageWrap.appendChild(mounted);
-      try { fn(mounted, spec); } catch (e) { close(); return; }
+      var handle;
+      try { handle = fn(mounted, spec); } catch (e) { close(); return; }
+      // State-handoff: re-mount at the reader's view (passed from the trigger / breakout message).
+      // setMaster for the composed master slider, setSlider for a single figure. No view / no handle
+      // -> the module's published start (today's behavior; graceful for adopters returning no handle).
+      if (view && handle) {
+        if (view.sliderM != null && handle.setMaster) handle.setMaster(view.sliderM);
+        else if (view.slider != null && handle.setSlider) handle.setSlider(view.slider);
+      }
       // The figure carries its own field into the overlay: paint the declared stage onto the mounted
       // .lf-svg layer(s) inline (querySelectorAll -- the cosmic composer mounts several stacked layers).
       // Inline beats the host's .lf-svg gradient; no module code sets an .lf-svg background to fight it.
@@ -498,16 +511,22 @@
     }
     function open(host) {
       var spec = specOf(host); if (!spec) return;
-      // CHILD role: an iframed figure hands its spec UP to the top document, which hosts a
+      // State-handoff: read the reader's CURRENT view off the live handle the module stashed on the
+      // host (container.__lfHandle). The overlay re-mounts at this zoom instead of the published start,
+      // so "expand" continues from where the reader is. No handle (e.g. an adopter that returns none)
+      // -> null -> the published start (today's behavior). Minimal payload: {slider} or {sliderM}.
+      var h = host.__lfHandle, st = h && h.getState ? h.getState() : null;
+      var view = st ? (st.sliderM != null ? { sliderM: st.sliderM } : { slider: st.slider }) : null;
+      // CHILD role: an iframed figure hands its spec + view UP to the top document, which hosts a
       // full-viewport overlay (escapes the iframe cap). Same-origin is the live path; if top is
       // unreachable (cross-origin throws) or we ARE the top (not iframed), fall back to a local overlay.
       try {
         if (root.top && root.top !== root.self) {
-          root.top.postMessage({ source: "lf-lightbox", type: "open", spec: spec }, "*");
+          root.top.postMessage({ source: "lf-lightbox", type: "open", spec: spec, view: view }, "*");
           return;
         }
       } catch (e) { /* cross-origin or blocked -> local fallback below */ }
-      openSpec(spec);
+      openSpec(spec, view);
     }
     function close() {
       if (!overlay) return;
@@ -608,7 +627,7 @@
     root.addEventListener("message", function (ev) {
       var d = ev.data;
       if (!d || d.source !== "lf-lightbox" || d.type !== "open" || !d.spec) return;
-      openSpec(d.spec);
+      openSpec(d.spec, d.view);
     });
     if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot);
     else boot();

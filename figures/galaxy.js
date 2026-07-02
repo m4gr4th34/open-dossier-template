@@ -242,9 +242,10 @@
     var HI = Math.max(LO * 1.0001, num(zoom.hi, 200000)); // light-year half-window range
     var tm = spec.time || {};
     var baseSpeed = num(tm.baseSpeed, 0.05);
-    var playing = tm.playing !== false;
+    var playing = (tm.playing !== false) && !DossierFigures.prefersReducedMotion();
 
     var slider = clamp01(logZoom.scaleToSlider(num(zoom.start, HI * 0.4), LO, HI));  // RUNTIME inverse
+    var startSlider = slider;   // the PUBLISHED start view (what the sealed poster freezes) — Reset restores it
     var panX = 0, panY = 0, galaxyAngle = 0, viewDirty = true, jump = null;
     var drawnStars = 0, drawnBulge = 0, drawnHalo = 0;
 
@@ -434,6 +435,17 @@
         controls.appendChild(btn);
       });
 
+      // Reset: restore the PUBLISHED start view (zoom + play state), re-consulting reduced-motion.
+      var resetBtn = doc.createElement("button");
+      resetBtn.type = "button"; resetBtn.className = "lf-btn";
+      resetBtn.textContent = "Reset";
+      resetBtn.addEventListener("click", function () {
+        jump = null; slider = startSlider; syncZoom(); viewDirty = true;
+        playing = (tm.playing !== false) && !DossierFigures.prefersReducedMotion();
+        playBtn.textContent = playing ? "❚❚ Pause" : "▶ Play";
+      });
+      controls.appendChild(resetBtn);
+
       readout = doc.createElement("span"); readout.className = "lf-readout";
       controls.appendChild(readout);
     }
@@ -504,7 +516,7 @@
       new root.IntersectionObserver(function (es) { lfVisible = es[0].isIntersecting; if (lfVisible) lfResume(); }, { root: null, threshold: 0 }).observe(svg);
     }
 
-    return {
+    var handle = {
       runtimeVersion: DossierFigures.FIGURES_RUNTIME_VERSION,
       getState: function () {
         return { slider: slider, scaleLY: scaleLY(), angle: galaxyAngle, playing: playing,
@@ -515,6 +527,8 @@
       },
       setSlider: function (v) { jump = null; slider = clamp01(v); syncZoom(); viewDirty = true; }
     };
+    container.__lfHandle = handle;
+    return handle;
   }
 
   DossierFigures.renderGalaxy = renderGalaxy;

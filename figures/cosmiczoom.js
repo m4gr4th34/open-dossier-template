@@ -110,6 +110,7 @@
     var MLO = Math.max(1e-3, num(seam.lo, 0.35));
     var MHI = Math.max(MLO * 1.0001, num(seam.hi, 4e9));       // ~63,000 ly
     var sliderM = clamp01(logZoom.scaleToSlider(num(seam.start, 5), MLO, MHI)); // open on the inner solar system
+    var startSliderM = sliderM;   // the PUBLISHED start view (the frame the sealed poster freezes) — Reset restores it
     function scaleAU() { return logZoom.sliderToScale(sliderM, MLO, MHI); }      // RUNTIME
 
     // crossfade band (AU) — MUST hand off in the EMPTY VOID BEYOND the Oort, not
@@ -284,7 +285,7 @@
     var bar = doc.createElement("div");
     bar.className = "lf-controls lf-cosmic";
 
-    var journeyPlaying = seam.playing === true;   // default paused (calm open)
+    var journeyPlaying = seam.playing === true && !DossierFigures.prefersReducedMotion();   // default paused (calm open); reduced-motion keeps it paused
     var jdir = 1, masterJump = null;
     var playBtn = doc.createElement("button");
     playBtn.type = "button"; playBtn.className = "lf-btn lf-play";
@@ -309,6 +310,18 @@
       btn.addEventListener("click", function () { jumpTo(num(rg.scale, scaleAU())); });
       bar.appendChild(btn);
     });
+
+    // Reset: re-derive the PUBLISHED start view (the master slider the poster freezes) and restore the
+    // journey play state, re-consulting reduced-motion so Reset returns to the paused published frame.
+    var resetBtn = doc.createElement("button");
+    resetBtn.type = "button"; resetBtn.className = "lf-btn";
+    resetBtn.textContent = "Reset";
+    resetBtn.addEventListener("click", function () {
+      masterJump = null; sliderM = startSliderM; syncMaster();
+      journeyPlaying = seam.playing === true && !DossierFigures.prefersReducedMotion();
+      playBtn.textContent = playLabel();
+    });
+    bar.appendChild(resetBtn);
 
     var readout = doc.createElement("span"); readout.className = "lf-readout";
     bar.appendChild(readout);
@@ -387,7 +400,7 @@
       new root.IntersectionObserver(function (es) { lfVisible = es[0].isIntersecting; if (lfVisible) lfResume(); }, { root: null, threshold: 0 }).observe(container);
     }
 
-    return {
+    var handle = {
       runtimeVersion: DossierFigures.FIGURES_RUNTIME_VERSION,
       orrery: hOrr, galaxy: hGal, localgroup: regimes[2] && regimes[2].handle, cosmicweb: regimes[3] && regimes[3].handle, observableuniverse: regimes[4] && regimes[4].handle,
       getState: function () {
@@ -404,6 +417,8 @@
       },
       setMaster: function (v) { masterJump = null; sliderM = clamp01(v); syncMaster(); }
     };
+    container.__lfHandle = handle;
+    return handle;
   }
 
   // -------------------------------------------------------------------------

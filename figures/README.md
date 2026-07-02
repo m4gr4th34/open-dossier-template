@@ -66,6 +66,16 @@ drift out of sync, because there is only one copy. Escaped when baked (the seale
 strings); `textContent` in the lightbox. Author it in the spec — do **not** hand-write a
 prose caption next to the figure (that recreates the drift this removes).
 
+### Lightbox behavior — handoff, reduced-motion, Reset (v0.11.0)
+
+- **State-handoff:** *expand* continues from the reader's **current zoom**, not the published
+  start — the runtime reads the figure's live view off `container.__lfHandle.getState()` and
+  re-mounts the overlay there (`setSlider` / `setMaster`), across the postMessage breakout too.
+- **Reduced motion:** figures honor `prefers-reduced-motion: reduce` — they start **paused** (the
+  reader can still press Play; their explicit action overrides the preference).
+- **Reset:** every figure's control bar has a **Reset** button that re-derives the **published start
+  view from the spec** — the same state the sealed poster freezes — restoring zoom and play state.
+
 ### Spec schema — zoom-orrery (`renderOrrery`)
 
 ```jsonc
