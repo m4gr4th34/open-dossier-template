@@ -179,6 +179,21 @@ never hand-write the rendered math:
 
 - Display goes on `.eq`, inline on `span.math`:
   `<div class="eq" data-tex="E = mc^2"></div>` · `<span class="math" data-tex="x_i"></span>`.
+- **Number equations with KaTeX's native `\tag`, inside the `data-tex`** — e.g.
+  `data-tex="\Gamma \propto e^{-2\bar{n}} \tag{eq.\ 1}"` — and reference it from prose as plain
+  text ("(eq. 1)"). The tag renders right-aligned in KaTeX's display layout, survives JS-off (it is
+  baked), and is projector-safe by construction: it lives inside the one attribute the markdown
+  projector already treats as a math atom. **Never build a label out of styled spans/divs** — the
+  projector rejects unrecognized markup, loudly.
+- **`\tag` is display-only.** It works in `.eq` divs; in `span.math` (inline) KaTeX throws
+  `\tag works only in display equations`. Label display equations; never inline math.
+- **The drawer's closed vocabulary.** Inside a `details.deeper` body the markdown projector accepts
+  exactly: `div.eq[data-tex]`, `span.math[data-tex]`, `span.mono`, `<b>`/`<strong>`, `<em>`/`<i>`,
+  `button.term`, `button.cite`, and prose. Anything else fails the render with a `die` naming the
+  block — this list is the contract; check it before inventing markup.
+- **Failure mode.** When `render_markdown` dies, `index.md` is left **stale** (the previous
+  version), not partially written — the gate aborts before the write. If content seems missing from
+  the markdown edition, find the `die` message and fix the named block; do not trust the old file.
 - After writing or editing any `data-tex`, run `npm run render-math`. It prerenders
   the LaTeX into committed static HTML + MathML (KaTeX, vendored and version-pinned),
   so the math is baked into the page and **readers need zero JavaScript**. `data-tex`
