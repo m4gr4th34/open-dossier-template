@@ -84,7 +84,11 @@ jobs:
           case "$CONCEPT_DOI" in TODO*) CONCEPT_DOI="" ;; esac   # placeholder -> empty
           VERSION_DOI="$(jq -r '.version_doi // ""' provenance.json 2>/dev/null || echo "")"
           case "$VERSION_DOI" in TODO*) VERSION_DOI="" ;; esac   # placeholder -> empty
-          DOI_ARCHIVED="$(jq -r '.doi_archived // ""' provenance.json 2>/dev/null || echo "")"   # "false" iff deliberately no-DOI; else ""
+          # "false" iff deliberately no-DOI; else "". MUST test ==false explicitly: jq's `//`
+          # alternative operator treats the JSON boolean `false` like null and returns the fallback,
+          # so `.doi_archived // ""` silently drops the flag on the no-DOI seal path (the honesty flag
+          # never reaches freeze_chapter.py, and the lineage entry loses "doi_archived": false).
+          DOI_ARCHIVED="$(jq -r 'if .doi_archived == false then "false" else "" end' provenance.json 2>/dev/null || echo "")"
 
           # --- run the shared freeze (gate / write-once / dup all enforced inside);
           #     a non-zero exit aborts the workflow before any push. ---
