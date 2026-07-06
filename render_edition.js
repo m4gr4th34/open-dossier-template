@@ -142,6 +142,20 @@ function renderEdition(skinPath = SKIN, sourcePath = SOURCE, machinery = null, r
   out = sub(out, '{{title}}', front.title, 'title');
   out = sub(out, '{{byline}}', front.byline, 'byline');
   out = sub(out, '{{body}}', body, 'body');
+  // Landscape kicker/lede: optional source slots (mirror {{head_extra}}) so a chapter whose
+  // apparatus is NOT a survey can label it honestly. Defaults = today's verbatim text, so every
+  // existing edition renders byte-identical. These tokens live INSIDE the landscape fragment (which
+  // lands in body), so they MUST be resolved AFTER the {{body}} sub above — subbing before body
+  // would leave the fragment unexpanded and trip the leak check below. Guarded by hasMounts (same
+  // as bakeMachinery): only editions that mount the landscape carry these tokens; dossier/verify,
+  // which mount nothing, must NOT be subbed (sub() is fail-loud on an absent token).
+  if (hasMounts) {
+    out = sub(out, '{{landscape_kicker}}',
+      readSlot('landscape_kicker', 'THE LANDSCAPE · SURVEY'), 'landscape_kicker');
+    out = sub(out, '{{landscape_lede}}',
+      readSlot('landscape_lede', 'Every avenue in this survey, each with its honest status label and — where the avenue is a forward bet — a dated forecast. <span class="mono">The labels are the verification here: each is exactly as strong as its evidence.</span>'),
+      'landscape_lede');
+  }
   out = sub(out, '{{cites}}', cites, 'cites');
   out = sub(out, '{{head_extra}}', readSlot('head_extra', ''), 'head_extra');
   out = sub(out, '{{foot}}', readSlot('foot', ''), 'foot');

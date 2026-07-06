@@ -133,6 +133,40 @@ hand-edit. See BOUNDARY.md (step 2b).
 - The abstract ends with the format's tagline: **Don't trust this paper —
   run it.**
 
+**Two layouts — apparatus-first and essay-first.** There are two legitimate places for the
+landscape apparatus. **Apparatus-first** (the template default): the landscape + console open the
+page, then the narrative follows — the survey/front-door shape. **Essay-first** (recap or narrative
+chapters): essay sections come first and the landscape appears *after* them, closing a thread rather
+than opening one. Both are supported; pick by what the chapter is.
+
+- **The seam is automatic.** When the landscape follows essay sections, the skin adds an
+  inter-register section break — generous whitespace over a hairline rule — at that boundary
+  (`h2 ~ #landscape`), so the shift from prose into the apparatus reads as a designed section
+  change, not a different document. It is **deliberately absent when the apparatus opens the page**:
+  a section-break marker belongs *between* registers, not before the first one. You write nothing —
+  put the landscape where it belongs and the seam appears (or doesn't) correctly.
+- **Honest label: override the kicker/lede for a non-survey apparatus.** The default kicker
+  (`THE LANDSCAPE · SURVEY`) and lede are a *claim about the section* — true of a survey, false of a
+  recap. A chapter whose landscape is not a survey **must** override them via source slots (they
+  default to today's text, so a survey writes nothing):
+
+  ```html
+  <!--slot:landscape_kicker-->
+  THE LANDSCAPE · PRIOR PROGRAM'S MAP
+  <!--/slot:landscape_kicker-->
+  <!--slot:landscape_lede-->
+  One line describing what THIS chapter's landscape is.
+  <!--/slot:landscape_lede-->
+  ```
+
+  The open/close tags go on their **own lines** with the content between (same convention as every
+  other source slot, e.g. `head_extra`) — a one-line `<!--slot:…-->text<!--/slot:…-->` will not
+  match. Skin-baked wording is a truth claim; label the apparatus for what it actually is here.
+- **Structural caveat.** The seam keys on essay sections being **bare `<h2>` direct children**
+  before `#landscape` (the repo idiom — see `editions/index.source.html`). If a future layout wraps
+  essay sections in containers, the `h2 ~ #landscape` sibling rule won't match and the seam will
+  need a class hook instead. Noted, not built — keep essays as bare `<h2>` siblings and it works.
+
 **The self-explaining narrative — THE MAGIC.** This is the format's crown jewel
 and the most judgment-heavy artifact. Specs, learned from Dossier 001:
 
