@@ -167,6 +167,18 @@ than opening one. Both are supported; pick by what the chapter is.
   essay sections in containers, the `h2 ~ #landscape` sibling rule won't match and the seam will
   need a class hook instead. Noted, not built — keep essays as bare `<h2>` siblings and it works.
 
+**Three-region grammar — every region announces itself with a kicker.** The page reads as three
+announced regions — the landscape apparatus, the consistency console, and the narrative chapter —
+each opened by a `<div class="kicker …">EYEBROW · LABEL</div>` above its heading. The two **apparatus**
+kickers are skin/slot-provided (`{{landscape_kicker}}` and the console's); the **chapter** kicker is
+**author-written body content** — a plain `<div class="kicker teal">…</div>` line before your first
+narrative `<h2>`, no slot machinery (the same lesson as the landscape slots: wording is a claim about
+the section, so each dossier writes its own honest one — `THE CHAPTER · NARRATIVE` in
+`index.source.html` is only the exemplar). Every kicker gets the **uniform region pause** above it
+automatically from the skin (`.kicker{margin-top}`), and sits tight above its heading so the eyebrow
+owns its title — you write the label, the spacing is free. Only *region openers* get a kicker; the
+numbered sub-sections inside a chapter keep the plain `<h2>` rhythm.
+
 **The self-explaining narrative — THE MAGIC.** This is the format's crown jewel
 and the most judgment-heavy artifact. Specs, learned from Dossier 001:
 

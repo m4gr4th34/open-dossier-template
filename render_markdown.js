@@ -196,6 +196,11 @@ function renderMarkdown() {
   }
 
   function renderCallout(html) {
+    // Region kicker (eyebrow label announcing a region). The apparatus kickers live inside the
+    // landscape/console mounts (handled there); a CHAPTER kicker is author-written top-level body
+    // content, so project it as a bold standalone line — its own new prose atom.
+    const km = html.match(/^<div class="kicker\b[^"]*">([\s\S]*?)<\/div>\s*$/);
+    if (km) return '**' + collapseWs(inlineToMd(km[1])) + '**';
     const cls = html.match(/^<div class="(openclaim|forecast|reported)"/);
     if (!cls) die('unmapped <div> block near ' + JSON.stringify(html.slice(0, 60)));
     let inner = html.replace(/^<div class="[^"]*">/, '').replace(/<\/div>\s*$/, '');

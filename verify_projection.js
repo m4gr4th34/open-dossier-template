@@ -137,6 +137,13 @@ function extractAtoms(sourcePath) {
     for (const r of proseRuns(m[2].replace(/<span class="tag">[\s\S]*?<\/span>/, ''))) add('callout-body', r);
   }
 
+  // Region kicker (eyebrow label). Scanning `body` (mounts already stripped at line above) captures
+  // ONLY the author-written CHAPTER kicker — the apparatus kickers (landscape/console) live inside
+  // <!--mount:...--> skin fragments, are chrome not projected content, and never appear in body.
+  // render_markdown projects this to a bold line (**...**); the normalizer strips the ** so it matches.
+  const reKicker = /<div class="kicker\b[^"]*">([\s\S]*?)<\/div>/g;
+  while ((m = reKicker.exec(body))) add('kicker', m[1]);
+
   return atoms;
 }
 

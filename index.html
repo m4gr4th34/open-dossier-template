@@ -256,6 +256,16 @@
   .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
   .kicker.teal{color:var(--teal)}.kicker.coral{color:var(--coral)}.kicker.violet{color:var(--violet)}
   p.lede{color:var(--ink2);max-width:66ch;margin-top:6px}
+  /* region-spacing system — a heading relates to what FOLLOWS, not what precedes. The kickers had
+     margin below but none above (glued to the previous region, floating 48px from their own h2 —
+     the footnote effect). Fix: a uniform region PAUSE above the kicker (2x the 26px paragraph gap,
+     exceeding the 48px sub-section h2 rhythm), and the kicker set tight above its h2 so the eyebrow
+     OWNS its title. Rhythm: region pause (52) > paragraph gap (26) > kicker->title (8). */
+  .kicker{margin-top:52px}
+  .kicker + h2{margin-top:8px}
+  /* seam reconciliation: when the essay-first seam below fires, ITS 64+border+30 IS the boundary --
+     zero the kicker's pause so they don't double-stack (prototyped: 147px crater -> 95px). */
+  h2 ~ #landscape .kicker{margin-top:0}
   /* inter-register seam — fires ONLY when the landscape follows essay sections (an h2 sibling
      precedes it); inert when the apparatus opens the page. A section-break marker belongs between
      registers, not before the first one. */
@@ -405,6 +415,7 @@
        ESTABLISHED meta-claim ("the field is divided on X") citing both sides.
      ============================================================ -->
 
+<div class="kicker teal">THE CHAPTER · NARRATIVE</div>
 <h2><span class="num">01</span>THE FIELD, AND WHY SURVEY IT</h2>
 
 <p>Open with the field as a story: what is the question everyone in this area is

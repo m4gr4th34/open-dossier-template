@@ -25,6 +25,8 @@ Results from `verification/verify_numbers.py` — the same checks the in-page co
 
 **TOTAL: 3 checks · 3 pass · 0 fail** — All checks pass — the survey is internally consistent.
 
+**THE CHAPTER · NARRATIVE**
+
 ## 01 THE FIELD, AND WHY SURVEY IT
 
 Open with the field as a story: what is the question everyone in this area is circling, why is it hard, and why is a map of the whole landscape — rather than one more result — the useful thing to publish right now? Introduce your first tappable term (Replace this with a 3-5 sentence plain-language explanation of the term, written for a smart non-specialist. What is it, why does it matter to this field, and what is the one surprising thing about it?) here, and your first sourced claim [Journal 'YY].
