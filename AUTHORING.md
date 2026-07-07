@@ -308,6 +308,19 @@ living figure only when the result has dynamics worth exploring.
   `figures/` script-src to the shared root). Enabling Pages on the fork and filling
   the `USER/REPO` placeholders is the ordinary fork story — see the README "Use this
   template" steps and DEPLOY.md; there is nothing figure-specific to redo.
+- **Break a data-dense figure out of the column with `class="living-figure wide"`.** Add
+  `wide` to the figure's class list when the figure is **data-dense or multi-panel** and its
+  internal headers, tick labels, or small multiples crowd at the ~720px reading column. The
+  breakout is page-wide (`min(1140px, 100vw - 48px)`, centered on the column — 680 → 1140px at a
+  1440 viewport), and because the counter-scale keys off each figure's rendered width, a wider
+  figure buys **more drawable art at the same tier text sizes** — it relieves the crowding
+  without shrinking the type, which is the whole point for small multiples. **Single-panel
+  figures should stay column-width**: the reading measure is the default for a reason, and a
+  lone plot gains nothing from the extra width. `wide` is viewport-capped, so it collapses to the
+  column on narrow viewports (732px against the 720px column at a 780 viewport, an exact match at
+  768, never overflowing — no horizontal scroll at any width), and the JS-off floor scales the
+  sealed poster uniformly — archival behavior is unchanged. It is one class on the `<figure>`;
+  nothing else to seal or re-run.
 
 **Writing an animated module.** The astronomy modules settled these conventions the hard
 way — measured in a real browser, fixed at the mechanism. Follow them and your figure

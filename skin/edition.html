@@ -212,6 +212,18 @@
   figure img{
     display:block; width:100%; height:auto; cursor:zoom-in;
   }
+  /* figure.living-figure.wide — break a data-dense figure out of the paper column to a
+     page-wide, viewport-capped width. Body-safe transform breakout (the lightbox appends to
+     the document body, so the figure's own transform can't trap the fixed overlay). The counter-scale keys
+     off rendered width, so wider = more drawable art at the SAME tier text sizes. min()
+     collapses the breakout to exactly column width on narrow viewports — degrades to a normal
+     figure. */
+  figure.living-figure.wide{
+    width:min(1140px, calc(100vw - 48px));
+    max-width:none;
+    margin-left:50%;
+    transform:translateX(-50%);
+  }
   figcaption{
     font-family:var(--mono); font-size:12.5px; line-height:1.5;
     color:var(--ink2); text-align:center;
