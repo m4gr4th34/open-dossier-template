@@ -246,6 +246,44 @@ def bake_release_label(html, tag):
     return pat.subn(lambda m: m.group(1) + "release " + tag + m.group(2), html, count=1)
 
 
+def bake_doi_chip(html, version_doi, doi_archived):
+    """Bake the sealed DOI state into the #pv-doi chip so a frozen page shows the truth
+    with NO script and NO fetch.
+
+    A frozen chapters/<tag>/ (or reskinned live/<tag>/) page ships no adjacent
+    provenance.json — its fetch 404s and the skin's .catch resets the DOI item to a generic
+    "see repository". That erases a real DOI, or (worse) implies an archive that a
+    doi_archived:false chapter never had. But a sealed chapter's DOI state is a STATIC FACT,
+    so bake it here and mark the anchor data-doi-baked="1" (the skin's .catch now leaves a
+    baked chip alone -> the honest state survives every JS-on load, not just JS-off):
+
+      real version_doi   -> href https://doi.org/<doi>,  text "<doi> ↗"
+      doi_archived false -> href verify.html,            text "not DOI-archived ↗"
+                            (the skin's own honest no-DOI wording + target, VERBATIM; verify.html
+                             is a sealed sibling in chapters/<tag>/ and live/<tag>/, so it resolves)
+      neither knowable   -> bake nothing (the generic .catch fallback stands)
+
+    Mirrors bake_release_label: targets the double-quoted static attrs id="pv-doi" /
+    id="pv-doi-v" (the fetch script's single-quoted getElementById is never matched).
+    Returns (new_html, count)."""
+    version_doi = (version_doi or "").strip()
+    if version_doi and not version_doi.startswith("TODO"):
+        href, text = "https://doi.org/" + version_doi, version_doi + " ↗"
+    elif doi_archived == "false":
+        href, text = "verify.html", "not DOI-archived ↗"
+    else:
+        return html, 0
+    # 1) the anchor: replace the static href="#" with the sealed href and flag it baked
+    a_pat = re.compile(r'(<a\b[^>]*\bid="pv-doi"[^>]*?)href="[^"]*"([^>]*>)')
+    html, na = a_pat.subn(
+        lambda m: m.group(1) + 'href="' + href + '" data-doi-baked="1"' + m.group(2),
+        html, count=1)
+    # 2) the value span's inner text
+    v_pat = re.compile(r'(id="pv-doi-v"[^>]*>).*?(</span>)')
+    html, nv = v_pat.subn(lambda m: m.group(1) + text + m.group(2), html, count=1)
+    return html, min(na, nv)
+
+
 # --- step 5: lineage.json ----------------------------------------------------
 
 def load_lineage():
@@ -315,14 +353,18 @@ def main():
     os.makedirs(chapter_dir, exist_ok=False)
     rewired_summary = {}
     baked_labels = []
+    baked_dois = []
     for f in present:
         with open(os.path.join(source_dir, f), encoding="utf-8") as fh:
             html = fh.read()
-        # --- step 4: REWIRE paths + BAKE the sealed release label ---
+        # --- step 4: REWIRE paths + BAKE the sealed release label + BAKE the DOI chip ---
         html, counts = rewire(html)
         html, nlabel = bake_release_label(html, tag)
         if nlabel:
             baked_labels.append(f)
+        html, ndoi = bake_doi_chip(html, args.version_doi, args.doi_archived)
+        if ndoi:
+            baked_dois.append(f)
         with open(os.path.join(chapter_dir, f), "w", encoding="utf-8") as fh:
             fh.write(html)
         if counts:
@@ -386,6 +428,9 @@ def main():
         print("  rewired: (no outward-local asset paths found to rewire)")
     if baked_labels:
         print("  pv-state baked 'release " + tag + "' in: " + ", ".join(baked_labels))
+    if baked_dois:
+        state = ("DOI " + args.version_doi) if (args.version_doi or "").strip() and not (args.version_doi or "").strip().startswith("TODO") else "not DOI-archived"
+        print("  pv-doi  baked '" + state + "' in: " + ", ".join(baked_dois))
     print("  lineage.json: appended " + json.dumps(entry, ensure_ascii=False))
     return 0
 
@@ -398,6 +443,10 @@ if __name__ == "__main__":
     # never the live default. REUSES rewire()/bake_release_label() — one implementation, so the
     # current-skin reading view can never drift from the frozen record's chrome transform.
     if len(sys.argv) >= 3 and sys.argv[1] == "--reskin":
+        # --reskin <tag> [version_doi] [doi_archived]: render_backcatalog.js forwards the DOI
+        # state from the chapter's OWN lineage.json entry so live/<tag>/ bakes the identical chip
+        # the freeze path bakes (one bake_doi_chip implementation -> the reading view's DOI chip
+        # can never drift from the frozen record's).
         html = sys.stdin.read()
         html, _ = rewire(html)
         # live/<tag>/ now ships the FULL edition set (index/dossier/verify.html) as siblings,
@@ -409,6 +458,9 @@ if __name__ == "__main__":
         # that precondition is gone now that all three editions are reskinned. lineage.html still
         # escapes ../../ via rewire() — series-level, never a per-chapter sibling.)
         html, _ = bake_release_label(html, sys.argv[2])
+        reskin_vdoi = sys.argv[3] if len(sys.argv) >= 4 else ""
+        reskin_darch = sys.argv[4] if len(sys.argv) >= 5 else ""
+        html, _ = bake_doi_chip(html, reskin_vdoi, reskin_darch)
         sys.stdout.write(html)
         sys.exit(0)
     sys.exit(main())

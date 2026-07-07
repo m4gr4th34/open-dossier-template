@@ -121,7 +121,11 @@ function renderChapter(ch) {
     // outward-rewire (../../) + release-label bake — the SAME transform freeze applies, reused
     // from freeze_chapter.py --reskin (now collapsed to rewire+label; sibling-bare nav). One
     // implementation, so the reading view's chrome matches the record's.
-    html = execFileSync('python3', ['verification/freeze_chapter.py', '--reskin', tag],
+    // forward the chapter's OWN DOI state (from its lineage entry) so --reskin bakes the same
+    // #pv-doi chip freeze did: a real version_doi -> the doi.org link; doi_archived:false ->
+    // the honest "not DOI-archived". Same one bake_doi_chip -> live/ view can't drift from the record.
+    html = execFileSync('python3', ['verification/freeze_chapter.py', '--reskin', tag,
+      ch.version_doi || '', ch.doi_archived === false ? 'false' : ''],
       { cwd: ROOT, input: html, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     out[ed.out] = html;
   }

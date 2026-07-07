@@ -690,7 +690,15 @@ fetch('provenance.json').then(r=>r.json()).then(p=>{
     }
     by.appendChild(strip);
   })();
-}).catch(()=>{document.getElementById('pv-doi-v').textContent='see repository \u2197';
+}).catch(()=>{
+  // data-doi-baked guard: a frozen chapters/<tag>/ (or live/<tag>/) page bakes its DOI state
+  // statically at freeze/reskin time (freeze_chapter.py bake_doi_chip). Its provenance.json fetch
+  // 404s by design -> this .catch fires, but the baked chip is the SEALED TRUTH (a real doi.org
+  // link, or the honest "not DOI-archived"); overwriting it with a generic "see repository" would
+  // un-bake honesty on every JS-on load. Leave a baked chip entirely alone (text + href). Root/live
+  // drafts are never baked, so they still fall through to the generic fallback below.
+  if(document.querySelector('#pv-doi[data-doi-baked]')) return;
+  document.getElementById('pv-doi-v').textContent='see repository \u2197';
   document.getElementById('pv-doi').href='https://github.com/YOURUSER/YOURREPO';});
 </script>
 <div class="lbx" id="lbx" role="dialog" aria-modal="true" aria-label="Figure, full size" aria-hidden="true">
