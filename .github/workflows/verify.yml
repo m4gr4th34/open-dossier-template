@@ -21,8 +21,10 @@ jobs:
         run: node verify_markdown.js
       - name: Content-equivalence gate (prose)
         run: node verify_projection.js
-      # Back-catalog byte-sync gate removed (5c): live/ freshness is now guaranteed at WRITE time —
-      # freeze-chapter.yml writes it atomically and reskin-backcatalog.yml regenerates it on a skin
-      # change, both fail-closing via `npm run check-backcatalog` BEFORE they commit. A per-push
-      # byte-sync gate here only produced red→green flicker. verify_backcatalog.js stays in the repo
-      # as both workflows' pre-commit guard — it's just no longer a standalone gate step here.
+      # Back-catalog byte-sync gate RESTORED: write-time guarantees are only sound if write-time
+      # FAILURES are visible. A silent reskin-workflow failure once left live/ stale while ordinary
+      # pushes stayed green — the staleness only surfaced at seal time. This per-push gate makes a
+      # stale or missing live/<tag> (incl. an unsealed verdict.json) red on EVERY push. Renders in
+      # memory; cheap at any realistic chapter count.
+      - name: Back-catalog byte-sync gate
+        run: node verify_backcatalog.js

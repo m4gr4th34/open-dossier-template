@@ -19,11 +19,13 @@ on:
       - 'render_edition.js'
       - 'render_markdown.js'
       - 'bake_machinery.js'
-      # Shelled by the renderer, with their output baked INTO live/: the SAME outward-rewire +
-      # release-label bake (freeze_chapter.py --reskin) and the per-chapter console verdict
-      # (verify_numbers.py --avenues <sealed>). A change to either changes the reskin bytes.
+      # Shelled by the renderer, with its output baked INTO live/: the SAME outward-rewire +
+      # release-label bake (freeze_chapter.py --reskin). A change to it changes the reskin bytes.
+      # NOTE: verify_numbers.py is NOT a trigger. The per-chapter console verdict is now READ from
+      # the chapter's sealed verdict.json (never recomputed), so the current verifier does not
+      # determine live/ bytes — a verifier change can no longer bake a wrong check-set onto an old
+      # chapter. verdict.json is sealed at freeze; verification/seal_verdicts.py backfilled the rest.
       - 'verification/freeze_chapter.py'
-      - 'verification/verify_numbers.py'
       # NOTE: lineage.json is intentionally NOT a trigger. A newly frozen chapter gets its live/
       # view generated ATOMICALLY in the same freeze commit (freeze-chapter.yml runs the renderer),
       # so this workflow owns only the skin/renderer-change case — re-skinning the EXISTING catalog.

@@ -47,6 +47,36 @@ import re
 import subprocess
 import sys
 
+# --- verdict extractor (shared by freeze step 3c AND verification/seal_verdicts.py) ----------
+# A chapter's console verdict is a function of avenues.json AND the verifier CODE. Freeze seals
+# avenues.json but not the verifier, so a back-catalog re-skin that re-ran the CURRENT verifier
+# against OLD avenues would bake the wrong check-set onto an old chapter — a false label. We seal
+# the verdict itself, extracted from the chapter's own sealed index.md (a projection of the SAME
+# verifier run that baked this chapter), reproducing render_markdown.runVerifier()'s shape exactly:
+#   { "checks": [ { "status": "PASS"|"FAIL", "label": str } ], "tally": str, "summary": str|None }
+def verdict_from_index_md(md):
+    lines = md.split("\n")
+    try:
+        start = next(i for i, l in enumerate(lines) if l.strip() == "## Consistency checks")
+    except StopIteration:
+        raise ValueError("index.md has no '## Consistency checks' section")
+    checks, tally, summary = [], None, None
+    for l in lines[start + 1:]:
+        if l.startswith("## "):                       # next section -> stop
+            break
+        m = re.match(r"^- \[(PASS|FAIL)\] (.+)$", l)
+        if m:
+            checks.append({"status": m.group(1), "label": m.group(2)})
+            continue
+        t = re.match(r"^\*\*TOTAL: (.+?)\*\*(?: — (.+))?$", l)
+        if t:
+            tally = t.group(1).strip()
+            summary = (t.group(2) or "").strip() or None
+            break                                     # checks precede TOTAL; nothing after it is the verdict
+    if not checks or not tally:
+        raise ValueError("could not parse checks/tally from index.md console section")
+    return {"checks": checks, "tally": tally, "summary": summary}
+
 # Repo root resolved from this file's location: <repo>/verification/freeze_chapter.py
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(HERE)
@@ -385,6 +415,17 @@ def main():
             raw = fh.read()
         with open(dst, "wb") as fh:
             fh.write(raw)
+
+    # --- step 3c: SEAL THE VERDICT (derived, NOT verbatim) -----------------------
+    # See verdict_from_index_md above for why. Only a chapter that carries machinery
+    # (sealed index.md + avenues.json) gets a verdict; pre-split chapters are skipped,
+    # matching "pre-split chapters are not retrofitted".
+    if "index.md" in cap_present and "avenues.json" in cap_present:
+        with open(os.path.join(chapter_dir, "index.md"), encoding="utf-8") as fh:
+            verdict = verdict_from_index_md(fh.read())
+        with open(os.path.join(chapter_dir, "verdict.json"), "w", encoding="utf-8") as fh:
+            json.dump(verdict, fh, ensure_ascii=False, indent=2)
+            fh.write("\n")
 
     # --- step 5: APPEND ---
     n = max((int(c.get("n", 0)) for c in lineage["chapters"]), default=0) + 1

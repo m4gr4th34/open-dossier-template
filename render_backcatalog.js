@@ -34,7 +34,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { renderEdition } = require('./render_edition.js');
-const { readAvenues, runVerifier } = require('./render_markdown.js');
+const { readAvenues } = require('./render_markdown.js');
 
 const ROOT = __dirname;
 const SKIN = path.join(ROOT, 'skin', 'edition.html');
@@ -115,7 +115,18 @@ function renderChapter(ch) {
         die('chapter ' + tag + ': missing sealed avenues.json (' + path.relative(ROOT, chAvenues)
           + ') — re-freeze the chapter (seals avenues.json into chapters/<tag>/).');
       }
-      machinery = { avenues: readAvenues(chAvenues).avenues, verdict: runVerifier(chAvenues) };
+      // Verdict is READ from the chapter's sealed verdict.json, never recomputed. The console
+      // verdict depends on avenues.json AND the verifier code, and only avenues.json is sealed, so
+      // re-running the CURRENT verifier against OLD avenues would bake the wrong check-set onto an
+      // old chapter (a false label). freeze seals verdict.json; verification/seal_verdicts.py
+      // backfills pre-existing chapters. Sealed data => the re-skin reproduces the record's verdict
+      // by construction, and verify_numbers.py no longer determines live/ bytes.
+      const chVerdict = path.join(chDir, 'verdict.json');
+      if (!fs.existsSync(chVerdict)) {
+        die('chapter ' + tag + ': missing sealed verdict.json (' + path.relative(ROOT, chVerdict)
+          + ') — run `python3 verification/seal_verdicts.py` to backfill it from the sealed index.md.');
+      }
+      machinery = { avenues: readAvenues(chAvenues).avenues, verdict: JSON.parse(fs.readFileSync(chVerdict, 'utf8')) };
     }
     let html = renderEdition(SKIN, source, machinery, recordBanner(ch, ed.out));
     // outward-rewire (../../) + release-label bake — the SAME transform freeze applies, reused
