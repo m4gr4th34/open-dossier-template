@@ -314,6 +314,26 @@ type to `FORECAST` and add its mandatory dated signpost; leave genuine non-
 forecast `EST` rows alone. *Safe to defer?* Yes — `EST` rows aren't false, just
 less precise. Do it as a deliberate authoring pass when you're ready.
 
+### Recording a minted DOI (post-release)
+
+Zenodo mints a release's DOI *after* the freeze has sealed the chapter (the freeze runs on the
+release event, before the DOI exists), so the immutable `chapters/<tag>/` snapshot genuinely
+predates its own DOI and stays as-is — its DOI lives in the Zenodo record and the root
+`provenance.json`. The **mutable** reading view `live/<tag>/` and the chapter index `lineage.html`
+bake/cite their DOI from the chapter's `lineage.json` entry, so once the DOI is minted you write it
+into that entry (never by hand — `lineage.json` is machinery-owned) and re-skin:
+
+    # after Zenodo mints and you've backfilled root provenance.json + CITATION.cff:
+    python3 verification/backfill_doi.py --tag <tag> --version-doi <doi> [--concept-doi <doi>]
+    npm run render-backcatalog          # re-bakes live/<tag>/ with the real DOI
+    npm run check-backcatalog           # gate the re-skin before committing
+    git add lineage.json live/          # by name; chapters/ is immutable and untouched
+    # then commit (-F) and push
+
+`backfill_doi.py` updates `lineage.json` via the same writer the freeze uses, is idempotent, and
+refuses to overwrite an already-set DOI with a different value. It touches neither `chapters/<tag>/`
+(immutable) nor `provenance.json` (the human/Zenodo-owned root backfill).
+
 ### Backfilling chapters from past releases
 
 Run this **once** in a dossier that already has releases predating the lineage

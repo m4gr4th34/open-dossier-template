@@ -92,6 +92,15 @@ placeholder fails. The provenance bar and lineage then show "not DOI-archived / 
 OpenTimestamps" instead of implying a DOI is coming. (If you activated the optional LaTeX export,
 clear its footer DOI too.)
 
+`doi_archived: false` is a **deliberate, permanent** declaration — not a "DOI pending" placeholder.
+If Zenodo is enabled and a DOI *is* coming, do NOT set `doi_archived: false` before releasing:
+leave the key absent (and `version_doi`/`concept_doi` as their `TODO` placeholders). The freeze then
+bakes no DOI claim into the immutable `chapters/<tag>/` snapshot (it reads "see repository" until the
+record is cited via its live view), instead of baking a "not DOI-archived" that becomes misleading the
+moment Zenodo mints — and `chapters/` is immutable, so a mistaken bake there is permanent. Once the DOI
+is minted, record it with the post-release ritual (README → Rituals → "Recording a minted DOI"): backfill
+it into the chapter's `lineage.json` entry, then re-skin.
+
 ## Maintenance notes
 - OpenTimestamps proofs mature over hours; `ots upgrade
   timestamps/*.ots` later folds in the Bitcoin block attestation.
